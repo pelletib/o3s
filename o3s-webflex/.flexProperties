@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<flexProperties enableServiceManager="false" flexServerFeatures="4" flexServerType="2" serverContextRoot="/o3s-webds" serverRoot="/home/pelletib/wks_fdc/o3s/o3s-webds/WebContent" serverRootURL="http://localhost:9000/o3s-webds" toolCompile="true" useServerFlexSDK="false" version="2"/>
+<flexProperties enableServiceManager="false" flexServerFeatures="4" flexServerType="2" serverContextRoot="/o3s-webds" serverRoot="/home/pelletib/wks_fdc/o3s_gc/o3s-webds/WebContent" serverRootURL="http://localhost:9000/o3s-webds" toolCompile="true" useServerFlexSDK="false" version="2"/>
