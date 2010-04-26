@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" creationComplete="init()">
+
+	<mx:Script>
+		<![CDATA[
+			import net.o3s.webflex.bean.Competition;
+         import net.o3s.webflex.bean.Category;
+
+			import mx.rpc.events.ResultEvent;
+         import mx.controls.Alert;
+         import mx.utils.ObjectUtil;
+
+
+			public function onClickPopulateAdminData(ev:Event):void {
+				RO_init.populateAdminData();
+            this.B_populateAdminData.enabled=false;
+			}
+
+         public function onClickPopulateRegistered(ev:Event):void {
+            RO_init.populateRegistered();
+            this.B_populateRegistered.enabled=false;
+         }
+
+        public function onClicksimulateDA(ev:Event):void {
+            RO_init.simulateDepartureAndArrivals();
+         }
+
+			private function populateOk(ev:ResultEvent):void {
+			}
+
+
+			public function init():void {
+			}
+
+
+         private function onFault(ev:Event):void
+         {
+            Alert.show("error");
+         }
+
+		]]>
+	</mx:Script>
+
+	<mx:RemoteObject id="RO_init" destination="init" result="populateOk(event)"/>
+
+	<mx:VBox width="95%" height="60%">
+
+      <mx:HBox width="100%" height="10%">
+
+		 <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Tests">
+
+          <mx:ControlBar horizontalAlign="center">
+            <mx:Button label="Populate Admin Data" id="B_populateAdminData"
+                         click="onClickPopulateAdminData(event)" enabled="true"/>
+            <mx:Button label="Populate Registered" id="B_populateRegistered"
+                         click="onClickPopulateRegistered(event)" enabled="true"/>
+            <mx:Button label="Simulate Departure and Arrivals" id="B_simulateDA"
+                         click="onClicksimulateDA(event)" enabled="true"/>
+          </mx:ControlBar>
+
+		 </mx:Panel>
+      </mx:HBox>
+
+	</mx:VBox>
+
+</mx:Canvas>

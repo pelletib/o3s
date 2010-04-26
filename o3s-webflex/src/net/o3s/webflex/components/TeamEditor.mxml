@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:components="net.o3s.webflex.components.*"
+		   creationComplete="init()"
+		   width="100%">
+<mx:Script>
+	<![CDATA[
+
+		import mx.collections.ArrayCollection;
+		import mx.validators.StringValidator;
+
+		import mx.validators.Validator;
+		import mx.events.ValidationResultEvent;
+		import mx.controls.Alert;
+		import mx.events.ListEvent;
+		import mx.rpc.events.ResultEvent;
+		import mx.utils.ObjectUtil;
+		import mx.core.IUIComponent;
+		import mx.utils.StringUtil;
+		import mx.events.DragEvent;
+		import mx.managers.DragManager;
+
+		import mx.rpc.Fault;
+		import mx.rpc.events.FaultEvent;
+
+		private var teamNameValidator:StringValidator;
+
+		[Bindable]
+		public var formIsValid:Boolean = false;
+
+		[Bindable]
+		public var formIsEmpty:Boolean = true;
+
+		[Bindable]
+		public var teamName:String = "";
+
+
+		// Holds a reference to the currently focussed
+		// control on the form.
+		private var focussedFormControl:DisplayObject;
+
+		private function init():void {
+			//
+			// Create validators
+			//
+			teamNameValidator = new StringValidator();
+			teamNameValidator.source = TI_teamName;
+			teamNameValidator.property = "text";
+			teamNameValidator.minLength = 2;
+			teamNameValidator.required=false;
+
+		}
+
+		// Clear the form and reset validation.
+		private function clearTeamHandler():void {
+
+			TI_teamName.text = "";
+			TI_teamName.errorString = "";
+
+			formIsEmpty = true;
+			formIsValid = false;
+		}
+
+		// Clear the form and reset validation.
+		public function clearAll():void {
+
+			clearTeamHandler();
+		}
+
+		// Validate the form
+		private function validateForm(event:Event):void
+		{
+			// Save a reference to the currently focussed form control
+			// so that the isValid() helper method can notify only
+			// the currently focussed form control and not affect
+			// any of the other form controls.
+			focussedFormControl = event.target as DisplayObject;
+
+			// Mark the form as valid to start with
+			formIsValid = true;
+
+			// Check if form is empty
+			formIsEmpty = (StringUtil.trim(TI_teamName.text) == "");
+
+			// Run each validator in turn, using the isValid()
+			// helper method and update the value of formIsValid
+			// accordingly.
+			if (validateTeam(teamNameValidator) == true) {
+				teamName = StringUtil.trim(TI_teamName.text);
+			};
+
+			this.parentDocument.notifyChangeFromChildComponent();
+
+		}
+
+
+		// Helper method. Performs validation on a passed Validator instance.
+		// Validator is the base class of all Flex validation classes so
+		// you can pass any validation class to this method.
+		private function validateTeam(validator:Validator):Boolean {
+			// Get a reference to the component that is the
+			// source of the validator.
+			var validatorSource:DisplayObject = validator.source as DisplayObject;
+
+			// Suppress events if the current control being validated is not
+			// the currently focussed control on the form. This stops the user
+			// from receiving visual validation cues on other form controls.
+			var suppressEvents:Boolean = (validatorSource != focussedFormControl);
+
+			// Carry out validation. Returns a ValidationResultEvent.
+			// Passing null for the first parameter makes the validator
+			// use the property defined in the property tag of the
+			// <mx:Validator> tag.
+			var event:ValidationResultEvent = validator.validate(null, suppressEvents);
+
+			// Check if validation passed and return a boolean value accordingly.
+			var currentControlIsValid:Boolean = (event.type == ValidationResultEvent.VALID);
+
+			// Update the formIsValid flag
+			formIsValid = formIsValid && currentControlIsValid;
+
+			return currentControlIsValid;
+		}
+
+		public function set4Update(tn:String):void {
+			teamName = tn;
+			TI_teamName.text=tn ;
+
+		}
+
+	]]>
+</mx:Script>
+
+	<mx:Panel title="Team information" width="100%" height="100%">
+		<mx:HBox width="100%" height="90%">
+			<mx:Form>
+				<mx:FormItem id="FI_teamName" label="Team name" direction="horizontal" >
+					<mx:TextInput id="TI_teamName" width="150" change="validateForm(event);"/>
+				</mx:FormItem>
+			</mx:Form>
+		</mx:HBox>
+	</mx:Panel>
+</mx:Canvas>

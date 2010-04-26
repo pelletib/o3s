@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:components="net.o3s.webflex.components.*"
+		   width="100%" height="100%" creationComplete="init()">
+
+	<mx:Script>
+		<![CDATA[
+			import net.o3s.webflex.bean.Competition;
+			import net.o3s.webflex.bean.Category;
+			import net.o3s.webflex.bean.Registered;
+			import net.o3s.webflex.bean.Person;
+			import net.o3s.webflex.bean.MyEvent;
+
+			import mx.rpc.events.ResultEvent;
+			import mx.controls.Alert;
+			import mx.utils.ObjectUtil;
+			import mx.collections.ArrayCollection;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.utils.URLUtil;
+			import mx.core.Application;
+			import mx.utils.StringUtil;
+			import mx.events.CloseEvent;
+
+			[Bindable]
+			private var registeredList:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			private var competitionList:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			public var categoryList:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			private var event:MyEvent;
+
+			[Bindable]
+			public var selectedCompetitionFilter:Competition=null;
+
+			[Bindable]
+			public var selectedNameFilter:String="";
+
+			[Bindable]
+			public var selectedLabelFilter:String="";
+
+			public var serverUrl:String = "";
+
+			// list of registered that are selected in the datagrid
+			[Bindable]
+			public var selectedItems:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			private var editedRegistered:Registered= null;
+
+			[Bindable]
+			public var actionSelectionEnabled:Boolean = false;
+
+			[Bindable]
+			public var selectAll:Boolean = false;
+
+			[Bindable]
+			public var printDialog:Boolean = false;
+
+
+			public function onClickRefresh(ev:Event):void {
+				refreshRegisteredData();
+			}
+
+			public function refreshAdminData():void {
+
+				RO_admin.getDefaultEvent();
+				RO_admin.getCompetitions();
+				RO_admin.getCategories();
+				serverUrl="http://" + URLUtil.getServerNameWithPort(Application.application.loaderInfo.url) + "/o3s-webds/";
+
+			}
+
+			public function refreshRegisteredData():void {
+
+				RO_admin.getDefaultEvent();
+
+				RO_registering.getRegistereds();
+				registeredList.filterFunction = null;
+
+				selectedCompetitionFilter=null;
+				selectedNameFilter="";
+				selectedLabelFilter = "";
+
+				CB_competition.selectedItem = -1;
+				TI_selectedNameFilter.text="";
+				TI_selectedLabelFilter.text="";
+
+				// refresh selected list if some items have been removed
+				var found:Boolean = false;
+				for(var i:int = 0; i < selectedItems.length; i++) {
+					var id:int = selectedItems.getItemAt(i, 0) as int;
+					found = false;
+					for(var j:int = 0; j < registeredList.length; j++) {
+						var r:Registered = registeredList.getItemAt(j, 0) as Registered;
+						if (r.id == id) {
+							found = true;
+							break;
+						}
+					}
+					if (found == false) {
+						selectedItems.removeItemAt(i);
+					}
+				}
+				actionSelectionEnabled = (selectedItems.length > 0);
+
+			}
+
+			public function init():void {
+				refreshAdminData();
+				refreshRegisteredData();
+				printDialog=false;
+				selectAll=false;
+				currentState="";
+
+			}
+
+			private function displayCompetition(item:Object, col:DataGridColumn):String
+			{
+				return item.competition.name;
+			}
+
+			private function displayCategory(item:Object, col:DataGridColumn):String
+			{
+				return item.category.name;
+			}
+
+			private function displayLabel(item:Object, col:DataGridColumn):String
+			{
+				return item.label.value;
+			}
+
+			private function displayTeam(item:Object, col:DataGridColumn):String
+			{
+				if (item.teamed == true)
+				{
+					return "Y";
+				}
+				else
+				{
+					return "N";
+				}
+			}
+			private function displayPaid(item:Object, col:DataGridColumn):String
+			{
+				if (item.paid == true)
+				{
+					return "Y";
+				}
+				else
+				{
+					return "N";
+				}
+			}
+
+
+			private function displayPersonsIdAsString(item:Object, col:DataGridColumn):String
+			{
+
+				if (item.persons == null)
+				{
+					Alert.show("error, persons is null");
+					return null;
+
+				} else
+				{
+					var msg:String="";
+
+					var registered:Registered = item as Registered;
+
+					for(var count:int = 0; count < registered.persons.length; count++)
+					{
+						var p:Person = registered.persons.list.getItemAt(count, 0) as Person;
+						if (count > 0) {
+							msg += "," ;
+						}
+
+						msg += p.id ;
+
+					}
+
+					return msg;
+				}
+
+			}
+
+			private function displayPersonsAsString(item:Object):String
+			{
+				if (item.persons == null)
+				{
+					Alert.show("error, persons is null");
+					return null;
+
+				} else
+				{
+					var msg:String="";
+
+					var registered:Registered = item as Registered;
+
+					for(var count:int = 0; count < registered.persons.length; count++)
+					{
+						var p:Person = registered.persons.list.getItemAt(count, 0) as Person;
+						if (count > 0) {
+							msg += "," ;
+						}
+
+						msg += "[" + p.id +
+							";" + p.firstname +
+							";" + p.lastname +
+							";" + p.birthday +
+							";" + p.sex +
+							";" + p.club +
+							";" + p.email +
+							"]";
+
+					}
+
+					return msg;
+				}
+			}
+
+
+			private function onFault(ev:Event):void
+			{
+				Alert.show("error");
+			}
+
+
+			private function buildRegisteredTip(item:Object):String
+			{
+				var myString:String = "";
+
+				if(item != null)
+				{
+					//myString = myString + item.id + ",";
+					//myString = myString + item.name + ",";
+					//myString = myString + item.competition.name + ",";
+					//myString = myString + item.category.name + ",";
+					//myString = myString + item.label.name + ",";
+
+					myString += displayPersonsAsString(item) ;
+
+					//myString = myString + item.teamed + ",";
+					//myString = myString + item.paid + ",";
+					//myString = myString + item.registeringDate + ",";
+					//myString = myString + item.arrivalDate + ",";
+					//myString = myString + item.elapsedTime + "\n";
+				}
+
+				return myString;
+			}
+
+			private function resultGetDefaultEvent(event:ResultEvent):void {
+				this.event = event.result as MyEvent;
+				eventLabel.text = this.event.name;
+			}
+
+			private function resultGetCompetitions(event:ResultEvent):void {
+				competitionList = event.result as ArrayCollection;
+			}
+
+			private function resultGetCategories(event:ResultEvent):void {
+				categoryList = event.result as ArrayCollection;
+			}
+
+			private function resultGetRegistered(event:ResultEvent):void {
+				registeredList = event.result as ArrayCollection;
+			}
+
+			public function getDateLabel(item:Object,column:DataGridColumn):String
+			{
+				return formatDate.format(item[column.dataField]);
+			}
+
+			public function getElapsedTimeLabel(item:Object,column:DataGridColumn):String
+			{
+				var timetmsec:uint = item[column.dataField] as uint;
+				var timet:uint = timetmsec / 1000;
+
+				var hours:uint = timet/(60*60);
+				var minutes:uint = (timet/60)-(hours*60);
+				var seconds:uint = timet-(minutes*60)-(hours*3600);
+				var mseconds:uint = timetmsec - (seconds*1000) - (minutes*60*1000) - (hours*3600*1000);
+
+				var myElapsedTimeStr:String = hours + ":" + minutes + ":" + seconds + ":" + mseconds;
+				return myElapsedTimeStr;
+				//return formatElapsedTime.format(new Date(timet));
+			}
+
+			private function resultRemoveRegistered(event:ResultEvent):void {
+				RO_registering.getRegistereds();
+			}
+
+			// return null if not found
+			private function getRegistered(id:int):Registered {
+
+				for(var count:int = 0; count < registeredList.length; count++) {
+					var r:Registered = registeredList.getItemAt(count, 0) as Registered;
+					if (r.id == id) {
+						return r;
+					}
+				}
+				return null;
+			}
+
+			public function editRegistered(id:int):void {
+				var r:Registered = getRegistered(id);
+				if (r == null) {
+					Alert.show("Unknown registered <" + id + ">");
+				} else {
+					editedRegistered = r;
+					currentState="edit";
+
+					// if it(s the first call, MyRegisteredEditor will be initialized in the completeEditState
+					if (MyRegisteredEditor != null) {
+						setUpdate4RegisteredEditor();
+					}
+				}
+			}
+
+			private function setUpdate4RegisteredEditor():void {
+				MyRegisteredEditor.set4Update(editedRegistered);
+				MyRegisteredEditor.setExitCallback(this.init);
+			}
+
+			private function completeEditState():void {
+				setUpdate4RegisteredEditor();
+			}
+
+
+			public function removeRegistered(id:int):void {
+				removeSelectedItem(id);
+				RO_registering.removeRegistered(id);
+			}
+
+			public function getLabel4Printing(id:int):void {
+				Alert.show("Pdf generation is in progress for registered <" + id + ">");
+
+				var url:URLRequest;
+				url = new URLRequest(serverUrl +
+					"report?type=label&registeredId=" +
+					id);
+				navigateToURL(url,"_blank");
+
+			}
+
+			private function setFilters():void {
+				if (selectedCompetitionFilter != null || selectedNameFilter != "" || selectedLabelFilter != "") {
+					registeredList.filterFunction = processFilters;
+				} else {
+					registeredList.filterFunction = null;
+				}
+				registeredList.refresh();
+			}
+
+			private function setFilterByCompetition(event:Event):void {
+				selectedCompetitionFilter=event.currentTarget.selectedItem as Competition;
+				if (selectedCompetitionFilter != null && selectedCompetitionFilter.name == "Unknown") {
+					selectedCompetitionFilter = null;
+				}
+				setFilters();
+			}
+
+			private function setFilterByName(event:Event):void {
+				selectedNameFilter=StringUtil.trim(TI_selectedNameFilter.text);
+				setFilters();
+			}
+
+			private function setFilterByLabel(event:Event):void {
+				selectedLabelFilter=StringUtil.trim(TI_selectedLabelFilter.text);
+				setFilters();
+			}
+
+			private function processFilters(item:Object):Boolean {
+
+				var resultCompetitionFilter:Boolean = true;
+				var resultNameFilter:Boolean = true;
+				var resultLabelFilter:Boolean = true;
+				var registered:Registered = item as Registered;
+
+				if (selectedCompetitionFilter != null) {
+					resultCompetitionFilter = (registered.competition.id == selectedCompetitionFilter.id);
+				}
+
+				if (selectedNameFilter != "") {
+					resultNameFilter = registered.name.match(selectedNameFilter);
+				}
+
+				if (selectedLabelFilter != "") {
+					resultLabelFilter = registered.label.value.match(selectedLabelFilter);
+				}
+
+				return (resultCompetitionFilter && resultNameFilter && resultLabelFilter);
+			}
+
+			public function addSelectedRegistered(id:int):void {
+				selectedItems.addItem(id);
+				actionSelectionEnabled = true;
+
+			}
+
+
+			// return -1 if not found
+			public function getIdxSelectedRegistered(id:int):int {
+
+				for(var count:int = 0; count < selectedItems.length; count++) {
+					var i:int = selectedItems.getItemAt(count, 0) as int;
+					if (i == id) {
+						return count;
+					}
+				}
+				return -1;
+			}
+
+			public function removeSelectedItem(id:int):void {
+
+				var idx:int = getIdxSelectedRegistered(id);
+				if (idx != -1) {
+					selectedItems.removeItemAt(idx);
+				}
+				actionSelectionEnabled = (selectedItems.length > 0);
+			}
+
+			public function onClickDeleteSelection(event:CloseEvent):void {
+				if(event.detail == Alert.OK) {
+
+					for(var count:int = 0; count < selectedItems.length; count++) {
+						var id:int = selectedItems.getItemAt(count, 0) as int;
+						RO_registering.removeRegistered(id);
+					}
+					selectedItems.removeAll();
+					actionSelectionEnabled = false;
+					selectAll=false;
+				}
+			}
+
+			private function confirmClickDeleteSelection():void {
+				Alert.show("Are you sure you want to remove these " + selectedItems.length + " items ?",
+					"Remove task ?",
+					Alert.OK | Alert.CANCEL,
+					this,
+					onClickDeleteSelection,
+					null,
+					Alert.OK);
+			}
+
+			public function onClickPrintSelection(event:Event):void {
+
+				for(var count:int = 0; count < selectedItems.length; count++) {
+					var id:int = selectedItems.getItemAt(count, 0) as int;
+					RO_reporting.printLabel(id, printDialog);
+				}
+				selectedItems.removeAll();
+				actionSelectionEnabled = false;
+				selectAll=false;
+
+			}
+
+			private function resultPrintLabel(event:ResultEvent):void {
+				RO_registering.getRegistereds();
+			}
+
+			// Set the scratch when change
+			private function modifySelectAll(event:Event):void {
+
+				if (CB_selectAll.selected == true) {
+					selectAll=true;
+					selectedItems.removeAll();
+					for(var j:int = 0; j < registeredList.length; j++) {
+						var r:Registered = registeredList.getItemAt(j, 0) as Registered;
+						selectedItems.addItem(r.id);
+					}
+				} else {
+					selectAll=false;
+					selectedItems.removeAll();
+				}
+
+				refreshRegisteredData();
+			}
+
+			// print dialog is asked ?
+			private function modifyPrintDialog(event:Event):void {
+
+				if (CB_printDialog.selected == true) {
+					printDialog=true;
+				}
+				else {
+					printDialog=false;
+				}
+			}
+
+
+
+
+		]]>
+	</mx:Script>
+
+	<mx:DateFormatter formatString="MM/DD/YY HH:NN:SS" id="formatDate"/>
+	<mx:DateFormatter formatString="MM/DD/YY HH:NN:SS" id="formatElapsedTime"/>
+
+	<mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
+		<mx:method name="getCompetitions" result="resultGetCompetitions(event)"/>
+		<mx:method name="getCategories" result="resultGetCategories(event)"/>
+		<mx:method name="getDefaultEvent" result="resultGetDefaultEvent(event)"/>
+	</mx:RemoteObject>
+
+	<mx:RemoteObject id="RO_registering" destination="registering" fault="onFault(event)">
+		<mx:method name="getRegistereds" result="resultGetRegistered(event)"/>
+		<mx:method name="removeRegistered" result="resultRemoveRegistered(event)"/>
+	</mx:RemoteObject>
+
+	<mx:RemoteObject id="RO_reporting" destination="reporting" fault="onFault(event)">
+		<mx:method name="printLabel" result="resultPrintLabel(event)"/>
+	</mx:RemoteObject>
+
+	<mx:states>
+		<mx:State name="edit">
+			<mx:AddChild relativeTo="{VB_label}" position="lastChild">
+				<components:RegisteredEditor id="MyRegisteredEditor" width="100%"  height="90%" creationComplete="completeEditState()"/>
+			</mx:AddChild>
+			<mx:RemoveChild target="{HB_FiltersActions}"/>
+			<mx:RemoveChild target="{HB_registereds}"/>
+		</mx:State>
+	</mx:states>
+
+	<mx:transitions>
+		<mx:Transition id="fromListToEdit" fromState="*" toState="edit">
+			<mx:Sequence target="{this}">
+				<mx:WipeDown duration="500"/>
+			</mx:Sequence>
+		</mx:Transition>
+		<mx:Transition id="fromEditToList" fromState="edit" toState="*">
+			<mx:Sequence target="{this}">
+				<mx:Blur duration="200" blurYFrom="20.0" blurYTo="1.0" blurXFrom="20.0" blurXTo="1.0" />
+				<mx:RemoveChildAction/>
+			</mx:Sequence>
+		</mx:Transition>
+	</mx:transitions>
+
+	<mx:VBox id="VB_label" width="95%">
+		<mx:HBox id="HB_event" width="100%" height="10%">
+			<mx:Panel id="P_event" title="Event" width="100%" height="100%" horizontalAlign="center">
+				<mx:Label id="eventLabel" fontSize="14" fontWeight="bold"/>
+			</mx:Panel>
+		</mx:HBox>
+		<mx:HBox id="HB_FiltersActions" width="100%" height="10%">
+			<mx:Panel width="50%" height="100%" horizontalAlign="center" title="Filters">
+				<mx:VBox width="100%" height="100%">
+					<mx:Form>
+						<mx:FormItem label="Filter by competition" >
+							<mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setFilterByCompetition(event)" />
+						</mx:FormItem>
+						<mx:FormItem label="Filter by name" >
+							<mx:TextInput id="TI_selectedNameFilter" width="150" change="setFilterByName(event);"/>
+						</mx:FormItem>
+						<mx:FormItem label="Filter by label" >
+							<mx:TextInput id="TI_selectedLabelFilter" width="150" change="setFilterByLabel(event);"/>
+						</mx:FormItem>
+					</mx:Form>
+				</mx:VBox>
+			</mx:Panel>
+			<mx:Panel width="50%" height="100%" horizontalAlign="center" title="Actions">
+				<mx:HBox width="100%" height="100%">
+					<mx:Tile direction="horizontal" borderStyle="none"
+							 horizontalGap="5" verticalGap="5"
+							 paddingLeft="5" paddingTop="5" paddingBottom="5" paddingRight="5">
+						<mx:Button label="Reinit/Refresh" id="B_refresh" click="onClickRefresh(event)" enabled="true"/>
+					</mx:Tile>
+					<mx:Tile direction="vertical" borderStyle="none"
+							 horizontalGap="5" verticalGap="5"
+							 paddingLeft="5" paddingTop="5" paddingBottom="5" paddingRight="5">
+						<mx:CheckBox id="CB_selectAll" label="Select all" selected="false" click="modifySelectAll(event)"/>
+						<mx:CheckBox id="CB_printDialog" label="Enable print dialog" selected="false" click="modifyPrintDialog(event)"/>
+						<mx:Button label="Delete selection" id="B_delete" click="confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
+						<mx:Button label="Print selection" id="B_print" click="onClickPrintSelection(event)" enabled="{actionSelectionEnabled}"/>
+					</mx:Tile>
+				</mx:HBox>
+			</mx:Panel>
+		</mx:HBox>
+		<mx:HBox id="HB_registereds" width="100%" height="80%">
+			<mx:Panel width="100%" height="100%" horizontalAlign="center" title="Registered">
+				<mx:DataGrid id="DG_registereds" dataProvider="{RO_registering.getRegistereds.lastResult}" dataTipFunction="buildRegisteredTip"
+							 rowCount="20"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
+					<mx:columns>
+						<mx:DataGridColumn headerText="Id" dataField="id" showDataTips="true" width="30"/>
+						<mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="150"/>
+						<mx:DataGridColumn headerText="Competition" labelFunction="displayCompetition" showDataTips="true" width="115"/>
+						<mx:DataGridColumn headerText="Category" labelFunction="displayCategory" showDataTips="true" width="115"/>
+						<mx:DataGridColumn headerText="Label" labelFunction="displayLabel" showDataTips="true" width="70"/>
+
+						<mx:DataGridColumn headerText="Persons" labelFunction="displayPersonsIdAsString" showDataTips="true" width="80"/>
+
+						<mx:DataGridColumn headerText="Team" labelFunction="displayTeam" showDataTips="true" width="30"/>
+						<mx:DataGridColumn headerText="Paid" labelFunction="displayPaid" showDataTips="true" width="30"/>
+						<mx:DataGridColumn headerText="Registering Date" dataField="registeringDate" showDataTips="true" width="120" labelFunction="getDateLabel"/>
+						<mx:DataGridColumn headerText="Arrival Date" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="getDateLabel"/>
+						<mx:DataGridColumn headerText="Elapsed time" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="getElapsedTimeLabel"/>
+						<mx:DataGridColumn width="100" headerText="Actions"
+										   itemRenderer="net.o3s.webflex.components.ActionLabelDataGridColumnItemRenderer" />
+					</mx:columns>
+				</mx:DataGrid>
+			</mx:Panel>
+		</mx:HBox>
+	</mx:VBox>
+</mx:Canvas>

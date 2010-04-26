@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="remoting-service"
+    class="flex.messaging.services.RemotingService">
+
+    <adapters>
+        <adapter-definition id="java-object" class="flex.messaging.services.remoting.adapters.JavaAdapter" default="true"/>
+    </adapters>
+
+    <default-channels>
+        <channel ref="my-amf"/>
+    </default-channels>
+
+	<destination id="init">
+		<properties>
+			<source>net.o3s.web.service.Init</source>
+			<scope>application</scope>
+		</properties>
+	</destination>
+
+	<destination id="admin">
+		<properties>
+			<source>net.o3s.web.service.Admin</source>
+			<scope>application</scope>
+		</properties>
+	</destination>
+
+   <destination id="notification">
+      <properties>
+         <source>net.o3s.web.service.Notification</source>
+         <scope>application</scope>
+      </properties>
+   </destination>
+
+   <destination id="registering">
+      <properties>
+         <source>net.o3s.web.service.Registering</source>
+         <scope>application</scope>
+      </properties>
+   </destination>
+
+   <destination id="tracking">
+      <properties>
+         <source>net.o3s.web.service.Tracking</source>
+         <scope>application</scope>
+      </properties>
+   </destination>
+
+   <destination id="reporting">
+      <properties>
+         <source>net.o3s.web.service.Reporting</source>
+         <scope>application</scope>
+      </properties>
+   </destination>
+
+   <destination id="login">
+      <properties>
+         <source>net.o3s.web.service.LoginService</source>
+         <scope>session</scope>
+      </properties>
+   </destination>
+
+</service>

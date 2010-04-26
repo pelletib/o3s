@@ -1,0 +1,974 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   width="100%" height="100%"
+		   creationComplete="init()"
+		   defaultButton="{submitButton}"
+		   pageTitle="O3S Registering">
+
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.validators.StringValidator;
+			import mx.validators.EmailValidator;
+			import mx.validators.DateValidator;
+
+			import mx.validators.Validator;
+			import mx.events.ValidationResultEvent;
+			import mx.controls.Alert;
+			import mx.events.ListEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ObjectUtil;
+			import mx.core.IUIComponent;
+			import mx.events.DragEvent;
+			import mx.managers.DragManager;
+			import mx.utils.StringUtil;
+			import net.o3s.webflex.bean.Person;
+			import net.o3s.webflex.bean.MyEvent;
+			import net.o3s.webflex.bean.Competition;
+			import net.o3s.webflex.bean.Category;
+			import net.o3s.webflex.bean.Registered;
+			import net.o3s.webflex.bean.FlexException;
+
+			import flash.utils.getDefinitionByName;
+			import mx.rpc.Fault;
+			import mx.rpc.events.FaultEvent;
+
+			[Bindable]
+			public var formIsValid:Boolean = false;
+
+			[Bindable]
+			public var addIsPossible:Boolean = true;
+
+			[Bindable]
+			public var addEnabled:Boolean = false;
+
+			[Bindable]
+			public var updateIsPossible:Boolean = false;
+
+			[Bindable]
+			public var updateEnabled:Boolean = false;
+
+			[Bindable]
+			public var personIdToUpdate:int = -1;
+
+			[Bindable]
+			public var formIsEmpty:Boolean = true;
+
+			// Holds a reference to the currently focussed
+			// control on the form.
+			private var focussedFormControl:DisplayObject;
+			private var personFirstnameValidator:StringValidator;
+			private var personLastnameValidator:StringValidator;
+			private var teamNameValidator:StringValidator;
+			private var personSexValidator:StringValidator;
+			private var personClubValidator:StringValidator;
+			private var personEmailValidator:EmailValidator;
+			private var personBirthdayValidator:DateValidator;
+
+			[Bindable]
+			public var personList:ArrayCollection = new ArrayCollection([]);
+
+			[Bindable]
+			public var sexList:ArrayCollection = new ArrayCollection(
+				[ {label:"M", data:1},
+					{label:"F", data:2} ]);
+
+			[Bindable]
+			public var competitionList:ArrayCollection;
+
+			[Bindable]
+			public var competitionIsEmpty:Boolean = true;
+
+			[Bindable]
+			public var competition:Competition;
+
+			[Bindable]
+			private var event:MyEvent;
+
+			[Bindable]
+			public var submitButtonEnabled:Boolean = false;
+
+			//private function closeHandler(event:Event):void {
+			//	myLabel.text = "You selected: " +  ComboBox(event.target).selectedItem.label;
+			//	myData.text = "Data: " +  ComboBox(event.target).selectedItem.data;
+			//}
+
+			public function refreshAdminData():void {
+
+				RO_admin.getDefaultEvent();
+				RO_admin.getCompetitions();
+			}
+
+			private function onFault(ev:Event):void {
+				Alert.show( ObjectUtil.toString(ev) );
+			}
+
+			private function resultGetCompetition(event:ResultEvent):void {
+				competitionList = event.result as ArrayCollection;
+			}
+
+			private function resultGetDefaultEvent(event:ResultEvent):void {
+				this.event = event.result as MyEvent;
+				eventLabel.text = this.event.name;
+
+			}
+
+			private function setCompetition(event:Event):void {
+				competition=event.currentTarget.selectedItem as Competition;
+
+				if (competition != null && competition.name != "Unknown") {
+					competitionIsEmpty = false;
+				} else {
+					competitionIsEmpty = true;
+				}
+
+				if (competition.teamed == true) {
+					//FI_teamName.visible = true;
+					this.currentState = "teamFormState";
+				} else {
+					//FI_teamName.visible = false;
+					this.currentState = "individualFormState";
+				}
+
+				//refreshSubmitButtonEnabled();
+
+			}
+
+			private function init():void {
+
+				this.currentState = "initState";
+
+				// tempory for tests purpose
+				RO_init.populateAdminData();
+				refreshAdminData();
+				CB_competition.selectedItem = -1;
+				competitionIsEmpty = true;
+				submitButtonEnabled = false;
+				FI_teamName.visible = false;
+
+				// needed in flex, class must be instancied once
+				var fe:FlexException = new FlexException();
+
+				//
+				// Create validators
+				//
+				personFirstnameValidator = new StringValidator();
+				personFirstnameValidator.source = TI_personFirstname;
+				personFirstnameValidator.property = "text";
+				personFirstnameValidator.minLength = 2;
+				personFirstnameValidator.required=true;
+
+				personLastnameValidator = new StringValidator();
+				personLastnameValidator.source = TI_personLastname;
+				personLastnameValidator.property = "text";
+				personLastnameValidator.minLength = 2;
+				personLastnameValidator.required=true;
+
+				teamNameValidator = new StringValidator();
+				teamNameValidator.source = TI_teamName;
+				teamNameValidator.property = "text";
+				teamNameValidator.minLength = 2;
+				teamNameValidator.required=false;
+
+				personSexValidator = new StringValidator();
+				personSexValidator.source = CB_personSex;
+				personSexValidator.property = "text";
+				personSexValidator.minLength = 1;
+				personSexValidator.maxLength = 1;
+				personSexValidator.required=true;
+
+				personClubValidator = new StringValidator();
+				personClubValidator.source = TI_personClub;
+				personClubValidator.property = "text";
+				personClubValidator.minLength = 2;
+				personClubValidator.required=false;
+
+				personBirthdayValidator = new DateValidator();
+				personBirthdayValidator.source = DF_personBirthday;
+				personBirthdayValidator.property = "text";
+				personBirthdayValidator.allowedFormatChars="/";
+				personBirthdayValidator.inputFormat="DD/MM/YYYY";
+				personBirthdayValidator.required=true;
+
+				personEmailValidator = new EmailValidator();
+				personEmailValidator.source = TI_personEmail;
+				personEmailValidator.property = "text";
+				personEmailValidator.required=false;
+
+				// Set the focus on the first field so
+				// user does not have to mouse over to it.
+				// Note that the user still has to click on the
+				// Flex application to give it focus. This is
+				// a currently limitation in Flex.
+				resetFocus();
+
+			}
+
+
+			// Validate the form
+			private function validateForm(event:Event):void
+			{
+				// Save a reference to the currently focussed form control
+				// so that the isValid() helper method can notify only
+				// the currently focussed form control and not affect
+				// any of the other form controls.
+				focussedFormControl = event.target as DisplayObject;
+
+				// Mark the form as valid to start with
+				formIsValid = true;
+
+				// Check if form is empty
+				formIsEmpty = (TI_personFirstname.text == "" && TI_personLastname.text == ""
+					&& DF_personBirthday.text == "");
+
+				// Run each validator in turn, using the isValid()
+				// helper method and update the value of formIsValid
+				// accordingly.
+				validatePerson(personFirstnameValidator);
+				validatePerson(personLastnameValidator);
+				validatePerson(personSexValidator);
+				validatePerson(personBirthdayValidator);
+				validatePerson(personEmailValidator);
+				validatePerson(personClubValidator);
+
+				// take into account the possibility to add
+				addEnabled = formIsValid && addIsPossible ;
+				updateEnabled = formIsValid && updateIsPossible ;
+
+			}
+
+
+			private function resultCreatePerson(event:ResultEvent):void {
+				var person:Person = event.result as Person;
+				personList.addItem(person);
+				clearFormHandler();
+				refreshSubmitButtonEnabled();
+			}
+
+			private function resultUpdatePerson(event:ResultEvent):void {
+				var person:Person = event.result as Person;
+
+				var idx:int = -1;
+
+				for(var count:int = 0; count < personList.length; count++)
+				{
+					var p:Person = personList.getItemAt(count, 0) as Person;
+					if (p.id == person.id)
+					{
+						idx = count;
+						break;
+					}
+				}
+
+				personList.setItemAt(person,idx);
+				clearFormHandler();
+				refreshSubmitButtonEnabled();
+
+			}
+
+			private function resultRemovePerson(event:ResultEvent):void {
+				var person:Person = event.result as Person;
+				var idx:int = -1;
+
+				for(var count:int = 0; count < personList.length; count++)
+				{
+					var p:Person = personList.getItemAt(count, 0) as Person;
+					if (p.id == person.id)
+					{
+						idx = count;
+						break;
+					}
+				}
+
+				personList.removeItemAt(idx);
+				clearFormHandler();
+			}
+
+
+			private function resultCreateRegistered(event:ResultEvent):void {
+				var registereds:ArrayCollection = event.result as ArrayCollection;
+				var myAlert:Alert;
+
+				var msg:String = "";
+
+				for(var count:int = 0; count < registereds.length; count++)
+				{
+					var r:Registered = registereds.getItemAt(count, 0) as Registered;
+					if (count == 0) {
+						msg = msg + "You're are registered to the competition" +
+							"'" + r.competition.name + "'" + "\n";
+					}
+
+					msg = msg + "'" + r.name + "'";
+					msg = msg + " is in the category " +
+						"'" + r.category.name + "'" +
+						" with the label " +
+						"'" + r.label.value + "'." + "\n" ;
+				}
+				msg = msg + "\n\n";
+
+				msg = msg + "We're looking forward to seeing you at the event '" +
+					this.event.name + "' the " +
+					formatDateDDMMYYY.format(this.event.date) + ".";
+
+				myAlert = Alert.show(msg, "Registration ok");
+				myAlert.height=300;
+				myAlert.width=300;
+
+				clearAll();
+			}
+
+			private function addPerson(event:Event):void
+			{
+				var person:Person = new Person();
+				person.firstname = StringUtil.trim(TI_personFirstname.text);
+				person.lastname = StringUtil.trim(TI_personLastname.text);
+				person.sex = CB_personSex.text;
+				person.birthday = DF_personBirthday.selectedDate;
+				person.email = StringUtil.trim(TI_personEmail.text);
+				person.club = StringUtil.trim(TI_personClub.text);
+
+				if (person.firstname == "" || person.lastname == "")
+				{
+					Alert.show("Person not defined !");
+				}
+				else
+				{
+
+					var found:Boolean = false;
+					for(var count:int = 0; count < personList.length; count++)
+					{
+						var p:Person = personList.getItemAt(count, 0) as Person;
+						if (p.firstname == person.firstname && p.lastname == person.lastname)
+						{
+							found = true;
+						}
+					}
+
+					if (found )
+					{
+						Alert.show("Person already defined !");
+					}
+					else
+					{
+						RO_registering.createPerson(person);
+					}
+				}
+
+			}
+
+			private function updatePerson(event:Event):void
+			{
+				var person:Person = new Person();
+				person.id = personIdToUpdate;
+				person.firstname = StringUtil.trim(TI_personFirstname.text);
+				person.lastname = StringUtil.trim(TI_personLastname.text);
+				person.sex = CB_personSex.text;
+				person.birthday = DF_personBirthday.selectedDate;
+				person.email = StringUtil.trim(TI_personEmail.text);
+				person.club = StringUtil.trim(TI_personClub.text);
+
+				if (person.firstname == "" || person.lastname == "")
+				{
+					Alert.show("Person not defined !");
+				}
+				else
+				{
+
+					var found:int = 0;
+					for(var count:int = 0; count < personList.length; count++)
+					{
+						var p:Person = personList.getItemAt(count, 0) as Person;
+						if (p.firstname == person.firstname && p.lastname == person.lastname)
+						{
+							found++;
+						}
+					}
+
+					if (found>1 )
+					{
+						Alert.show("Person defined twice !");
+					}
+					else
+					{
+						RO_registering.updatePerson(person);
+					}
+				}
+
+			}
+
+			// Clear the form and reset validation.
+			private function clearFormHandler():void
+			{
+				// Clear all input fields.
+				personIdToUpdate = -1;
+				TI_personFirstname.text = "";
+				TI_personLastname.text = "";
+				TI_teamName.text = "";
+				TI_personEmail.text = "";
+				TI_personClub.text = "";
+				DF_personBirthday.text = "";
+				DF_personBirthday.selectedDate = null;
+				CB_personSex.selectedIndex=-1;
+				L_age.text = "Age: N/A";
+
+
+				// Clear validation error messages.
+				TI_personFirstname.errorString = "";
+				TI_personLastname.errorString = "";
+				TI_teamName.errorString = "";
+				TI_personEmail.errorString = "";
+				TI_personClub.errorString = "";
+				DF_personBirthday.errorString = "";
+				CB_personSex.errorString = "";
+
+				// Flag that the form is now clear
+				formIsEmpty = true;
+				formIsValid = false;
+				addEnabled = false;
+				addIsPossible = true;
+				updateIsPossible = false;
+				updateEnabled = false;
+
+				refreshSubmitButtonEnabled();
+
+				// Set the focus on the first field so
+				// user does not have to mouse over to it.
+				resetFocus();
+			}
+
+			private function clearAll():void {
+				clearFormHandler();
+				personList.removeAll();
+				CB_competition.selectedItem = -1;
+				competitionIsEmpty = true;
+				refreshSubmitButtonEnabled();
+				FI_teamName.visible = false;
+				this.currentState = "initState";
+			}
+
+			private function rollOverPerson(event:ListEvent):void {
+				personIdToUpdate = this.DG_persons.dataProvider[event.rowIndex].id;
+				TI_personFirstname.text = this.DG_persons.dataProvider[event.rowIndex].firstname;
+				TI_personLastname.text = this.DG_persons.dataProvider[event.rowIndex].lastname;
+				CB_personSex.text = this.DG_persons.dataProvider[event.rowIndex].sex;
+				DF_personBirthday.selectedDate = this.DG_persons.dataProvider[event.rowIndex].birthday;
+				TI_personEmail.text = this.DG_persons.dataProvider[event.rowIndex].email;
+				TI_personClub.text = this.DG_persons.dataProvider[event.rowIndex].club;
+				updateIsPossible = true;
+				addIsPossible = false;
+			}
+
+
+			// Helper method. Performs validation on a passed Validator instance.
+			// Validator is the base class of all Flex validation classes so
+			// you can pass any validation class to this method.
+			private function validatePerson(validator:Validator):Boolean {
+				// Get a reference to the component that is the
+				// source of the validator.
+				var validatorSource:DisplayObject = validator.source as DisplayObject;
+
+				// Suppress events if the current control being validated is not
+				// the currently focussed control on the form. This stops the user
+				// from receiving visual validation cues on other form controls.
+				var suppressEvents:Boolean = (validatorSource != focussedFormControl);
+
+				// Carry out validation. Returns a ValidationResultEvent.
+				// Passing null for the first parameter makes the validator
+				// use the property defined in the property tag of the
+				// <mx:Validator> tag.
+				var event:ValidationResultEvent = validator.validate(null, suppressEvents);
+
+				// Check if validation passed and return a boolean value accordingly.
+				var currentControlIsValid:Boolean = (event.type == ValidationResultEvent.VALID);
+
+				// Update the formIsValid flag
+				formIsValid = formIsValid && currentControlIsValid;
+
+				var msg:String = "validator=" + validator + ":" + formIsValid + "\n" +
+					"currentControlIsValid=" + currentControlIsValid;
+
+				//Alert.show(msg,"formIsValid");
+
+				return currentControlIsValid;
+			}
+
+
+
+
+			// Helper method. Sets the focus on the first field so
+			// user does not have to mouse over to it.
+			private function resetFocus():void
+			{
+				focusManager.setFocus(TI_personFirstname);
+			}
+
+
+			// Compute Age from date of birthday
+			private function computeAge(userDOB:Date):int
+			{
+				var today : Date = new Date();
+
+				var diff : Date = new Date(); diff.setTime( today.getTime() - userDOB.getTime() );
+
+				var userAge : int = diff.getFullYear() - 1970;
+
+				return userAge;
+			}
+
+			private function displayAge(date:Date):void {
+				if (date == null)
+					L_age.text = "Age: N/A";
+				else
+					L_age.text = "Age: " + computeAge(date);
+			}
+
+			private function buildToolTip(item:Object):String
+			{
+				var myString:String = "";
+				if(item != null)
+				{
+					myString = myString + item.id + ",";
+					myString = myString + item.firstname + ",";
+					myString = myString + item.lastname + ",";
+					myString = myString + item.sex + ",";
+					myString = myString + item.birthday + ",";
+					myString = myString + item.email + ",";
+					myString = myString + item.club + ",";
+					myString = myString + item.computedCategory + "\n";
+				}
+				return myString;
+			}
+
+			private function trash_dragEnter(evt:DragEvent):void {
+				var obj:IUIComponent = IUIComponent(evt.currentTarget);
+				DragManager.acceptDragDrop(obj);
+			}
+
+			private function trash_dragDrop(evt:DragEvent):void {
+				var person:Person = DG_persons.selectedItem as Person;
+				RO_registering.removePerson(person);
+			}
+
+			private function refreshSubmitButtonEnabled():void {
+
+				submitButtonEnabled = true;
+
+				validateRegistered(teamNameValidator);
+
+				submitButtonEnabled = submitButtonEnabled && !competitionIsEmpty;
+				submitButtonEnabled = submitButtonEnabled && personList.length>0;
+
+				if (competition != null && competition.teamed == true) {
+					submitButtonEnabled = submitButtonEnabled && TI_teamName.text != "";
+				}
+
+			}
+
+			private function validateRegistered(validator:Validator):Boolean {
+				// Get a reference to the component that is the
+				// source of the validator.
+				var validatorSource:DisplayObject = validator.source as DisplayObject;
+
+				// Suppress events if the current control being validated is not
+				// the currently focussed control on the form. This stops the user
+				// from receiving visual validation cues on other form controls.
+				var suppressEvents:Boolean = (validatorSource != focussedFormControl);
+
+				// Carry out validation. Returns a ValidationResultEvent.
+				// Passing null for the first parameter makes the validator
+				// use the property defined in the property tag of the
+				// <mx:Validator> tag.
+				var event:ValidationResultEvent = validator.validate(null, suppressEvents);
+
+				// Check if validation passed and return a boolean value accordingly.
+				var currentControlIsValid:Boolean = (event.type == ValidationResultEvent.VALID);
+
+				// Update the formIsValid flag
+				submitButtonEnabled = submitButtonEnabled && currentControlIsValid;
+
+				return currentControlIsValid;
+			}
+
+			private function validateSubmit(event:Event):void
+			{
+				focussedFormControl = event.target as DisplayObject;
+
+				refreshSubmitButtonEnabled();
+			}
+
+
+			// Submit form if everything is valid.
+			private function submitForm(event:Event):void
+			{
+				var registered:Registered = new Registered();
+				registered.persons = personList;
+				registered.event = this.event;
+				registered.competition = competition;
+				registered.teamed = competition.teamed;
+				registered.name = TI_teamName.text;
+				registered.paid = true;
+				RO_registering.createRegistered(registered);
+
+			}
+
+			public static function handleExceptionPerson(event:FaultEvent): void {
+				var msg : String = event.fault.faultString;
+				var clazz : Class = getExceptionClass(event.fault);
+				var instance : Error = null;
+				if (clazz != null) {
+					Alert.show(msg,"Error");
+				}  else {
+					Alert.show("Error! Please try again. If this issue persists, contact the system administrator : " + event.fault.faultString);
+				}
+			}
+
+			public static function handleExceptionRegistered(event:FaultEvent): void {
+				var msg : String = event.fault.faultString;
+				var clazz : Class = getExceptionClass(event.fault);
+				var instance : Error = null;
+				if (clazz != null) {
+					Alert.show(msg,"Error");
+				}  else {
+					Alert.show("Error! Please try again. If this issue persists, contact the system administrator : " + event.fault.faultString);
+				}
+			}
+
+
+			public static function getExceptionClass(myFault:Fault) : Class {
+				var clazz:Class = null;
+				var index:int = myFault.faultString.indexOf("FlexException");
+				if (index != -1) {
+					var cname:String = myFault.faultString.substr(0,index-1);
+					try {
+						clazz = getDefinitionByName("bean.FlexException") as Class;
+					}
+					catch (e:ReferenceError) {
+					}
+				}
+				return clazz;
+			}
+
+			public function getDateDDMMYYYLabel(item:Object,column:DataGridColumn):String {
+				return formatDateDDMMYYY.format(item[column.dataField]);
+			}
+
+		]]>
+	</mx:Script>
+
+	<mx:RemoteObject id="RO_init" destination="init"/>
+
+	<mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
+		<mx:method name="getCompetitions" result="resultGetCompetition(event)"/>
+		<mx:method name="getDefaultEvent" result="resultGetDefaultEvent(event)"/>
+	</mx:RemoteObject>
+
+	<mx:RemoteObject id="RO_registering" destination="registering" fault="onFault(event)">
+		<mx:method name="createPerson" result="resultCreatePerson(event)" fault="handleExceptionPerson(event)"/>
+		<mx:method name="updatePerson" result="resultUpdatePerson(event)" fault="handleExceptionPerson(event)"/>
+		<mx:method name="removePerson" result="resultRemovePerson(event)" fault="handleExceptionPerson(event)"/>
+		<mx:method name="createRegistered" result="resultCreateRegistered(event)" fault="handleExceptionRegistered(event)"/>
+	</mx:RemoteObject>
+
+	<mx:DateFormatter formatString="DD/MM/YYYY" id="formatDateDDMMYYY"/>
+
+
+	<mx:states>
+		<mx:State name="initState">
+			<mx:AddChild relativeTo="{VB_WebRegistering}">
+				<mx:HBox width="100%" height="10%">
+					<mx:Panel title="Competition" width="100%" height="100%" horizontalAlign="center">
+						<mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setCompetition(event)"  />
+					</mx:Panel>
+				</mx:HBox>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="individualFormState">
+			<mx:AddChild relativeTo="{VB_WebRegistering}">
+				<mx:HBox width="100%" height="50%">
+					<mx:Panel title="Person(s)" width="100%" height="100%">
+						<mx:HBox width="100%" height="90%">
+							<mx:VBox width="40%" height="100%">
+								<mx:Form>
+									<mx:FormItem label="First Name" >
+										<mx:TextInput id="TI_personFirstname" width="150" change="validateForm(event);"/>
+									</mx:FormItem>
+									<mx:FormItem label="Last Name" >
+										<mx:TextInput id="TI_personLastname" width="150" change="validateForm(event);"/>
+									</mx:FormItem>
+									<mx:FormItem label="Sex" >
+										<mx:ComboBox id="CB_personSex" dataProvider="{sexList}" width="50" change="validateForm(event);"/>
+									</mx:FormItem>
+
+									<mx:FormItem label="Birthday (DD/MM/YYYY)" >
+										<mx:DateField id="DF_personBirthday"
+													  yearNavigationEnabled="true"
+													  editable="true"
+													  formatString="DD/MM/YYYY"
+													  textAlign="center"
+													  fontSize="9"
+													  selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date()}}"
+													  change="validateForm(event);displayAge(DateField(event.target).selectedDate);"/>
+
+										<mx:Label id="L_age" color="blue" text="Age: N/A" textAlign="right"/>
+									</mx:FormItem>
+
+									<mx:FormItem label="Club" direction="horizontal" >
+										<mx:TextInput id="TI_personClub" width="150" change="validateForm(event);"/>
+									</mx:FormItem>
+									<mx:FormItem label="Email" direction="horizontal" >
+										<mx:TextInput id="TI_personEmail" width="150" restrict="A-Za-z0-9\-_@." change="validateForm(event);"/>
+									</mx:FormItem>
+								</mx:Form>
+							</mx:VBox>
+							<mx:VBox width="60%" height="100%">
+								<mx:DataGrid id="DG_persons" dataProvider="{this.personList}" width="100%"  height="90%" editable="true"
+											 dropEnabled="true" dragEnabled="true" dataTipFunction="buildToolTip"
+											 doubleClickEnabled="true" itemDoubleClick="rollOverPerson(event);" rowCount="6" verticalScrollPolicy="on">
+									<mx:columns>
+										<mx:DataGridColumn dataField="firstname" headerText="firstname" editable="false" showDataTips="true"/>
+										<mx:DataGridColumn dataField="lastname" headerText="lastname" editable="false" sortable="true" showDataTips="true"/>
+										<mx:DataGridColumn dataField="sex" headerText="sex" editable="false" minWidth="10" showDataTips="true"/>
+										<mx:DataGridColumn dataField="birthday" headerText="birthday" editable="false" minWidth="25" showDataTips="true" labelFunction="getDateDDMMYYYLabel"/>
+										<mx:DataGridColumn dataField="email" headerText="email" editable="false" minWidth="10" showDataTips="true"/>
+										<mx:DataGridColumn dataField="club" headerText="club" editable="false" minWidth="10" showDataTips="true"/>
+										<mx:DataGridColumn dataField="computedCategory" headerText="category" editable="false" minWidth="50" showDataTips="true"/>
+									</mx:columns>
+								</mx:DataGrid>
+								<mx:Spacer height="5" />
+								<mx:ControlBar horizontalAlign="center" width="100%" height="10%">
+									<mx:Image id="I_trash" width="50" height="50"
+											  source="@Embed('images/trash.png')"
+											  dragDrop="trash_dragDrop(event);"
+											  dragEnter="trash_dragEnter(event);" />
+								</mx:ControlBar>
+
+							</mx:VBox>
+						</mx:HBox>
+						<mx:HBox width="100%" height="10%">
+							<mx:ControlBar horizontalAlign="center">
+								<mx:Button
+									id="B_addPerson"
+									label="Add"
+									enabled="{addEnabled}"
+									click="addPerson(event);"
+									/>
+								<mx:Button
+									id="B_updatePerson"
+									label="Update"
+									enabled="{updateEnabled}"
+									click="updatePerson(event);"
+									/>
+								<mx:Button
+									id="B_clearPerson"
+									label="Clear"
+									enabled="{!formIsEmpty}"
+									click="clearFormHandler();"
+									/>
+							</mx:ControlBar>
+						</mx:HBox>
+					</mx:Panel>
+				</mx:HBox>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="teamFormState">
+			<mx:AddChild relativeTo="{VB_WebRegistering}">
+				<mx:HBox width="100%" height="20%">
+					<mx:Panel title="Others informations" width="100%" height="100%">
+						<mx:HBox width="100%" height="90%">
+							<mx:Form>
+								<mx:FormItem id="FI_teamName" label="Team name" direction="horizontal" >
+									<mx:TextInput id="TI_teamName" width="150" change="validateSubmit(event);"/>
+								</mx:FormItem>
+							</mx:Form>
+						</mx:HBox>
+					</mx:Panel>
+				</mx:HBox>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+
+	<mx:transitions>
+		<!-- Define the transition from the base state to the Register state.-->
+		<mx:Transition id="toIndividualForm" fromState="*" toState="*">
+			<!--
+			<mx:Sequence targets="{[loginPanel, registerLink, confirm, loginLink, spacer1]}">
+				<mx:RemoveChildAction/>
+				<mx:SetPropertyAction target="{loginPanel}" name="title"/>
+				<mx:SetPropertyAction target="{loginButton}" name="label"/>
+				<mx:SetStyleAction target="{loginButton}" name="color"/>
+				<mx:Resize target="{loginPanel}"/>
+				<mx:AddChildAction/>
+			</mx:Sequence>
+			-->
+			<mx:Sequence >
+			<mx:Blur target="{this}" duration="200" blurYFrom="20.0" blurYTo="1.0" blurXFrom="20.0" blurXTo="1.0" />
+			<mx:Parallel>
+				<mx:Move duration="400"/>
+				<mx:Resize duration="400"/>
+			</mx:Parallel>
+			</mx:Sequence>
+
+		</mx:Transition>
+
+
+	</mx:transitions>
+
+
+	<mx:VBox id="VB_WebRegistering" width="95%" height="60%">
+
+
+
+		<mx:HBox width="100%" height="10%">
+			<mx:Panel title="Event" width="100%" height="100%" horizontalAlign="center">
+				<mx:Label id="eventLabel" fontSize="14" fontWeight="bold"/>
+			</mx:Panel>
+		</mx:HBox>
+<!--
+		<mx:HBox width="100%" height="10%">
+			<mx:Panel title="Competition" width="80%" height="100%" horizontalAlign="center">
+				<mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setCompetition(event)"  />
+			</mx:Panel>
+		</mx:HBox>
+		<mx:HBox width="100%" height="50%">
+			<mx:Panel title="Person(s)" width="80%" height="100%">
+				<mx:HBox width="100%" height="90%">
+					<mx:VBox width="40%" height="100%">
+						<mx:Form>
+							<mx:FormItem label="First Name" >
+								<mx:TextInput id="TI_personFirstname" width="150" change="validateForm(event);"/>
+							</mx:FormItem>
+							<mx:FormItem label="Last Name" >
+								<mx:TextInput id="TI_personLastname" width="150" change="validateForm(event);"/>
+							</mx:FormItem>
+							<mx:FormItem label="Sex" >
+								<mx:ComboBox id="CB_personSex" dataProvider="{sexList}" width="50" change="validateForm(event);"/>
+							</mx:FormItem>
+
+							<mx:FormItem label="Birthday (DD/MM/YYYY)" >
+								<mx:DateField id="DF_personBirthday"
+											  yearNavigationEnabled="true"
+											  editable="true"
+											  formatString="DD/MM/YYYY"
+											  textAlign="center"
+											  fontSize="9"
+											  selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date()}}"
+											  change="validateForm(event);displayAge(DateField(event.target).selectedDate);"/>
+
+								<mx:Label id="L_age" color="blue" text="Age: N/A" textAlign="right"/>
+							</mx:FormItem>
+
+							<mx:FormItem label="Club" direction="horizontal" >
+								<mx:TextInput id="TI_personClub" width="150" change="validateForm(event);"/>
+							</mx:FormItem>
+							<mx:FormItem label="Email" direction="horizontal" >
+								<mx:TextInput id="TI_personEmail" width="150" restrict="A-Za-z0-9\-_@." change="validateForm(event);"/>
+							</mx:FormItem>
+						</mx:Form>
+					</mx:VBox>
+					<mx:VBox width="60%" height="100%">
+						<mx:DataGrid id="DG_persons" dataProvider="{this.personList}" width="100%"  height="90%" editable="true"
+									 dropEnabled="true" dragEnabled="true" dataTipFunction="buildToolTip"
+									 doubleClickEnabled="true" itemDoubleClick="rollOverPerson(event);" rowCount="6" verticalScrollPolicy="on">
+							<mx:columns>
+								<mx:DataGridColumn dataField="firstname" headerText="firstname" editable="false" showDataTips="true"/>
+								<mx:DataGridColumn dataField="lastname" headerText="lastname" editable="false" sortable="true" showDataTips="true"/>
+								<mx:DataGridColumn dataField="sex" headerText="sex" editable="false" minWidth="10" showDataTips="true"/>
+								<mx:DataGridColumn dataField="birthday" headerText="birthday" editable="false" minWidth="25" showDataTips="true" labelFunction="getDateDDMMYYYLabel"/>
+								<mx:DataGridColumn dataField="email" headerText="email" editable="false" minWidth="10" showDataTips="true"/>
+								<mx:DataGridColumn dataField="club" headerText="club" editable="false" minWidth="10" showDataTips="true"/>
+								<mx:DataGridColumn dataField="computedCategory" headerText="category" editable="false" minWidth="50" showDataTips="true"/>
+							</mx:columns>
+						</mx:DataGrid>
+						<mx:Spacer height="5" />
+						<mx:ControlBar horizontalAlign="center" width="100%" height="10%">
+							<mx:Image id="I_trash" width="50" height="50"
+									  source="@Embed('images/trash.png')"
+									  dragDrop="trash_dragDrop(event);"
+									  dragEnter="trash_dragEnter(event);" />
+						</mx:ControlBar>
+
+					</mx:VBox>
+				</mx:HBox>
+				<mx:HBox width="100%" height="10%">
+					<mx:ControlBar horizontalAlign="center">
+						<mx:Button
+							id="B_addPerson"
+							label="Add"
+							enabled="{addEnabled}"
+							click="addPerson(event);"
+							/>
+						<mx:Button
+							id="B_updatePerson"
+							label="Update"
+							enabled="{updateEnabled}"
+							click="updatePerson(event);"
+							/>
+						<mx:Button
+							id="B_clearPerson"
+							label="Clear"
+							enabled="{!formIsEmpty}"
+							click="clearFormHandler();"
+							/>
+					</mx:ControlBar>
+				</mx:HBox>
+			</mx:Panel>
+		</mx:HBox>
+		<mx:HBox width="100%" height="20%">
+			<mx:Panel title="Others informations" width="80%" height="100%">
+				<mx:HBox width="100%" height="90%">
+					<mx:Form>
+						<mx:FormItem id="FI_teamName" label="Team name" direction="horizontal" >
+							<mx:TextInput id="TI_teamName" width="150" change="validateSubmit(event);"/>
+						</mx:FormItem>
+					</mx:Form>
+				</mx:HBox>
+			</mx:Panel>
+		</mx:HBox>
+-->
+		<mx:HBox width="100%" height="10%">
+			<mx:Panel title="Registering" width="100%" height="100%">
+				<mx:ControlBar horizontalAlign="center">
+					<mx:Button
+						id="submitButton"
+						label="Submit"
+						click="submitForm(event);"
+						enabled="{submitButtonEnabled} "
+
+						/>
+					<mx:Button
+						label="Cancel"
+						click="clearAll();"
+						/>
+				</mx:ControlBar>
+
+			</mx:Panel>
+		</mx:HBox>
+
+	</mx:VBox>
+</mx:Canvas>

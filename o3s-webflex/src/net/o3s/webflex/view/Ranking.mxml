@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+           width="100%" height="100%"
+           creationComplete="init()"
+           defaultButton="{B_getRankingPdf}"
+           pageTitle="O3S Ranking">
+
+	<mx:Script>
+		<![CDATA[
+         import mx.collections.ArrayCollection;
+         import mx.validators.StringValidator;
+         import mx.validators.EmailValidator;
+         import mx.validators.DateValidator;
+
+         import mx.validators.Validator;
+         import mx.events.ValidationResultEvent;
+         import mx.controls.Alert;
+         import mx.events.ListEvent;
+         import mx.rpc.events.ResultEvent;
+         import mx.utils.ObjectUtil;
+         import mx.core.IUIComponent;
+         import mx.events.DragEvent;
+         import mx.managers.DragManager;
+         import mx.utils.StringUtil;
+         import flash.net.FileReference;
+         import mx.utils.URLUtil;
+         import mx.core.Application
+         import net.o3s.webflex.bean.Person;
+         import net.o3s.webflex.bean.MyEvent;
+         import net.o3s.webflex.bean.Competition;
+         import net.o3s.webflex.bean.Category;
+         import net.o3s.webflex.bean.Registered;
+         import net.o3s.webflex.bean.FlexException;
+
+         import flash.utils.getDefinitionByName;
+         import mx.rpc.Fault;
+         import mx.rpc.events.FaultEvent;
+
+         [Bindable]
+         public var selectedScratch:Boolean = false;
+
+         [Bindable]
+         public var selectedCategories:ArrayCollection = new ArrayCollection([]);
+
+
+			[Bindable]
+			public var competitionList:ArrayCollection;
+
+         [Bindable]
+         public var selectedCompetition:Competition;
+
+         [Bindable]
+         public var competitionIsEmpty:Boolean = true;
+
+         [Bindable]
+         public var categoryList:ArrayCollection;
+
+         [Bindable]
+         private var event:MyEvent;
+
+         [Bindable]
+         public var submitButtonEnabled:Boolean = false;
+
+         [Bindable]
+         var fileData:ByteArray = new ByteArray();
+
+         [Bindable]
+         var fileReference:FileReference = new FileReference();
+
+         var resultOnServer:Boolean;
+
+         var serverUrl:String;
+
+         private function changeStateCBCategories(state:Boolean):void {
+            CB_allCategories.enabled = state;
+            var idx:int;
+            var len:int = categoryList.length;
+            for (idx=0; idx<len; idx++) {
+              CB_categories[idx].enabled=state;
+            }
+         }
+
+         private function changeStateCBScratch(state:Boolean):void {
+            CB_scratch.enabled = state;
+          }
+
+			private function init():void {
+
+            refreshAdminData();
+            CB_competition.selectedItem = -1;
+            competitionIsEmpty = true;
+            submitButtonEnabled = false;
+            // needed in flex, class must be instancied once
+            var fe:FlexException = new FlexException();
+
+            serverUrl="http://" + URLUtil.getServerNameWithPort(Application.application.loaderInfo.url) + "/o3s-webds/";
+
+				// Set the focus on the first field so
+				// user does not have to mouse over to it.
+				// Note that the user still has to click on the
+				// Flex application to give it focus. This is
+				// a currently limitation in Flex.
+				resetFocus();
+
+			}
+
+         public function refreshAdminData():void {
+
+            RO_admin.getDefaultEvent();
+            RO_admin.getCompetitions();
+            RO_admin.getCategories();
+         }
+
+         private function resultGetDefaultEvent(event:ResultEvent):void {
+            this.event = event.result as MyEvent;
+            eventLabel.text = this.event.name;
+
+         }
+
+         private function resultGetCompetitions(event:ResultEvent):void {
+            competitionList = event.result as ArrayCollection;
+         }
+
+         private function resultGetCategories(event:ResultEvent):void {
+            categoryList = event.result as ArrayCollection;
+         }
+
+
+			// Clear the form and reset validation.
+			private function clearFormHandler():void
+			{
+			   selectedScratch=false;
+            CB_scratch.selected = false;
+            changeStateCBScratch(true);
+            selectedCategories.removeAll();
+            CB_allCategories.selected = false;
+            changeStateCBCategories(true);
+            var len:int = categoryList.length;
+            var idx:int;
+            for (idx=0; idx<len; idx++) {
+               CB_categories[idx].selected = false;
+            }
+            CB_competition.selectedItem = -1;
+            selectedCompetition=null;
+            refreshSubmitButtonEnabled();
+				// Set the focus on the first field so
+				// user does not have to mouse over to it.
+				resetFocus();
+			}
+
+         private function clearAll():void
+         {
+            clearFormHandler();
+         }
+
+
+			// Helper method. Sets the focus on the first field so
+			// user does not have to mouse over to it.
+			private function resetFocus():void
+			{
+				focusManager.setFocus(CB_competition);
+			}
+
+
+         // Set the category when change
+         private function setCategories(event:Event):void {
+
+            // rebuilt the full list
+            selectedCategories.removeAll();
+            var idx:int;
+            var selectedNb:int = 0;
+            var len:int = categoryList.length;
+            for (idx=0; idx<len; idx++) {
+               if (CB_categories[idx].selected) {
+
+                  // the associated category has the same index
+                  selectedCategories.addItem(categoryList.getItemAt(idx));
+                  selectedNb++;
+               }
+            }
+            // if none category
+            if (selectedNb == 0) {
+               changeStateCBScratch(true);
+               CB_allCategories.selected = false;
+            } else if (selectedNb == len) {
+            // if all categories are selected
+               changeStateCBScratch(false);
+               CB_allCategories.selected = true;
+            } else {
+            // if some (but not all) are selected
+               changeStateCBScratch(false);
+               CB_allCategories.selected = false;
+            }
+            refreshSubmitButtonEnabled();
+         }
+
+         private function setCompetition(event:Event):void {
+            selectedCompetition=event.currentTarget.selectedItem as Competition;
+            if (selectedCompetition != null && selectedCompetition.name != "Unknown") {
+               competitionIsEmpty = false;
+            } else {
+               competitionIsEmpty = true;
+            }
+            refreshSubmitButtonEnabled();
+         }
+
+         private function refreshSubmitButtonEnabled():void {
+
+            submitButtonEnabled = true;
+
+            submitButtonEnabled = submitButtonEnabled && !competitionIsEmpty;
+            submitButtonEnabled = submitButtonEnabled && (selectedCategories.length > 0 || selectedScratch);
+
+         }
+
+        // Set the scratch when change
+         private function modifyScratch(event:Event):void {
+
+            if (CB_scratch.selected == true)
+            {
+               selectedScratch=true;
+               changeStateCBCategories(false);
+            }
+            else
+            {
+               selectedScratch=false;
+               changeStateCBCategories(true);
+            }
+
+            refreshSubmitButtonEnabled();
+
+         }
+
+        // Set all categories when change
+         private function modifyAllCategories(event:Event):void {
+
+            if (CB_allCategories.selected == true)
+            {
+                changeStateCBScratch(false);
+                selectedCategories.removeAll();
+                var idx:int;
+                var len:int = categoryList.length;
+                for (idx=0; idx<len; idx++) {
+                  CB_categories[idx].selected=true;
+                  selectedCategories.addItem(categoryList.getItemAt(idx));
+
+                }
+            }
+            else
+            {
+                changeStateCBScratch(true);
+                var idx:int;
+                var len:int = categoryList.length;
+                for (idx=0; idx<len; idx++) {
+                  CB_categories[idx].selected=false;
+                }
+                selectedCategories.removeAll();
+
+            }
+
+            refreshSubmitButtonEnabled();
+
+         }
+
+         private function resultIsNotEmptyScratchRanking(event:ResultEvent):void {
+            var isNotEmpty:Boolean = event.result as Boolean;
+
+            if (isNotEmpty == false) {
+               Alert.show("Empty report!");
+            } else {
+
+               if (resultOnServer == true) {
+                  RO_reporting.getScratchRankingPdfAsFileName(selectedCompetition.id);
+               } else {
+                  Alert.show("Pdf generation is in progress ...");
+                  var url:URLRequest;
+                  url = new URLRequest(serverUrl +
+                                       "report?type=scratchRanking&competitionId=" +
+                                       selectedCompetition.id);
+                  navigateToURL(url,"_blank");
+               }
+            clearFormHandler();
+            }
+         }
+
+         private function resultIsNotEmptyCategoryRanking(event:ResultEvent):void {
+           var isNotEmpty:Boolean = event.result as Boolean;
+
+           if (isNotEmpty == false) {
+               Alert.show("Empty report!");
+            } else {
+               if (resultOnServer == true) {
+                  RO_reporting.getCategoryRankingPdfAsFileName(selectedCompetition.id);
+               } else {
+
+                  Alert.show("Pdf generation is in progress ...");
+
+                  var url:URLRequest;
+                  var idx:int;
+                  var catPrms:String ="";
+                  for (idx=0;idx<selectedCategories.length;idx++) {
+                     var cat:Category = selectedCategories.getItemAt(idx) as Category;
+                     if (idx == 0) {
+                        catPrms = "" + cat.id;
+                     } else {
+                        catPrms = catPrms + "," + cat.id;
+                     }
+                  }
+                  url = new URLRequest(serverUrl +
+                                       "report?type=categoriesRanking&competitionId=" +
+                                       selectedCompetition.id +
+                                       "&categoriesId=" +
+                                       catPrms);
+
+                  navigateToURL(url,"_blank");
+               }
+               clearFormHandler();
+            }
+         }
+
+         private function doGetRanking():void {
+
+            // at first check that the report is not empty
+            // the reporting servlet is invoked when processing the result
+
+            if (selectedScratch == true) {
+               RO_reporting.isNotEmptyScratchRanking(selectedCompetition.id);
+            } else {
+               RO_reporting.isNotEmptyCategoryRanking(selectedCompetition.id, selectedCategories);
+            }
+
+         }
+
+        private function getRankingPdf(event:Event):void {
+            this.resultOnServer = false;
+            doGetRanking();
+         }
+
+        private function generateRankingPdf(event:Event):void {
+           this.resultOnServer = true;
+           doGetRanking();
+
+         }
+
+         private function resultGetRankingPdfAsFileName(event:ResultEvent):void {
+           var fileName:String = event.result as String;
+           Alert.show("File <" + fileName + "> is available on the server.");
+
+         }
+
+
+         private function onFault(ev:Event):void {
+            Alert.show( ObjectUtil.toString(ev) );
+         }
+
+		]]>
+	</mx:Script>
+
+   <mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
+      <mx:method name="getCompetitions" result="resultGetCompetitions(event)"/>
+      <mx:method name="getCategories" result="resultGetCategories(event)"/>
+      <mx:method name="getDefaultEvent" result="resultGetDefaultEvent(event)"/>
+   </mx:RemoteObject>
+
+   <mx:RemoteObject id="RO_reporting" destination="reporting" fault="onFault(event)">
+      <mx:method name="isNotEmptyScratchRanking" result="resultIsNotEmptyScratchRanking(event)"/>
+      <mx:method name="isNotEmptyCategoryRanking" result="resultIsNotEmptyCategoryRanking(event)"/>
+      <mx:method name="getCategoryRankingPdfAsFileName" result="resultGetRankingPdfAsFileName(event)"/>
+      <mx:method name="getScratchRankingPdfAsFileName" result="resultGetRankingPdfAsFileName(event)"/>
+   </mx:RemoteObject>
+
+	<mx:VBox width="95%" height="60%">
+
+		<mx:HBox width="100%" height="10%">
+			<mx:Panel title="Event" width="100%" height="100%" horizontalAlign="center">
+				<mx:Label id="eventLabel" fontSize="14" fontWeight="bold"/>
+			</mx:Panel>
+		</mx:HBox>
+		<mx:HBox width="100%" height="40%">
+			<mx:Panel title="Ranking selection" width="100%" height="100%" horizontalAlign="center">
+           <mx:HBox width="100%" height="20%">
+             <mx:Label id="L_competition" color="blue" text="Select a competition: " textAlign="right"/>
+		 		 <mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setCompetition(event)" />
+           </mx:HBox>
+           <mx:HBox width="100%" height="10%">
+            <mx:CheckBox id="CB_scratch" label="Get scratch ranking" selected="false" click="modifyScratch(event)"/>
+           </mx:HBox>
+           <mx:VBox width="100%" height="60%">
+            <mx:CheckBox id="CB_allCategories" label="Get ranking for all categories or select some below" selected="false" click="modifyAllCategories(event)"/>
+            <mx:Tile direction="horizontal" borderStyle="inset"
+                     horizontalGap="5" verticalGap="5"
+                     paddingLeft="5" paddingTop="5" paddingBottom="5" paddingRight="5" label="Select categories">
+
+             <mx:Repeater id="R_checkBoxRepeater" dataProvider="{categoryList}">
+                <mx:CheckBox id="CB_categories"
+                           label="{R_checkBoxRepeater.currentItem.name}"
+                           data="{R_checkBoxRepeater.currentItem.data}"
+                           change="setCategories(event);" />
+
+              </mx:Repeater>
+            </mx:Tile>
+           </mx:VBox>
+
+           <mx:HBox width="100%" height="10%">
+             <mx:ControlBar horizontalAlign="center">
+                  <mx:Button
+                     id="B_getRankingPdf"
+                     label="Get PDF"
+                     click="getRankingPdf(event);"
+                     enabled="{submitButtonEnabled}"
+                     />
+                  <mx:Button
+                     id="B_generateRankingPDF"
+                     label="Generate PDF on server"
+                     click="generateRankingPdf(event);"
+                     enabled="{submitButtonEnabled}"
+                     />
+
+                  <mx:Button
+                     id="B_clear"
+                     label="Clear"
+                     click="clearFormHandler();"
+                     />
+             </mx:ControlBar>
+           </mx:HBox>
+ 			</mx:Panel>
+		</mx:HBox>
+
+		<mx:HBox width="100%" height="60%">
+			<mx:Panel title="Result(s)" width="100%" height="100%">
+
+			</mx:Panel>
+		</mx:HBox>
+
+	</mx:VBox>
+</mx:Canvas>

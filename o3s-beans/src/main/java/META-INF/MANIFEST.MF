@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Class-Path: o3s-apis.jar 
+ o3s-persistence.jar 
+ jasperreports-3.6.1.jar
+

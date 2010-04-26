@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" 
+              name="ScratchRankingReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<parameter name="competitionId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+   <parameter name="competitionName" class="java.lang.String"/>
+   <parameter name="eventName" class="java.lang.String"/>
+	
+	<field name="id" class="java.lang.Integer">
+		<fieldDescription><![CDATA[id]]></fieldDescription>
+	</field>
+	<field name="arrivalDate" class="java.util.Date">
+		<fieldDescription><![CDATA[arrivalDate]]></fieldDescription>
+	</field>
+
+	<field name="elapsedTime" class="java.lang.Long">
+		<fieldDescription><![CDATA[elapsedTime]]></fieldDescription>
+	</field>
+
+	<field name="name" class="java.lang.String">
+		<fieldDescription><![CDATA[name]]></fieldDescription>
+	</field>
+
+   <field name="label" class="org.ow2.o3s.apis.IEntityLabel">
+      <fieldDescription><![CDATA[label]]></fieldDescription>
+   </field>
+   <field name="category" class="org.ow2.o3s.apis.IEntityCategory">
+      <fieldDescription><![CDATA[category]]></fieldDescription>
+   </field>
+   <field name="event" class="org.ow2.o3s.apis.IEntityEvent">
+      <fieldDescription><![CDATA[event]]></fieldDescription>
+   </field>
+   
+   <variable name="rcount" class="java.lang.Integer" calculation="Count">
+      <variableExpression><![CDATA[Boolean.TRUE]]></variableExpression>
+   </variable>
+   <variable name="millisec" class="java.lang.Long">
+      <variableExpression>$F{elapsedTime}%1000</variableExpression>
+   </variable>
+   <variable name="d1" class="java.lang.Long">
+      <variableExpression>((int)($F{elapsedTime}/1000))</variableExpression>
+   </variable>
+   <variable name="sec" class="java.lang.Long">
+      <variableExpression>$V{d1}%60</variableExpression>
+   </variable>
+   <variable name="d2" class="java.lang.Long">
+      <variableExpression>((int)(((int)($F{elapsedTime}/1000)) / 60))</variableExpression>
+   </variable>
+   <variable name="min" class="java.lang.Long">
+      <variableExpression>((int)(((int)($F{elapsedTime}/1000)) / 60))%60</variableExpression>
+   </variable>
+   <variable name="d3" class="java.lang.Long">
+      <variableExpression>((int)(((int)(((int)($F{elapsedTime}/1000)) / 60)) / 60))</variableExpression>
+   </variable>
+   <variable name="hour" class="java.lang.Long">
+      <variableExpression>((int)(((int)(((int)($F{elapsedTime}/1000)) / 60)) / 60))%60</variableExpression>
+   </variable>
+   <variable name="d4" class="java.lang.Long">
+      <variableExpression>((int)(((int)(((int)(((int)($F{elapsedTime}/1000)) / 60)) / 60)) / 60))</variableExpression>
+   </variable>
+   <variable name="day" class="java.lang.Long">
+      <variableExpression>((int)(((int)(((int)(((int)($F{elapsedTime}/1000)) / 60)) / 60)) / 60))%24</variableExpression>
+   </variable>
+
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+   <title>
+      <band height="130" splitType="Stretch">
+         <textField>
+            <reportElement x="169" y="0" width="500" height="30"/>
+            <textElement textAlignment="Center">
+               <font size="30"/>
+            </textElement>
+            <textFieldExpression class="java.lang.String"><![CDATA[$P{eventName}]]></textFieldExpression>
+         </textField>
+         <staticText>
+            <reportElement x="169" y="50" width="249" height="29"/>
+            <textElement textAlignment="Center">
+               <font size="22" isBold="true"/>
+            </textElement>
+            <text><![CDATA[Classement Scratch]]></text>
+         </staticText>
+         <textField>
+            <reportElement x="169" y="100" width="249" height="23"/>
+            <textElement textAlignment="Center">
+               <font size="18"/>
+            </textElement>
+            <textFieldExpression class="java.lang.String"><![CDATA[$P{competitionName}]]></textFieldExpression>
+         </textField>
+      </band>
+   </title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+		
+         <textField>
+            <reportElement x="0" y="0" width="100" height="20"/>
+            <textElement/>
+            <textFieldExpression class="java.lang.Integer"><![CDATA[$V{rcount}]]></textFieldExpression>
+         </textField>
+			<textField>
+				<reportElement x="50" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+         <textField>
+            <reportElement x="200" y="0" width="100" height="20"/>
+            <textElement/>
+            <textFieldExpression class="java.lang.String">
+               $F{label}.getValue()
+            </textFieldExpression>
+         </textField>
+			<textField>
+				<reportElement x="350" y="0" width="100" height="20"/>
+				<textElement/>
+            <textFieldExpression class="java.lang.String">
+            ($V{day}==0?"":$V{day} + "days-") +
+             $V{hour} + "h" + $V{min} + "m" + $V{sec} + "sec" + $V{millisec} + "ms"
+            </textFieldExpression>
+			</textField>
+
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+<wb-module deploy-name="o3s-application">
+<wb-resource deploy-path="/" source-path="/EarContentWTP"/>
+<dependent-module deploy-path="/" handle="module:/resource/o3s-beans/o3s-beans">
+<dependent-object/>
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<dependent-module archiveName="o3s-apis.jar" deploy-path="/lib" handle="module:/resource/o3s-apis/o3s-apis">
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<dependent-module archiveName="o3s-persistence.jar" deploy-path="/lib" handle="module:/resource/o3s-persistence/o3s-persistence">
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<dependent-module deploy-path="/" handle="module:/resource/o3s-appclient-init/o3s-appclient-init">
+<dependent-object/>
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<dependent-module archiveName="jasperreports-3.6.1.jar" deploy-path="/lib" handle="module:/resource/jasperreports-3.6.1/jasperreports-3.6.1">
+<dependency-type>uses</dependency-type>
+</dependent-module>
+<dependent-module deploy-path="/" handle="module:/resource/o3s-webds/o3s-webds">
+<dependent-object></dependent-object>
+<dependency-type>uses</dependency-type>
+</dependent-module>
+</wb-module>
+</project-modules>

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" creationComplete="init()">
+
+	<mx:Script>
+		<![CDATA[
+			import net.o3s.webflex.bean.Competition;
+         import net.o3s.webflex.bean.Category;
+
+			import mx.rpc.events.ResultEvent;
+         import mx.controls.Alert;
+         import mx.utils.ObjectUtil;
+
+         public function onClickRefresh(ev:Event):void {
+            refreshAdminData();
+         }
+
+			public function refreshAdminData():void {
+
+            RO_admin.getAllEvents();
+				RO_admin.getAllCompetitions();
+				RO_admin.getAllCategories();
+			}
+
+			public function init():void {
+				refreshAdminData();
+			}
+
+			private function displayEvent(item:Object, col:DataGridColumn):String
+			{
+				return item.event.id;
+			}
+
+			private function displayCompetitions(item:Object, col:DataGridColumn):String
+			{
+            //Alert.show( ObjectUtil.toString(item) );
+				return displayCompetitionsAsString(item);
+			}
+
+         private function displayCompetitionsAsString(item:Object):String
+         {
+            if (item.competitions == null)
+            {
+            Alert.show("error, competitions is null");
+            return null;
+
+            } else
+            {
+             var msg:String="";
+
+            var category:Category = item as Category;
+
+            for(var count:int = 0; count < category.competitions.length; count++)
+            {
+               var c:Competition = category.competitions.list.getItemAt(count, 0) as Competition;
+               if (count == 0) {
+                  msg += c.id ;
+               }
+               else {
+                  msg += "," + c.id ;
+              }
+            }
+
+            return msg;
+            }
+         }
+
+         private function onFault(ev:Event):void
+         {
+            Alert.show("error");
+         }
+
+         private function buildEventTip(item:Object):String
+         {
+            var myString:String = "";
+            if(item != null)
+            {
+               myString = myString + item.id + ",";
+               myString = myString + item.name + ",";
+               myString = myString + item.date + ",";
+               myString = myString + item.theDefault + "\n";
+            }
+            return myString;
+         }
+
+        private function buildCompetitionTip(item:Object):String
+         {
+            var myString:String = "";
+            if(item != null)
+            {
+               myString = myString + item.id + ",";
+               myString = myString + item.event.id + ",";
+               myString = myString + item.name + ",";
+               myString = myString + item.lowerLabelNumber + ",";
+               myString = myString + item.higherLabelNumber + ",";
+               myString = myString + item.lastLabelNumber + ",";
+               myString = myString + item.teamed + ",";
+               myString = myString + item.startingDate + "\n";
+            }
+            return myString;
+         }
+
+        private function buildCategoryTip(item:Object):String
+         {
+            var myString:String = "";
+            if(item != null)
+            {
+               myString = myString + item.id + ",";
+               myString = myString + item.event.id + ",";
+               myString = myString + item.name + ",";
+               myString = myString + item.sex + ",";
+               myString = myString + item.shortName + ",";
+               myString = myString + item.minDate + ",";
+               myString = myString + item.maxDate + ",";
+               myString = myString + "(" + displayCompetitionsAsString(item) + ")" + "\n";
+            }
+            return myString;
+         }
+
+		]]>
+	</mx:Script>
+
+	<mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
+	</mx:RemoteObject>
+
+	<mx:VBox width="95%" height="60%">
+
+      <mx:HBox width="100%" height="10%">
+
+		 <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Action">
+
+          <mx:ControlBar horizontalAlign="center">
+             <mx:Button label="Refresh" id="B_refresh"
+                         click="onClickRefresh(event)" enabled="true"/>
+          </mx:ControlBar>
+
+		 </mx:Panel>
+      </mx:HBox>
+
+      <mx:HBox width="100%" height="20%">
+
+      <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Event">
+         <mx:DataGrid id="DG_events" dataProvider="{RO_admin.getAllEvents.lastResult}" dataTipFunction="buildEventTip"
+                      rowCount="2"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
+            <mx:columns>
+               <mx:DataGridColumn headerText="Id" dataField="id" showDataTips="true" width="50"/>
+               <mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="300"/>
+               <mx:DataGridColumn headerText="Date" dataField="date" showDataTips="true" width="300"/>
+               <mx:DataGridColumn headerText="Default" dataField="theDefault" showDataTips="true" width="100"/>
+            </mx:columns>
+         </mx:DataGrid>
+      </mx:Panel>
+      </mx:HBox>
+
+
+	   <mx:HBox width="100%" height="30%">
+		<mx:Panel width="100%" height="100%" horizontalAlign="center" title="Competition">
+			<mx:DataGrid id="DG_competitions" dataProvider="{RO_admin.getAllCompetitions.lastResult}" dataTipFunction="buildCompetitionTip"
+                      rowCount="5"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
+				<mx:columns>
+					<mx:DataGridColumn headerText="Id" dataField="id" showDataTips="true" width="50"/>
+               <mx:DataGridColumn headerText="Event" labelFunction="displayEvent" showDataTips="true" width="50"/>
+					<mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="300"/>
+					<mx:DataGridColumn headerText="Lower Label" dataField="lowerLabelNumber" showDataTips="true" width="100"/>
+					<mx:DataGridColumn headerText="Higher Label" dataField="higherLabelNumber" showDataTips="true" width="100"/>
+					<mx:DataGridColumn headerText="Last Label" dataField="lastLabelNumber" showDataTips="true" width="100"/>
+               <mx:DataGridColumn headerText="Teamed" dataField="teamed" showDataTips="true" width="100"/>
+					<mx:DataGridColumn headerText="Starting Date" dataField="startingDate" showDataTips="true" width="200"/>
+
+				</mx:columns>
+			</mx:DataGrid>
+		</mx:Panel>
+	  </mx:HBox>
+
+		<mx:HBox width="100%" height="40%">
+		<mx:Panel width="100%" height="100%" horizontalAlign="center" title="Category">
+			<mx:DataGrid id="DG_categories" dataProvider="{RO_admin.getAllCategories.lastResult}" dataTipFunction="buildCategoryTip"
+                      rowCount="5"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
+				<mx:columns>
+					<mx:DataGridColumn headerText="Id" dataField="id" showDataTips="true" width="50"/>
+               <mx:DataGridColumn headerText="Event" labelFunction="displayEvent" showDataTips="true" width="50"/>
+					<mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="200"/>
+					<mx:DataGridColumn headerText="Sex" dataField="sex" showDataTips="true" width="50"/>
+					<mx:DataGridColumn headerText="Short Name" dataField="shortName" showDataTips="true" width="50"/>
+					<mx:DataGridColumn headerText="Min Date" dataField="minDate" showDataTips="true" width="200"/>
+					<mx:DataGridColumn headerText="Max Date" dataField="maxDate" showDataTips="true" width="200"/>
+
+					<mx:DataGridColumn headerText="Competitions" labelFunction="displayCompetitions" showDataTips="true" width="200"/>
+
+
+				</mx:columns>
+			</mx:DataGrid>
+		</mx:Panel>
+     </mx:HBox>
+
+	</mx:VBox>
+
+</mx:Canvas>
