@@ -421,17 +421,17 @@
 	</mx:RemoteObject>
 
 	<mx:Form>
-		<mx:FormItem label="First Name" >
+		<mx:FormItem label="Prenom" >
 			<mx:TextInput id="TI_personFirstname" width="150" change="removeDisplayList();validateForm(event);predictFirstName(event);" enter="removeDisplayList()" focusOut="removeDisplayList();checkIfPersonExist()"/>
 		</mx:FormItem>
-		<mx:FormItem label="Last Name" >
+		<mx:FormItem label="Nom" >
 			<mx:TextInput id="TI_personLastname" width="150" change="removeDisplayList();validateForm(event);predictLastName(event);" enter="removeDisplayList()" focusOut="removeDisplayList();checkIfPersonExist()"/>
 		</mx:FormItem>
-		<mx:FormItem label="Sex" >
+		<mx:FormItem label="Sexe" >
 			<mx:ComboBox id="CB_personSex" dataProvider="{sexList}" width="50" change="removeDisplayList();validateForm(event);"/>
 		</mx:FormItem>
 
-		<mx:FormItem label="Birthday (DD/MM/YYYY)" >
+		<mx:FormItem label="Date de naissance (DD/MM/YYYY)" >
 			<mx:DateField id="DF_personBirthday"
 						  yearNavigationEnabled="true"
 						  editable="true"

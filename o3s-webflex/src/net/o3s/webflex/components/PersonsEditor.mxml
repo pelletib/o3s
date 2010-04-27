@@ -126,7 +126,7 @@
 			var person:Person = MyPersonForm.person;
 
 			if (person.firstname == "" || person.lastname == "") {
-				Alert.show("Person not defined !");
+				Alert.show("Personne non definie !");
 			}
 			else {
 				var found:Boolean = false;
@@ -138,7 +138,7 @@
 				}
 
 				if (found ) {
-					Alert.show("Person already defined !");
+					Alert.show("Personne deja definie !");
 				}
 				else {
 					RO_registering.createPerson(person);
@@ -151,7 +151,7 @@
 			person.id = personIdToUpdate;
 
 			if (person.firstname == "" || person.lastname == "") {
-				Alert.show("Person not defined !");
+				Alert.show("Personne non definie !");
 			}
 			else {
 				var found:int = 0;
@@ -163,7 +163,7 @@
 				}
 
 				if (found>1 ) {
-					Alert.show("Person defined twice !");
+					Alert.show("Personne definie plusieurs fois !");
 				} else {
 					RO_registering.updatePerson(person);
 				}
@@ -227,7 +227,7 @@
 		}
 
 		private function buildPersonTip(item:Object):String {
-			var myString:String = "Double click to edit";
+			var myString:String = "Double click pour editer";
 			/*
 			if(item != null) {
 				myString = myString + item.id + ",";
@@ -278,7 +278,7 @@
 
 	<mx:DateFormatter formatString="DD/MM/YYYY" id="formatDateDDMMYYY"/>
 
-	<mx:Panel title="Person(s)" width="100%" height="100%">
+	<mx:Panel title="Personne(s)" width="100%" height="100%">
 		<mx:HBox width="100%" height="90%">
 			<mx:VBox width="40%" height="100%">
 				<components:PersonForm id="MyPersonForm"/>
@@ -288,13 +288,13 @@
 							 dropEnabled="true" dragEnabled="true" dataTipFunction="buildPersonTip"
 							 doubleClickEnabled="true" itemDoubleClick="rollOverPerson(event);" rowCount="6" verticalScrollPolicy="on">
 					<mx:columns>
-						<mx:DataGridColumn dataField="firstname" headerText="firstname" editable="false" showDataTips="true"/>
-						<mx:DataGridColumn dataField="lastname" headerText="lastname" editable="false" sortable="true" showDataTips="true"/>
-						<mx:DataGridColumn dataField="sex" headerText="sex" editable="false" minWidth="10" showDataTips="true"/>
-						<mx:DataGridColumn dataField="birthday" headerText="birthday" editable="false" minWidth="25" showDataTips="true" labelFunction="getDateDDMMYYYLabel"/>
+						<mx:DataGridColumn dataField="firstname" headerText="prenom" editable="false" showDataTips="true"/>
+						<mx:DataGridColumn dataField="lastname" headerText="nom" editable="false" sortable="true" showDataTips="true"/>
+						<mx:DataGridColumn dataField="sex" headerText="sexe" editable="false" minWidth="10" showDataTips="true"/>
+						<mx:DataGridColumn dataField="birthday" headerText="date de naissance" editable="false" minWidth="25" showDataTips="true" labelFunction="getDateDDMMYYYLabel"/>
 						<mx:DataGridColumn dataField="email" headerText="email" editable="false" minWidth="10" showDataTips="true"/>
 						<mx:DataGridColumn dataField="club" headerText="club" editable="false" minWidth="10" showDataTips="true"/>
-						<mx:DataGridColumn dataField="computedCategory" headerText="category" editable="false" minWidth="50" showDataTips="true"/>
+						<mx:DataGridColumn dataField="computedCategory" headerText="categorie" editable="false" minWidth="50" showDataTips="true"/>
 					</mx:columns>
 				</mx:DataGrid>
 				<mx:Spacer height="5" />
@@ -311,19 +311,19 @@
 			<mx:ControlBar horizontalAlign="center">
 				<mx:Button
 					id="B_addPerson"
-					label="Add"
+					label="Ajouter"
 					enabled="{addEnabled}"
 					click="addPerson(event);"
 					/>
 				<mx:Button
 					id="B_updatePerson"
-					label="Update"
+					label="Mettre a jour"
 					enabled="{updateEnabled}"
 					click="updatePerson(event);"
 					/>
 				<mx:Button
 					id="B_clearPerson"
-					label="Clear"
+					label="Effacer"
 					click="clearFormHandler();"
 					/>
 			</mx:ControlBar>

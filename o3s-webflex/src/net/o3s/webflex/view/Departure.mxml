@@ -86,7 +86,7 @@
 		private function resultSetStartDate(event:ResultEvent):void {
 			var mytime:Date = event.result as Date;
 
-			Alert.show("Date registered to " + mytime);
+			Alert.show("Date enregistree : " + mytime);
          refreshAdminData();
 		}
 
@@ -116,7 +116,7 @@
 	<mx:VBox width="95%" height="60%">
 
 		<mx:HBox width="100%" height="10%">
-			<mx:Panel title="Event" width="100%" height="100%" horizontalAlign="center">
+			<mx:Panel title="Evenement" width="100%" height="100%" horizontalAlign="center">
 				<mx:Label id="eventLabel" fontSize="14" fontWeight="bold"/>
 			</mx:Panel>
 		</mx:HBox>
@@ -127,14 +127,14 @@
 			</mx:Panel>
 		</mx:HBox>
 		<mx:HBox width="100%" height="20%">
-			<mx:Panel title="Current Time" width="100%" height="100%" horizontalAlign="center">
+			<mx:Panel title="Date courante" width="100%" height="100%" horizontalAlign="center">
 				<components:MyWatch fontSize="14" fontWeight="bold" formatString="DD/MM/YYYY KK:NN:SS "/>
 			</mx:Panel>
 
 		</mx:HBox>
 
 		<mx:HBox width="100%" height="10%">
-			<mx:Panel title="Register starting time" width="100%" height="100%">
+			<mx:Panel title="Enregistrement Heure Depart" width="100%" height="100%">
 				<mx:ControlBar horizontalAlign="center">
 					<mx:Button
 						id="submitButton"
@@ -149,12 +149,12 @@
 			</mx:Panel>
 		</mx:HBox>
       <mx:HBox width="100%" height="30%">
-         <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Started competitions">
+         <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Competitions en cours">
             <mx:DataGrid id="DG_competitions" dataProvider="{RO_admin.getStartedCompetitions.lastResult}"
                          rowCount="7"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
                <mx:columns>
                   <mx:DataGridColumn headerText="Name" dataField="name" width="300"/>
-                  <mx:DataGridColumn headerText="Starting Date" dataField="startingDate" width="200"/>
+                  <mx:DataGridColumn headerText="Heure Depart" dataField="startingDate" width="200"/>
                </mx:columns>
             </mx:DataGrid>
       </mx:Panel>

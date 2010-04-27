@@ -57,9 +57,6 @@
 		public var selectedCompetition:Competition=null;
 
 		[Bindable]
-		private var event:MyEvent;
-
-		[Bindable]
 		public var submitRegisteredButtonEnabled:Boolean = false;
 
 		[Bindable]
@@ -71,7 +68,7 @@
 		private var exitCallback:Function = null;
 
 		public function refreshAdminData():void {
-			RO_admin.getDefaultEvent();
+
 			RO_admin.getCompetitions();
 		}
 
@@ -117,10 +114,6 @@
 			}
 		}
 
-		private function resultGetDefaultEvent(event:ResultEvent):void {
-			this.event = event.result as MyEvent;
-		}
-
 		private function resultGetCompetition(event:ResultEvent):void {
 			competitionList = event.result as ArrayCollection;
 			competitionList.filterFunction = Util.competitionFilter;
@@ -136,6 +129,11 @@
 				CB_competition.selectedIndex = -1;
 			}
 		}
+
+      private function onFaultGetCompetition(ev:Event):void {
+         // recovery
+         RO_admin.getCompetitions();
+      }
 
 		private function setCompetition(event:Event):void {
 			selectedCompetition=event.currentTarget.selectedItem as Competition;
@@ -164,23 +162,23 @@
 			{
 				var r:Registered = registereds.getItemAt(count, 0) as Registered;
 				if (count == 0) {
-					msg = msg + "You're are registered to the competition" +
+					msg = msg + "Vous etes inscrit a la competition" +
 						"'" + r.competition.name + "'" + "\n";
 				}
 
 				msg = msg + "'" + r.name + "'";
-				msg = msg + " is in the category " +
+				msg = msg + " est dans la categorie " +
 					"'" + r.category.name + "'" +
-					" with the label " +
+					" avec le dossard " +
 					"'" + r.label.value + "'." + "\n" ;
 			}
 			msg = msg + "\n\n";
 
-			msg = msg + "We're looking forward to seeing you at the event '" +
-				this.event.name + "' the " +
-				formatDateDDMMYYY.format(this.event.date) + ".";
+			msg = msg + "Nous sommes impatients de vous retrouver au '" +
+				parentDocument.event.name + "' le " +
+				formatDateDDMMYYY.format(parentDocument.event.date) + ".";
 
-			myAlert = Alert.show(msg, "Registration ok");
+			myAlert = Alert.show(msg, "Inscription ok");
 			myAlert.height=300;
 			myAlert.width=300;
 
@@ -196,14 +194,14 @@
 			msg = msg + "Competition " +
 						"'" + registered.competition.name + "'" + "\n";
 			msg = msg + "'" + registered.name + "'";
-			msg = msg + " is in the category " +
+			msg = msg + " est dans la categorie " +
 					"'" + registered.category.name + "'" +
-					" with the label " +
+					" avec le dossard " +
 					"'" + registered.label.value + "'." + "\n" ;
 
 			msg = msg + "\n\n";
 
-			myAlert = Alert.show(msg, "Registration updated");
+			myAlert = Alert.show(msg, "Inscription mise a jour");
 			myAlert.height=300;
 			myAlert.width=300;
 
@@ -237,7 +235,7 @@
 			if (mode == "create") {
 				var registered:Registered = new Registered();
 				registered.persons = MyPersonsEditor.personList;
-				registered.event = this.event;
+				registered.event = parentDocument.event;
 				registered.competition = selectedCompetition;
 				if (currentState == "team") {
 					registered.name = MyTeamEditor.teamName;
@@ -329,9 +327,8 @@
 	]]>
 </mx:Script>
 
-	<mx:RemoteObject id="RO_admin" destination="admin" fault="Util.onFault(event)">
+	<mx:RemoteObject id="RO_admin" destination="admin" fault="onFaultGetCompetition(event)">
 		<mx:method name="getCompetitions" result="resultGetCompetition(event)"/>
-		<mx:method name="getDefaultEvent" result="resultGetDefaultEvent(event)"/>
 	</mx:RemoteObject>
 
 	<mx:RemoteObject id="RO_registering" destination="registering" fault="Util.onFault(event)">
@@ -389,16 +386,16 @@
 		</mx:HBox>
 
 		<mx:HBox id="HB_Submit" width="100%" height="10%">
-			<mx:Panel title="Registering" width="100%" height="100%">
+			<mx:Panel title="Inscription" width="100%" height="100%">
 				<mx:ControlBar horizontalAlign="center">
 					<mx:Button
 						id="submitRegisteredButton"
-						label="Submit registered"
+						label="Soumettre inscription"
 						click="submitRegisteredForm(event);"
 						enabled="{submitRegisteredButtonEnabled} "
 						/>
 					<mx:Button
-						label="Cancel"
+						label="Effacer tout"
 						click="clearAll();"
 						/>
 				</mx:ControlBar>

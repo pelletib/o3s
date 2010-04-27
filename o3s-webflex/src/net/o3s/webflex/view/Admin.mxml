@@ -65,7 +65,7 @@
          {
             if (item.competitions == null)
             {
-            Alert.show("error, competitions is null");
+            Alert.show("error : competitions is null");
             return null;
 
             } else

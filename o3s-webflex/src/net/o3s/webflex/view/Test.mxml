@@ -75,11 +75,11 @@
 		 <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Tests">
 
           <mx:ControlBar horizontalAlign="center">
-            <mx:Button label="Populate Admin Data" id="B_populateAdminData"
+            <mx:Button label="Peupler les donnees 'Admin'" id="B_populateAdminData"
                          click="onClickPopulateAdminData(event)" enabled="true"/>
-            <mx:Button label="Populate Registered" id="B_populateRegistered"
+            <mx:Button label="Peupler les donnees 'Inscrits'" id="B_populateRegistered"
                          click="onClickPopulateRegistered(event)" enabled="true"/>
-            <mx:Button label="Simulate Departure and Arrivals" id="B_simulateDA"
+            <mx:Button label="Simuler depart et arrivee" id="B_simulateDA"
                          click="onClicksimulateDA(event)" enabled="true"/>
           </mx:ControlBar>
 

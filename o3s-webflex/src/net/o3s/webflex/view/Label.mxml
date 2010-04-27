@@ -56,7 +56,7 @@
 			public var categoryList:ArrayCollection= new ArrayCollection([]);
 
 			[Bindable]
-			private var event:MyEvent;
+			public var event:MyEvent=null;
 
 			[Bindable]
 			public var selectedCompetitionFilter:Competition=null;
@@ -334,7 +334,7 @@
 			public function editRegistered(id:int):void {
 				var r:Registered = getRegistered(id);
 				if (r == null) {
-					Alert.show("Unknown registered <" + id + ">");
+					Alert.show("Enregistrement inconnu <" + id + ">");
 				} else {
 					editedRegistered = r;
 					currentState="edit";
@@ -362,7 +362,7 @@
 			}
 
 			public function getLabel4Printing(id:int):void {
-				Alert.show("Pdf generation is in progress for registered <" + id + ">");
+				Alert.show("Generation du Pdf generation en cours pour l'enregistrement <" + id + ">");
 
 				var url:URLRequest;
 				url = new URLRequest(serverUrl +
@@ -463,8 +463,8 @@
 			}
 
 			private function confirmClickDeleteSelection():void {
-				Alert.show("Are you sure you want to remove these " + selectedItems.length + " items ?",
-					"Remove task ?",
+				Alert.show("Etes-vous sure de vouloir supprimer ces " + selectedItems.length + " enregistrements ?",
+					"Suppression ?",
 					Alert.OK | Alert.CANCEL,
 					this,
 					onClickDeleteSelection,
@@ -523,8 +523,8 @@
 		]]>
 	</mx:Script>
 
-	<mx:DateFormatter formatString="MM/DD/YY HH:NN:SS" id="formatDate"/>
-	<mx:DateFormatter formatString="MM/DD/YY HH:NN:SS" id="formatElapsedTime"/>
+	<mx:DateFormatter formatString="DD/MM/YY HH:NN:SS" id="formatDate"/>
+	<mx:DateFormatter formatString="DD/MM/YY HH:NN:SS" id="formatElapsedTime"/>
 
 	<mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
 		<mx:method name="getCompetitions" result="resultGetCompetitions(event)"/>
@@ -567,21 +567,21 @@
 
 	<mx:VBox id="VB_label" width="95%">
 		<mx:HBox id="HB_event" width="100%" height="10%">
-			<mx:Panel id="P_event" title="Event" width="100%" height="100%" horizontalAlign="center">
+			<mx:Panel id="P_event" title="Evenement" width="100%" height="100%" horizontalAlign="center">
 				<mx:Label id="eventLabel" fontSize="14" fontWeight="bold"/>
 			</mx:Panel>
 		</mx:HBox>
 		<mx:HBox id="HB_FiltersActions" width="100%" height="10%">
-			<mx:Panel width="50%" height="100%" horizontalAlign="center" title="Filters">
+			<mx:Panel width="50%" height="100%" horizontalAlign="center" title="Filtres">
 				<mx:VBox width="100%" height="100%">
 					<mx:Form>
-						<mx:FormItem label="Filter by competition" >
+						<mx:FormItem label="Filtre par competition" >
 							<mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setFilterByCompetition(event)" />
 						</mx:FormItem>
-						<mx:FormItem label="Filter by name" >
+						<mx:FormItem label="Filtre par nom" >
 							<mx:TextInput id="TI_selectedNameFilter" width="150" change="setFilterByName(event);"/>
 						</mx:FormItem>
-						<mx:FormItem label="Filter by label" >
+						<mx:FormItem label="Filtre par dossard" >
 							<mx:TextInput id="TI_selectedLabelFilter" width="150" change="setFilterByLabel(event);"/>
 						</mx:FormItem>
 					</mx:Form>
@@ -597,32 +597,32 @@
 					<mx:Tile direction="vertical" borderStyle="none"
 							 horizontalGap="5" verticalGap="5"
 							 paddingLeft="5" paddingTop="5" paddingBottom="5" paddingRight="5">
-						<mx:CheckBox id="CB_selectAll" label="Select all" selected="false" click="modifySelectAll(event)"/>
-						<mx:CheckBox id="CB_printDialog" label="Enable print dialog" selected="false" click="modifyPrintDialog(event)"/>
-						<mx:Button label="Delete selection" id="B_delete" click="confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
-						<mx:Button label="Print selection" id="B_print" click="onClickPrintSelection(event)" enabled="{actionSelectionEnabled}"/>
+						<mx:CheckBox id="CB_selectAll" label="Selectionner tout" selected="false" click="modifySelectAll(event)"/>
+						<mx:CheckBox id="CB_printDialog" label="Activer la boite de dialogue d'impression" selected="false" click="modifyPrintDialog(event)"/>
+						<mx:Button label="Supprimer la selection" id="B_delete" click="confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
+						<mx:Button label="Imprimer la selection" id="B_print" click="onClickPrintSelection(event)" enabled="{actionSelectionEnabled}"/>
 					</mx:Tile>
 				</mx:HBox>
 			</mx:Panel>
 		</mx:HBox>
 		<mx:HBox id="HB_registereds" width="100%" height="80%">
-			<mx:Panel width="100%" height="100%" horizontalAlign="center" title="Registered">
+			<mx:Panel width="100%" height="100%" horizontalAlign="center" title="Liste des inscrits">
 				<mx:DataGrid id="DG_registereds" dataProvider="{RO_registering.getRegistereds.lastResult}" dataTipFunction="buildRegisteredTip"
 							 rowCount="20"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
 					<mx:columns>
 						<mx:DataGridColumn headerText="Id" dataField="id" showDataTips="true" width="30"/>
 						<mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="150"/>
 						<mx:DataGridColumn headerText="Competition" labelFunction="displayCompetition" showDataTips="true" width="115"/>
-						<mx:DataGridColumn headerText="Category" labelFunction="displayCategory" showDataTips="true" width="115"/>
-						<mx:DataGridColumn headerText="Label" labelFunction="displayLabel" showDataTips="true" width="70"/>
+						<mx:DataGridColumn headerText="Categorie" labelFunction="displayCategory" showDataTips="true" width="115"/>
+						<mx:DataGridColumn headerText="Dossard" labelFunction="displayLabel" showDataTips="true" width="70"/>
 
-						<mx:DataGridColumn headerText="Persons" labelFunction="displayPersonsIdAsString" showDataTips="true" width="80"/>
+						<mx:DataGridColumn headerText="Personnes" labelFunction="displayPersonsIdAsString" showDataTips="true" width="80"/>
 
-						<mx:DataGridColumn headerText="Team" labelFunction="displayTeam" showDataTips="true" width="30"/>
-						<mx:DataGridColumn headerText="Paid" labelFunction="displayPaid" showDataTips="true" width="30"/>
-						<mx:DataGridColumn headerText="Registering Date" dataField="registeringDate" showDataTips="true" width="120" labelFunction="getDateLabel"/>
-						<mx:DataGridColumn headerText="Arrival Date" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="getDateLabel"/>
-						<mx:DataGridColumn headerText="Elapsed time" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="getElapsedTimeLabel"/>
+						<mx:DataGridColumn headerText="Equipe" labelFunction="displayTeam" showDataTips="true" width="30"/>
+						<mx:DataGridColumn headerText="Paye" labelFunction="displayPaid" showDataTips="true" width="30"/>
+						<mx:DataGridColumn headerText="Date d'enregistrement" dataField="registeringDate" showDataTips="true" width="120" labelFunction="getDateLabel"/>
+						<mx:DataGridColumn headerText="Date d'arrivee" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="getDateLabel"/>
+						<mx:DataGridColumn headerText="Temps ecoule" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="getElapsedTimeLabel"/>
 						<mx:DataGridColumn width="100" headerText="Actions"
 										   itemRenderer="net.o3s.webflex.components.ActionLabelDataGridColumnItemRenderer" />
 					</mx:columns>

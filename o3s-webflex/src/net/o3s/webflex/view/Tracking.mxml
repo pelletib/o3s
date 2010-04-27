@@ -48,10 +48,7 @@
          private function onMessage(msg:IMessage):void {
 
 
-            var notification:Notification = msg.body as Notification;
-
-            //this.textNotif.text = formatDateNotificationCreation.format(notification.creationTime) + " " + notification.type + " " + notification.message;
-
+           var notification:Notification = msg.body as Notification;
 
            this.textTypeNotif.htmlText = notification.type;
            this.textMessageNotif.htmlText = notification.message;
@@ -97,20 +94,20 @@
 
 	<mx:Consumer id="consumerNotif" destination="notificationMessage" message="onMessage(event.message)"/>
 
-   <mx:DateFormatter formatString="MM/DD/YY HH:NN:SS" id="formatDateNotificationCreation"/>
-   <mx:DateFormatter formatString="MM/DD/YY HH:NN:SS" id="formatDateNotificationArrival"/>
+   <mx:DateFormatter formatString="DD/MM/YY HH:NN:SS" id="formatDateNotificationCreation"/>
+   <mx:DateFormatter formatString="DD/MM/YY HH:NN:SS" id="formatDateNotificationArrival"/>
    <mx:DateFormatter formatString="HH:NN:SS" id="formatDateNotificationDeparture"/>
 
    <mx:VBox width="95%" height="100%">
 
-         <mx:Panel width="100%" height="30%" layout="vertical" title="Last notification" horizontalAlign="center">
+         <mx:Panel width="100%" height="30%" layout="vertical" title="Derniere notification" horizontalAlign="center">
 
             <mx:Label id="textTypeNotif" fontSize="30" color="blue" fontWeight="bold"/>
             <mx:Label id="textMessageNotif" fontSize="30" color="blue" fontStyle="italic"/>
 
          </mx:Panel>
 
-         <mx:Panel width="100%" height="70%" layout="vertical" title="Notifications list">
+         <mx:Panel width="100%" height="70%" layout="vertical" title="Liste des Notifications">
             <mx:DataGrid id="DG_notifications" dataProvider="{this.notifList}" width="100%"  height="90%" editable="false"
                             rowCount="20" verticalScrollPolicy="on"
                             dataTipFunction="buildNotificationTip"

@@ -162,14 +162,14 @@
 			<mx:AddChild relativeTo="{HB_linkLogin}"  position="before" creationPolicy="all"	>
 
 				<mx:ViewStack id="stack" width="100%" height="100%" >
-					<view:Registering id="VS_registering" label="Registering" />
-					<view:Label label="Label" />
-					<view:Departure label="Departure" />
-					<view:Arrival label="Arrival" />
-					<view:Tracking label="Tracking" />
-					<view:Ranking label="Ranking" />
+					<view:Registering id="VS_registering" label="Inscriptions" />
+					<view:Label label="Liste des inscrits" />
+					<view:Departure label="Depart" />
+					<view:Arrival label="Arrivee" />
+					<view:Tracking label="Suivi" />
+					<view:Ranking label="Classement" />
 					<view:Admin label="Admin" />
-					<view:Statistics label="Statistics" />
+					<view:Statistics label="Stats" />
 					<view:Test label="Test" />
 				</mx:ViewStack>
 			</mx:AddChild>

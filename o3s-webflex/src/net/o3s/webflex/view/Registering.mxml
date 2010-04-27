@@ -48,7 +48,7 @@
 			import net.o3s.webflex.components.Util;
 
 			[Bindable]
-			private var event:MyEvent;
+			public var event:MyEvent=null;
 
 			[Bindable]
 			public var submitRegisteredButtonEnabled:Boolean = false;
@@ -81,7 +81,7 @@
 
 	<mx:VBox id="VB_WebRegistering" width="95%">
 		<mx:HBox id="HB_Event" width="100%" height="10%">
-			<mx:Panel title="Event" width="100%" height="100%" horizontalAlign="center">
+			<mx:Panel title="Evenement" width="100%" height="100%" horizontalAlign="center">
 				<mx:Label id="eventLabel" fontSize="14" fontWeight="bold"/>
 			</mx:Panel>
 		</mx:HBox>
