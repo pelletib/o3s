@@ -48,4 +48,8 @@ public interface IEJBRegisteringLocal {
 	void removeRegistered(final int id) throws RegisteringException;
 	IEntityRegistered updateRegistered(final int id, final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid) throws RegisteringException;
 	List<IEntityLabel> findAllLabels();
+	int countRegisteredFromCompetition(final int competitionId) throws RegisteringException;
+	int countArrivalFromCompetition(final int competitionId) throws RegisteringException;
+	int countRegisteredFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException;
+	int countArrivalFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException;
 }

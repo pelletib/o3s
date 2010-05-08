@@ -132,9 +132,9 @@ public class NotificationMessage implements Serializable {
 	}
 
 	public static final int NOTIFICATION_INT_TYPE_ARRIVAL = 0;
-	public static final String NOTIFICATION_STR_TYPE_ARRIVAL = "Arrival";
+	public static final String NOTIFICATION_STR_TYPE_ARRIVAL = "Arrivee";
 	public static final int NOTIFICATION_INT_TYPE_DEPARTURE = 1;
-	public static final String NOTIFICATION_STR_TYPE_DEPARTURE = "Departure";
+	public static final String NOTIFICATION_STR_TYPE_DEPARTURE = "Depart";
 
 	private int registeredId;
 	private int competitionId;
