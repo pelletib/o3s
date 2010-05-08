@@ -55,13 +55,21 @@ import net.o3s.apis.IEntityRegistered;
  */
 @Entity
 @NamedQueries( {
+	@NamedQuery(name = "COUNT_REGISTERED_FROM_COMPETITION",
+		    query = "SELECT count(r) FROM Registered r WHERE r.event.id = :EVENTID AND r.competition.id = :COMPETITION"),
+	@NamedQuery(name = "COUNT_ARRIVAL_FROM_COMPETITION",
+			query = "SELECT count(r) FROM Registered r WHERE r.event.id = :EVENTID AND r.competition.id = :COMPETITION AND r.arrivalDate IS NOT NULL"),
+	@NamedQuery(name = "COUNT_REGISTERED_FROM_COMPETITION_AND_CATEGORY",
+		    query = "SELECT count(r) FROM Registered r WHERE r.event.id = :EVENTID AND r.competition.id = :COMPETITION AND r.category.id = :CATEGORY"),
+	@NamedQuery(name = "COUNT_ARRIVAL_FROM_COMPETITION_AND_CATEGORY",
+			query = "SELECT count(r) FROM Registered r WHERE r.event.id = :EVENTID AND r.competition.id = :COMPETITION AND r.category.id = :CATEGORY AND r.arrivalDate IS NOT NULL"),
 	@NamedQuery(name = "REGISTERED_FROM_NAME", query = "SELECT r FROM Registered r WHERE r.name = :NAME AND r.event.id = :EVENTID"),
 	@NamedQuery(name = "REGISTERED_FROM_PERSONID", query = "SELECT r FROM Registered r INNER JOIN r.persons p WHERE p.id = :PERSONID AND r.event.id = :EVENTID"),
     @NamedQuery(name = "REGISTERED_FROM_LABEL", query = "SELECT r FROM Registered r WHERE r.label.value LIKE :VALUE"),
     @NamedQuery(name = "REGISTERED_FROM_COMPETITION_ORDERBY_ETIME",
-		    query = "SELECT r FROM Registered r WHERE r.competition.id = :COMPETITION AND r.arrivalDate IS NOT NULL ORDER BY r.elapsedTime"),
+		    query = "SELECT r FROM Registered r WHERE r.event.id = :EVENTID AND r.competition.id = :COMPETITION AND r.arrivalDate IS NOT NULL ORDER BY r.elapsedTime"),
 	@NamedQuery(name = "REGISTERED_FROM_COMPETITION_ORDERBY_CATEGORY_ETIME",
-			    query = "SELECT r FROM Registered r WHERE r.competition.id = :COMPETITION AND r.arrivalDate IS NOT NULL ORDER BY r.category.id,r.elapsedTime"),
+			    query = "SELECT r FROM Registered r WHERE r.event.id = :EVENTID AND r.competition.id = :COMPETITION AND r.arrivalDate IS NOT NULL ORDER BY r.category.id,r.elapsedTime"),
 	@NamedQuery(name = "ALL_REGISTERED_FROM_EVENT", query = "SELECT r FROM Registered r WHERE r.event.id = :EVENT_ID"),
     @NamedQuery(name = "ALL_REGISTERED", query = "SELECT r FROM Registered r") })
 public class Registered implements IEntityRegistered, Serializable {
