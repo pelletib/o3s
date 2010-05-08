@@ -53,9 +53,6 @@ import net.o3s.persistence.Label;
 import net.o3s.persistence.Person;
 import net.o3s.persistence.Registered;
 
-
-
-
 /**
  * Session Bean implementation class RegisteringBean
  */
@@ -85,7 +82,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     		}
     	}
     	if (!found) {
-    		throw new RegisteringException("Category <" + category.getName() + "> is not compatible with Competition <" + competition.getName() + ">");
+    		throw new RegisteringException("La categorie <" + category.getName() + "> n'est pas compatible avec la competition <" + competition.getName() + ">");
     	}
     	return;
     }
@@ -144,7 +141,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     	int labelNumber = competition.getLastLabelNumber() + 1;
     	if (labelNumber >= competition.getHigherLabelNumber()) {
-    		throw new RegisteringException("label overflow");
+    		throw new RegisteringException("Debordement de numero de dossard");
     	}
     	competition.setLastLabelNumber(labelNumber);
 
@@ -160,7 +157,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	label.setValue(labelValue);
         	this.entityManager.persist(label);
     	} else {
-    		throw new RegisteringException("Label already exists for number [" + labelNumber + "]:" + label);
+    		throw new RegisteringException("Le dossard existe deja pour cette etiquette [" + labelNumber + "]:" + label);
     	}
 
     	return label;
@@ -223,7 +220,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
             this.entityManager.persist(person);
         } else {
-        	throw new RegisteringException("The person <" + lastname + ", " + firstname + ", " + birthday + "> already exists !");
+        	throw new RegisteringException("La personne <" + lastname + ", " + firstname + ", " + birthday + "> existe deja !");
         }
         return person;
     }
@@ -240,7 +237,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	person.setSex(sex);
         	person.setBirthday(birthday);
         } else {
-        	throw new RegisteringException("The person <" + id + "> doesn't exist !");
+        	throw new RegisteringException("La personne <" + id + "> n'existe pas !");
         }
         return person;
     }
@@ -260,7 +257,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	p.setSex(person.getSex());
         	p.setBirthday(person.getBirthday());
         } else {
-        	throw new RegisteringException("The person <" + person + "> doesn't exist !");
+        	throw new RegisteringException("La personne <" + person + "> n'existe pas !");
         }
         return person;
     }
@@ -378,10 +375,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
         } catch (NonUniqueResultException nure) {
         	nure.printStackTrace();
-        	throw new RegisteringException("Unable to find label[" + labelValue + "]", nure);
+        	throw new RegisteringException("Impossible de trouver ce dossard [" + labelValue + "]", nure);
         } catch (Exception e){
         	e.printStackTrace();
-        	throw new RegisteringException("Unable to find label[" + labelValue + "]", e);
+        	throw new RegisteringException("Impossible de trouver ce dossard [" + labelValue + "]", e);
 
         }
 
@@ -410,8 +407,12 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByDuration(final int competitionId) throws RegisteringException {
+
+    	IEntityEvent event = admin.findDefaultEvent();
+
         Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_ETIME");
         query.setParameter("COMPETITION", competitionId);
+        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
@@ -432,8 +433,11 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId) throws RegisteringException {
-        Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_CATEGORY_ETIME");
+    	IEntityEvent event = admin.findDefaultEvent();
+
+    	Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_CATEGORY_ETIME");
         query.setParameter("COMPETITION", competitionId);
+        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
@@ -452,7 +456,89 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    @SuppressWarnings("unchecked")
+    public int countRegisteredFromCompetition(final int competitionId) throws RegisteringException {
+    	IEntityEvent event = admin.findDefaultEvent();
 
+    	Query query = this.entityManager.createNamedQuery("COUNT_REGISTERED_FROM_COMPETITION");
+        query.setParameter("COMPETITION", competitionId);
+        query.setParameter("EVENTID", event.getId());
+
+        int count = -1;
+        try {
+        	count = ((Long) query.getSingleResult()).intValue();
+        } catch (javax.persistence.NoResultException e) {
+        	count = 0;
+        } catch (Exception e){
+        	e.printStackTrace();
+        	throw new RegisteringException("Unable to find registered for competitionId [" + competitionId + "]", e);
+        }
+        return count;
+    }
+
+    @SuppressWarnings("unchecked")
+    public int countArrivalFromCompetition(final int competitionId) throws RegisteringException {
+    	IEntityEvent event = admin.findDefaultEvent();
+
+    	Query query = this.entityManager.createNamedQuery("COUNT_ARRIVAL_FROM_COMPETITION");
+        query.setParameter("COMPETITION", competitionId);
+        query.setParameter("EVENTID", event.getId());
+
+        int count = -1;
+        try {
+        	count = ((Long) query.getSingleResult()).intValue();
+        } catch (javax.persistence.NoResultException e) {
+        	count = 0;
+        } catch (Exception e){
+        	e.printStackTrace();
+        	throw new RegisteringException("Unable to find arrival for competitionId [" + competitionId + "]", e);
+        }
+        return count;
+    }
+
+    @SuppressWarnings("unchecked")
+    public int countRegisteredFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException {
+    	IEntityEvent event = admin.findDefaultEvent();
+
+    	Query query = this.entityManager.createNamedQuery("COUNT_REGISTERED_FROM_COMPETITION_AND_CATEGORY");
+        query.setParameter("COMPETITION", competitionId);
+        query.setParameter("CATEGORY", categoryId);
+        query.setParameter("EVENTID", event.getId());
+
+        int count = -1;
+        try {
+        	count = ((Long) query.getSingleResult()).intValue();
+        } catch (javax.persistence.NoResultException e) {
+        	count = 0;
+        } catch (Exception e){
+        	e.printStackTrace();
+        	throw new RegisteringException("Unable to find registered for competitionId [" + competitionId + "] and categoryId [" + categoryId + "]", e);
+        }
+        return count;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public int countArrivalFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException {
+    	IEntityEvent event = admin.findDefaultEvent();
+
+    	Query query = this.entityManager.createNamedQuery("COUNT_ARRIVAL_FROM_COMPETITION_AND_CATEGORY");
+        query.setParameter("COMPETITION", competitionId);
+        query.setParameter("CATEGORY", categoryId);
+        query.setParameter("EVENTID", event.getId());
+
+        int count = -1;
+        try {
+        	count = ((Long) query.getSingleResult()).intValue();
+        } catch (javax.persistence.NoResultException e) {
+        	count = 0;
+        } catch (Exception e){
+        	e.printStackTrace();
+        	throw new RegisteringException("Unable to find arrival for competitionId [" + competitionId + "] and categoryId [" + categoryId + "]", e);
+        }
+        return count;
+
+    }
 
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findAllRegistered() {
@@ -499,13 +585,13 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
            		registeredName = person.getFirstname() + " " + person.getLastname();
            	} else {
            		if (name == null || name.equals("") == true ) {
-                	throw new RegisteringException("Name is not valid !");
+                	throw new RegisteringException("Ce nom n'est pas valide !");
            		}
            		registeredName = name;
            	}
 
     		if (findRegisteredFromName(name) != null) {
-            	throw new RegisteringException("The registered <" + name + "> already exists !");
+            	throw new RegisteringException("L'inscrit <" + name + "> existe deja !");
     		}
 
         	registered = new Registered();
@@ -526,7 +612,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
             	// retrieve the category
             	List<IEntityCategory> categories = admin.findCategoryFromDatesAndSex(persons.get(0).getBirthday(), persons.get(0).getSex());
             	if (categories == null || categories.isEmpty()){
-            		throw new RegisteringException("Category not found for (birthday/sex):" + persons.get(0).getBirthday() + "," + persons.get(0).getSex());
+            		throw new RegisteringException("Categorie non trouvee pour le couple (date naissance/sexe):" + persons.get(0).getBirthday() + "," + persons.get(0).getSex());
             	}
             	// get the first one (almost equiv to random)
             	category = categories.get(0);
@@ -554,7 +640,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	label = createLabel(competition, category,  registeredName);
 
         	if (label == null) {
-        		throw new RegisteringException("Unable to create a label for (competition/category/name)" + competition + ", " + category + ", " + registeredName);
+        		throw new RegisteringException("Impossible de creer un dossard pour le triplet (competition/categorie/nom)" + competition + ", " + category + ", " + registeredName);
         	}
         	registered.setLabel(label);
         	registered = this.entityManager.merge(registered);
@@ -586,7 +672,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
                	} else {
                		if (name == null || name.equals("") == true ) {
-                    	throw new RegisteringException("Name is not valid !");
+                    	throw new RegisteringException("Nom invalide !");
                		}
                		registeredName = name;
                	}
@@ -594,7 +680,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
                	IEntityRegistered r = findRegisteredFromName(name);
 
         		if (r != null && r.getId() != id) {
-                	throw new RegisteringException("The registered <" + name + "> already exists !");
+                	throw new RegisteringException("L'inscrit <" + name + "> existe deja !");
         		}
 
             	registered.setName(registeredName);
@@ -614,7 +700,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
                 	// retrieve the category
                 	List<IEntityCategory> categories = admin.findCategoryFromDatesAndSex(persons.get(0).getBirthday(), persons.get(0).getSex());
                 	if (categories == null || categories.isEmpty()){
-                		throw new RegisteringException("Category not found for (birthday/sex):" + persons.get(0).getBirthday() + "," + persons.get(0).getSex());
+                		throw new RegisteringException("Categorie non trouvee pour le couple (date naissance/sexe):" + persons.get(0).getBirthday() + "," + persons.get(0).getSex());
                 	}
                 	// get the first one (almost equiv to random)
                 	category = categories.get(0);
@@ -638,7 +724,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
             		label = createLabel(competition, category,  registeredName);
 
             		if (label == null) {
-            			throw new RegisteringException("Unable to create a label for (competition/category/name)" + competition + ", " + category + ", " + registeredName);
+            			throw new RegisteringException("Impossible de creer un dossard pour le triplet (competition/categorie/nom)" + competition + ", " + category + ", " + registeredName);
             		}
             		registered.setLabel(label);
 
@@ -646,7 +732,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	}
 
           } else {
-        	throw new RegisteringException("The registered <" + id + "> doesn't exist !");
+        	throw new RegisteringException("L'inscrit <" + id + "> n'existe pas !");
         }
         return registered;
 
