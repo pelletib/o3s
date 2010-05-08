@@ -30,20 +30,18 @@ import java.util.List;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-
 import net.o3s.apis.IEJBAdminRemote;
 import net.o3s.apis.IEJBRegisteringRemote;
 import net.o3s.apis.IEntityCategory;
+import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
 import net.o3s.web.common.Util;
-import net.o3s.web.vo.CategoryVO;
 import net.o3s.web.vo.FlexException;
 import net.o3s.web.vo.PersonVO;
+import net.o3s.web.vo.RegisteredStatisticsVO;
 import net.o3s.web.vo.RegisteredVO;
-
-
 
 public class Registering {
 
@@ -67,7 +65,6 @@ public class Registering {
 				e1.printStackTrace();
 			}
 		}
-
 	}
 
 	private void setRegisteringEJB() {
@@ -84,7 +81,6 @@ public class Registering {
 				e1.printStackTrace();
 			}
 		}
-
 	}
 
 
@@ -315,6 +311,74 @@ public class Registering {
 		System.out.println("remove registered=" + id);
 	}
 
+    public List<RegisteredStatisticsVO> getStatistics() throws RegisteringException {
+		setAdminEJB();
+    	List<IEntityCompetition> competitions = admin.findAllCompetitionsFromDefaultEvent();
+    	List<IEntityCategory> categories = admin.findAllCategoriesFromDefaultEvent();
 
+		setRegisteringEJB();
 
+		int registeredNb = - 1;
+		int arrivalNb = -1;
+		int totalRegisteredNb = 0;
+		int totalArrivalNb = 0;
+		RegisteredStatisticsVO registeredStatisticsVO =  null;
+
+		List<RegisteredStatisticsVO> statistics = new ArrayList<RegisteredStatisticsVO>();
+
+		for (IEntityCompetition competition:competitions) {
+
+			if (competition.getName().equals("Unknown")) {
+				continue;
+			}
+
+			// statistics for scratch
+			registeredStatisticsVO = new RegisteredStatisticsVO();
+			registeredStatisticsVO.setCompetition(competition.getName());
+			registeredStatisticsVO.setCategory("Total");
+
+			registeredNb = registering.countRegisteredFromCompetition(competition.getId());
+			totalRegisteredNb += registeredNb;
+			registeredStatisticsVO.setRegisteredNumber(registeredNb);
+			arrivalNb = registering.countArrivalFromCompetition(competition.getId());
+			totalArrivalNb += arrivalNb;
+			registeredStatisticsVO.setArrivalNumber(arrivalNb);
+			statistics.add(registeredStatisticsVO);
+
+			// statistics by categories
+			for (IEntityCategory category:categories) {
+
+				// check if the competition is compatible with the category
+				for (IEntityCompetition competitionInCategory:category.getCompetitions()) {
+					if (competitionInCategory.getId() == competition.getId()) {
+
+						registeredNb = registering.countRegisteredFromCompetitionAndCategory(competition.getId(), category.getId());
+						arrivalNb = registering.countArrivalFromCompetitionAndCategory(competition.getId(), category.getId());
+
+						// don't add if equals 0
+						if (registeredNb != 0 || arrivalNb != 0) {
+							registeredStatisticsVO = new RegisteredStatisticsVO();
+							registeredStatisticsVO.setCompetition(competition.getName());
+							registeredStatisticsVO.setCategory(category.getName());
+							registeredStatisticsVO.setRegisteredNumber(registeredNb);
+							registeredStatisticsVO.setArrivalNumber(arrivalNb);
+							statistics.add(registeredStatisticsVO);
+							break;
+						}
+					}
+
+				}
+			}
+		}
+
+		// Add total counter
+		registeredStatisticsVO = new RegisteredStatisticsVO();
+		registeredStatisticsVO.setCompetition("Total");
+		registeredStatisticsVO.setCategory("Total");
+		registeredStatisticsVO.setRegisteredNumber(totalRegisteredNb);
+		registeredStatisticsVO.setArrivalNumber(totalArrivalNb);
+		statistics.add(registeredStatisticsVO);
+
+		return statistics;
+    }
 }
