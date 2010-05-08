@@ -105,56 +105,19 @@
 				}
 			}
 
-            private function pausePurgeTask():void {
-                //var pausePurgeTaskEvent:PausePurgeTaskEvent = new PausePurgeTaskEvent();
-                //pausePurgeTaskEvent.purgeTaskId = data.id;
-
-                // Dispatch event
-                //CairngormEventDispatcher.getInstance().dispatchEvent(pausePurgeTaskEvent);
-				Alert.show("pause data id = " + data.id);
-            }
-
-            private function startPurgeTask():void {
-                //var startPurgeTaskEvent:StartPurgeTaskEvent = new StartPurgeTaskEvent();
-                //startPurgeTaskEvent.purgeTaskId = data.id;
-
-                // Dispatch event
-                //CairngormEventDispatcher.getInstance().dispatchEvent(startPurgeTaskEvent);
-				Alert.show("start data id = " + data.id);
-            }
-
             private function dataChanged():void {
 
-				// reinit if necessary the check box
-				if (parentDocument.getIdxSelectedRegistered(data.id) == -1) {
-					CB_selectItem.selected = false;
-				} else {
-					CB_selectItem.selected = true;
-				}
-                if (data.executionInterval > 0) {
-                    if (data.started) {
-                        this.currentState = "startedPurgeTaskState";
-                    } else {
-                        this.currentState = "pausedPurgeTaskState";
-                    }
-                }
+				  // reinit if necessary the check box
+               if (parentDocument != null) {
+				     if (parentDocument.getIdxSelectedRegistered(data.id) == -1) {
+					    CB_selectItem.selected = false;
+				     } else {
+					    CB_selectItem.selected = true;
+				     }
+               }
             }
         ]]>
     </mx:Script>
-
-
-    <mx:states>
-        <mx:State name="startedPurgeTaskState">
-            <mx:AddChild>
-                <mx:Button icon="{pauseIcon16}" width="20" height="20" click="pausePurgeTask()" />
-            </mx:AddChild>
-        </mx:State>
-        <mx:State name="pausedPurgeTaskState">
-            <mx:AddChild>
-                <mx:Button icon="{startIcon16}" width="20" height="20" click="startPurgeTask()" />
-            </mx:AddChild>
-        </mx:State>
-    </mx:states>
 
     <mx:Button id="B_removeItem" icon="{removeIcon16}" width="20" height="20" toolTip="Supprimer un inscrit"
                click="confirmRemove()" />

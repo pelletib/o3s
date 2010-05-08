@@ -48,7 +48,7 @@ package net.o3s.webflex.components
 			if (clazz != null) {
 				Alert.show(msg,"Error");
 			}  else {
-				Alert.show("Error! Please try again. If this issue persists, contact the system administrator : " + event.fault.faultString);
+				Alert.show("Erreur ! Si l'erreur persiste, contacter l'administrateur " + event.fault.faultString);
 			}
 		}
 

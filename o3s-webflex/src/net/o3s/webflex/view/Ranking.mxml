@@ -183,7 +183,9 @@
 			// user does not have to mouse over to it.
 			private function resetFocus():void
 			{
-				focusManager.setFocus(CB_competition);
+            if (focusManager != null) {
+               focusManager.setFocus(CB_competition);
+            }
 			}
 
 

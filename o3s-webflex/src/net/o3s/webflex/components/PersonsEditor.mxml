@@ -103,7 +103,7 @@
 
 			personList.setItemAt(person,idx);
 			clearFormHandler();
-			this.parentDocument.notifyChangeFromPersonsEditor();
+			this.parentDocument.notifyChangeFromChildComponent();
 		}
 
 		private function resultRemovePerson(event:ResultEvent):void {

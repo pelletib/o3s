@@ -25,7 +25,7 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 -->
 
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:component="net.o3s.webflex.component.*" xmlns:view="net.o3s.webflex.view.*" creationComplete="init()">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:component="net.o3s.webflex.component.*" xmlns:view="net.o3s.webflex.view.*" preinitialize="initTest()" creationComplete="init()">
 
 	<mx:Script>
 		<![CDATA[
@@ -48,6 +48,11 @@
 
 			private var username:String;
 			private var password:String;
+
+         public function initTest():void {
+            // tempory for tests purpose
+            RO_init.populateAdminData();
+         }
 
 			public function init():void {
 				this.currentState="";
@@ -110,6 +115,8 @@
 
 		]]>
 	</mx:Script>
+
+   <mx:RemoteObject id="RO_init" destination="init"/>
 
 	<mx:RemoteObject id="RO_login" destination="login" fault="Util.onFault(event)">
 		<mx:method name="login" result="resultLogin(event)" fault="Util.handleException(event)"/>

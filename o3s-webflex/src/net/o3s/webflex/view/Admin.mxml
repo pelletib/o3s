@@ -41,7 +41,7 @@
 
 			public function refreshAdminData():void {
 
-            RO_admin.getAllEvents();
+            	RO_admin.getAllEvents();
 				RO_admin.getAllCompetitions();
 				RO_admin.getAllCategories();
 			}

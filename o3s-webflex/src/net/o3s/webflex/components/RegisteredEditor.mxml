@@ -211,7 +211,9 @@
 		// Helper method. Sets the focus on the first field so
 		// user does not have to mouse over to it.
 		private function resetFocus():void {
-			focusManager.setFocus(CB_competition);
+         if (focusManager != null) {
+			   focusManager.setFocus(CB_competition);
+         }
 		}
 
 		private function refreshSubmitRegisteredButtonEnabled():void {

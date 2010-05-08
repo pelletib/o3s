@@ -65,15 +65,11 @@
 
 
 			private function init():void {
-				// tempory for tests purpose
-				RO_init.populateAdminData();
 				refreshAdminData();
 			}
 
 		]]>
 	</mx:Script>
-
-	<mx:RemoteObject id="RO_init" destination="init"/>
 
 	<mx:RemoteObject id="RO_admin" destination="admin" fault="Util.onFault(event)">
 		<mx:method name="getDefaultEvent" result="resultGetDefaultEvent(event)"/>
