@@ -87,8 +87,8 @@
 
 
 			public function onClickRefresh(ev:Event):void {
-				refreshRegisteredData();
-			}
+            resetRegisteredData();
+         }
 
 			public function refreshAdminData():void {
 
@@ -99,48 +99,31 @@
 
 			}
 
+         public function resetRegisteredData():void {
+            selectAll=false;
+            CB_selectAll.selected = false;
+            selectedItems.removeAll();
+            registeredList.filterFunction = null;
+            selectedCompetitionFilter=null;
+            selectedNameFilter="";
+            selectedLabelFilter = "";
+
+            CB_competition.selectedItem = -1;
+            TI_selectedNameFilter.text="";
+            TI_selectedLabelFilter.text="";
+            refreshRegisteredData();
+         }
+
 			public function refreshRegisteredData():void {
-
-				RO_admin.getDefaultEvent();
-
 				RO_registering.getRegistereds();
-				registeredList.filterFunction = null;
-
-				selectedCompetitionFilter=null;
-				selectedNameFilter="";
-				selectedLabelFilter = "";
-
-				CB_competition.selectedItem = -1;
-				TI_selectedNameFilter.text="";
-				TI_selectedLabelFilter.text="";
-
-				// refresh selected list if some items have been removed
-				var found:Boolean = false;
-				for(var i:int = 0; i < selectedItems.length; i++) {
-					var id:int = selectedItems.getItemAt(i, 0) as int;
-					found = false;
-					for(var j:int = 0; j < registeredList.length; j++) {
-						var r:Registered = registeredList.getItemAt(j, 0) as Registered;
-						if (r.id == id) {
-							found = true;
-							break;
-						}
-					}
-					if (found == false) {
-						selectedItems.removeItemAt(i);
-					}
-				}
-				actionSelectionEnabled = (selectedItems.length > 0);
-
 			}
 
 			public function init():void {
 				refreshAdminData();
-				refreshRegisteredData();
+            resetRegisteredData();
 				printDialog=false;
 				selectAll=false;
 				currentState="";
-
 			}
 
 			private function displayCompetition(item:Object, col:DataGridColumn):String
@@ -293,6 +276,28 @@
 
 			private function resultGetRegistered(event:ResultEvent):void {
 				registeredList = event.result as ArrayCollection;
+
+           // refresh selected list if some items have been removed
+            var found:Boolean = false;
+            for(var i:int = 0; i < selectedItems.length; i++) {
+               var id:int = selectedItems.getItemAt(i, 0) as int;
+               found = false;
+               for(var j:int = 0; j < registeredList.length; j++) {
+                  var r:Registered = registeredList.getItemAt(j, 0) as Registered;
+                  if (r.id == id) {
+                     found = true;
+                     break;
+                  }
+               }
+               if (found == false) {
+                  selectedItems.removeItemAt(i);
+               }
+            }
+            // action buttons has to be disabled ?
+            actionSelectionEnabled = (selectedItems.length > 0);
+
+            // apply filter
+            setFilters();
 			}
 
 			public function getDateLabel(item:Object,column:DataGridColumn):String
@@ -373,6 +378,9 @@
 			}
 
 			private function setFilters():void {
+
+            //Alert.show("ComF=" + selectedCompetitionFilter + ", NamF=" + selectedNameFilter + ", LabF=" + selectedLabelFilter);
+
 				if (selectedCompetitionFilter != null || selectedNameFilter != "" || selectedLabelFilter != "") {
 					registeredList.filterFunction = processFilters;
 				} else {
@@ -411,7 +419,7 @@
 				}
 
 				if (selectedNameFilter != "") {
-					resultNameFilter = registered.name.match(selectedNameFilter);
+					resultNameFilter = registered.name.toLowerCase().match(selectedNameFilter.toLowerCase());
 				}
 
 				if (selectedLabelFilter != "") {
@@ -426,7 +434,6 @@
 				actionSelectionEnabled = true;
 
 			}
-
 
 			// return -1 if not found
 			public function getIdxSelectedRegistered(id:int):int {
