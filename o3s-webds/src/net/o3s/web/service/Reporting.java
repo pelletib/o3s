@@ -116,6 +116,7 @@ public class Reporting {
 			throw new FlexException(e.getMessage());
 		}
 	}
+
 	public void printLabel(final int registeredId, boolean withPrintDialog) {
 		setReportEJB();
 		try  {
