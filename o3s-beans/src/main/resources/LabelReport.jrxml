@@ -39,26 +39,37 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-      		<band height="300" splitType="Stretch">
+      		<band height="450" splitType="Stretch">
+
 			<textField>
-				<reportElement x="0" y="0" width="100" height="20"/>
-				<textElement/>
+				<reportElement x="0" y="0" width="800" height="50"/>
+				<textElement textAlignment="Center">
+					<font size="40" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{event}.getName()]]></textFieldExpression>
+			</textField>
+
+			<textField>
+				<reportElement x="0" y="100" width="800" height="50"/>
+				<textElement textAlignment="Center">
+					<font size="30"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+
+			<textField>
+				<reportElement x="0" y="150" width="400" height="50"/>
+				<textElement textAlignment="Center">
+					<font size="30"/>
+				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{competition}.getName()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="100" y="0" width="100" height="20"/>
-				<textElement/>
+				<reportElement x="400" y="150" width="400" height="50"/>
+				<textElement textAlignment="Center">
+					<font size="30"/>
+				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{category}.getName()]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="200" y="0" width="100" height="20"/>
-				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="300" y="0" width="100" height="20"/>
-				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{label}.getValue()]]></textFieldExpression>
 			</textField>
 
 <!--
@@ -73,11 +84,20 @@
 
 -->
 
+			<textField>
+				<reportElement x="0" y="200" width="800" height="200"/>
+				<textElement textAlignment="Center">
+					<font size="150" isBold="true"/>
+				</textElement>
+
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{label}.getNumber()]]></textFieldExpression>
+			</textField>
+
          		<componentElement>
-				<reportElement style="Barcode" x="200" y="100" width="400" height="150" />
+				<reportElement style="Barcode" x="330" y="400" width="400" height="50" />
             			<c:Code128 xmlns:c="http://jasperreports.sourceforge.net/jasperreports/components" 
                                   xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" 
-                                      moduleWidth="1.2" textPosition="none">
+                                      moduleWidth="1.2" textPosition="bottom">
 
 					<c:codeExpression><![CDATA[$F{label}.getValue()]]></c:codeExpression>
 				</c:Code128>
@@ -88,10 +108,10 @@
       		</band>
    	</title>
 	<pageHeader>
-		<band height="100" splitType="Stretch"/>
+		<band height="40" splitType="Stretch"/>
 	</pageHeader>
 
 	<pageFooter>
-		<band height="100"/>
+		<band height="40"/>
 	</pageFooter>
 </jasperReport>

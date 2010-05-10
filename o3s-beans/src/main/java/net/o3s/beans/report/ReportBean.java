@@ -39,6 +39,12 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.HashPrintServiceAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.PrintServiceAttributeSet;
+import javax.print.attribute.standard.MediaSizeName;
+import javax.print.attribute.standard.OrientationRequested;
 
 import net.o3s.apis.IEJBAdminLocal;
 import net.o3s.apis.IEJBRegisteringLocal;
@@ -49,6 +55,7 @@ import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
 import net.o3s.apis.ReportException;
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -57,6 +64,8 @@ import net.sf.jasperreports.engine.JasperPrintManager;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
+import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.engine.query.JRJpaQueryExecuterFactory;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
@@ -68,21 +77,52 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 @Remote(IEJBReportRemote.class)
 public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
+	/**
+	 * Logger
+	 */
     private static Logger logger = Logger.getLogger(ReportBean.class.getName());
+
+    /**
+     * Prefix for scratch ranking report
+     */
     private static String SCRATCH_RANKING_REPORT="ScratchRankingReport";
+
+    /**
+     * Prefix for categories ranking report
+     */
     private static String CATEGORIES_RANKING_REPORT="CategoriesRankingReport";
+
+    /**
+     * Prefix for label report
+     */
     private static String LABEL_REPORT="LabelReport";
 
-
+    /**
+     * Persistent manager
+     */
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * Admin EJB
+     */
     @EJB
     private IEJBAdminLocal admin;
 
+    /**
+     * Registering EJB
+     */
     @EJB
     private IEJBRegisteringLocal registering;
 
+    /**
+     * Get a Jasper document (that can be viewed, printed, exported)
+     * @param sourceFileName JRXML source file
+     * @param parameters parameters for the JRXML file
+     * @param collection datas for the JRXML file
+     * @return Jasper document
+     * @throws ReportException whenever an error occurs
+     */
     @SuppressWarnings("unchecked")
 	private JasperPrint getJasperPrint(String sourceFileName, Map parameters, Collection collection) throws ReportException {
 
@@ -125,6 +165,14 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
 	}
 
+    /**
+     * Generate a pdf file from the Jasper report description
+     * @param sourceFileName JRXML source file
+     * @param pdfFileName target file name
+     * @param parameters parameters for the JRXML file
+     * @param collection datas for the JRXML file
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	private void invokeJasperReportPdf(String sourceFileName, String pdfFileName,
 			Map parameters, Collection collection) throws ReportException {
@@ -143,6 +191,14 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		logger.fine("Export ok");
 	}
 
+    /**
+     * Generate a pdf stream from the Jasper report description
+     * @param sourceFileName JRXML source file
+     * @param outputStream target output stream
+     * @param parameters parameters for the JRXML file
+     * @param collection datas for the JRXML file
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	private void invokeJasperReportStream(String sourceFileName, OutputStream outputStream,
 			Map parameters, Collection collection) throws ReportException {
@@ -161,13 +217,43 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		logger.fine("Export ok");
 	}
 
+    /**
+     * Print a report
+     * @param sourceFileName JRXML source file
+     * @param parameters parameters for the JRXML file
+     * @param collection datas for the JRXML file
+     * @param withPrintDialog open or not the print dialog
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	private void printJasperReport(String sourceFileName, Map parameters, Collection collection, boolean withPrintDialog) throws ReportException {
 
     	JasperPrint jasperPrint = getJasperPrint(sourceFileName, parameters, collection);
 
 		try {
-			JasperPrintManager.printReport(jasperPrint, withPrintDialog);
+			// Jasper native method
+			//JasperPrintManager.printReport(jasperPrint, withPrintDialog);
+
+			// with more advanced option to adjust the printer configuration
+			PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
+			printRequestAttributeSet.add(MediaSizeName.ISO_A4);
+			printRequestAttributeSet.add(OrientationRequested.LANDSCAPE);
+
+			PrintServiceAttributeSet printServiceAttributeSet = new HashPrintServiceAttributeSet();
+			//printServiceAttributeSet.add(new PrinterName("Epson Stylus 820 ESC/P 2", null));
+			//printServiceAttributeSet.add(new PrinterName("hp LaserJet 1320 PCL 6", null));
+			//printServiceAttributeSet.add(new PrinterName("PDFCreator", null));
+
+			JRPrintServiceExporter exporter = new JRPrintServiceExporter();
+
+			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+			exporter.setParameter(JRPrintServiceExporterParameter.PRINT_REQUEST_ATTRIBUTE_SET, printRequestAttributeSet);
+			exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceAttributeSet);
+			exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
+			exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, withPrintDialog);
+
+			exporter.exportReport();
+
 		} catch (JRException e) {
 			e.printStackTrace();
 			throw new ReportException(
@@ -178,6 +264,11 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		logger.fine("Print ok");
 	}
 
+    /**
+     * Build the file name for the scratch ranking
+     * @param competitionId competition id
+     * @return file name
+     */
     public String buildScratchFileName(final int competitionId)  throws ReportException{
     	IEntityCompetition competition = null;
 
@@ -191,9 +282,13 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		pdfFileName = pdfFileName.replace(' ', '_');
 
 		return pdfFileName;
-
     }
 
+    /**
+     * Test if the ranking is not empty
+     * @param competitionId competition id
+     * @return true is the ranking is not empty
+     */
     public Boolean isNotEmptyScratchRanking(final int competitionId) {
     	IEntityCompetition competition = null;
 
@@ -214,13 +309,18 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
     	if (registereds.isEmpty()) {
     		logger.warning("Not yet arrived");
-
     		return false;
         }
 
     	return true;
     }
 
+    /**
+     * Generate a pdf report for the scratch ranking
+     * @param competitionId competition id
+	 * @return file name
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	public String getScratchRankingPdfAsFileName(final int competitionId) throws ReportException {
 
@@ -261,12 +361,25 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
         return pdfFileName;
     }
 
+    /**
+     * Generate a byte array report for the scratch ranking
+     * @param competitionId competition id
+	 * @return byte array
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	public byte[] getScratchRankingPdfAsByteArray(final int competitionId) throws ReportException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		getScratchRankingPdfAsByteArray(competitionId, outputStream);
 	    return outputStream.toByteArray();
     }
+
+    /**
+     * Generate a byte array report for the scratch ranking
+     * @param competitionId competition id
+	 * @param output stream
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
 
     @SuppressWarnings("unchecked")
 	public void getScratchRankingPdfAsByteArray(final int competitionId, final OutputStream outputStream) throws ReportException {
@@ -303,6 +416,12 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		invokeJasperReportStream(sourceFileName, outputStream, parameters, registereds);
     }
 
+    /**
+     * Test if the category ranking is not empty
+     * @param competitionId competition id
+     * @param categoryId category id
+     * @return true is the ranking is not empty
+     */
     public Boolean isNotEmptyCategoryRanking(final int competitionId, List<Integer> categoriesId) {
     	IEntityCompetition competition = null;
 
@@ -349,6 +468,13 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     	return true;
     }
 
+    /**
+     * Generate a byte array report for the category ranking
+     * @param competitionId competition id
+     * @param categoryId category id
+	 * @return byte array
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	public byte[] getCategoryRankingPdfAsByteArray(final int competitionId, List<Integer> categoriesId) throws ReportException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -356,6 +482,13 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 	    return outputStream.toByteArray();
     }
 
+    /**
+     * Generate a byte array report for the category ranking
+     * @param competitionId competition id
+     * @param categoryId category id
+	 * @param output stream
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	public void getCategoryRankingPdfAsByteArray(final int competitionId,  List<Integer> categoriesId, final OutputStream outputStream) throws ReportException {
 
@@ -404,6 +537,10 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
     }
 
+    /**
+     * Generate the file name for a category ranking report
+     * @param competitionId competition
+     */
     public String buildCategoryFileName(final int competitionId)  throws ReportException{
     	IEntityCompetition competition = null;
 
@@ -420,6 +557,12 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
     }
 
+    /**
+     * Generate a pdf report for the category ranking
+     * @param competitionId competition id
+	 * @return file name
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	public String getCategoryRankingPdfAsFileName(final int competitionId) throws ReportException {
 
@@ -460,6 +603,12 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
         return pdfFileName;
     }
 
+    /**
+     * Generate a pdf report for the label
+     * @param registeredId registered id
+	 * @return file name
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	public String getLabelPdfAsFileName(final int registeredId) throws ReportException {
 
@@ -487,6 +636,11 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
         return pdfFileName;
     }
 
+    /**
+     * Generate the label file name
+     * @param registeredId registered id
+     * @return file name
+     */
     public String buildLabelFileName(final int registeredId)  throws ReportException{
     	IEntityRegistered registered = null;
 
@@ -502,6 +656,12 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
     }
 
+    /**
+     * Generate a byte array report for the label
+     * @param registeredId registered id
+	 * @return byte array
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	public byte[] getLabelPdfAsByteArray(final int registeredId) throws ReportException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -509,6 +669,12 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 	    return outputStream.toByteArray();
     }
 
+    /**
+     * Generate a byte array report for the label
+     * @param registeredId registered id
+	 * @param output stream
+	 * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	public void getLabelPdfAsByteArray(final int registeredId, final OutputStream outputStream) throws ReportException {
 
@@ -533,6 +699,12 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		invokeJasperReportStream(sourceFileName, outputStream, parameters, registereds);
     }
 
+    /**
+     * Print a label report
+     * @param registeredId registered id
+	 * @param withPrintDialog open or not the printing dialog
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
     @SuppressWarnings("unchecked")
 	public void printLabel(final int registeredId, boolean withPrintDialog) throws ReportException {
 
@@ -543,7 +715,6 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     	if (registered == null) {
     		throw new ReportException("Registered <" + registeredId + "> unknown");
         }
-
 
     	// set parameters
 		Map parameters = new HashMap();
