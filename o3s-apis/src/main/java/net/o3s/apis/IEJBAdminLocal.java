@@ -33,7 +33,7 @@ public interface IEJBAdminLocal {
 	List<IEntityEvent> findAllEvents();
 	IEntityEvent findDefaultEvent();
 	void setDefaultEvent(final int id);
-	IEntityEvent createEvent(final String name, final Date date);
+	IEntityEvent createEvent(final String name, final Date date, final String fileName);
 
 	IEntityCompetition findCompetitionFromId(final int id);
 	List<IEntityCompetition> findAllCompetitions();

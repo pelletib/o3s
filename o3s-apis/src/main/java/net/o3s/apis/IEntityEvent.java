@@ -42,6 +42,10 @@ public interface IEntityEvent {
 
 	void setTheDefault(boolean theDefault) ;
 
+	byte[] getImageFile() ;
+
+	void setImageFile(byte[] imageFile) ;
+
 	String toString();
 
 }
