@@ -50,6 +50,7 @@ public class Util {
 			eventVO.setId(event.getId());
 			eventVO.setName(event.getName());
 			eventVO.setDate(event.getDate());
+			eventVO.setImageFile(event.getImageFile());
 			eventVO.setTheDefault(event.isTheDefault());
 		}
 		return eventVO;

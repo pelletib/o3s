@@ -29,15 +29,41 @@ import java.util.Date;
 
 public class EventVO {
 
+	/**
+	 * Id
+	 */
 	private int id;
+
+	/**
+	 * Name
+	 */
 	private String name;
+
+	/**
+	 * Date
+	 */
 	private Date date;
 
+	/**
+	 * Default event ?
+	 */
 	private boolean theDefault = false;
 
+	/**
+	 * Logo
+	 */
+	private  byte[]  imageFile;
+
+	/**
+	 * Constructor
+	 */
 	public EventVO() {
 		super();
 	}
+
+	/**
+	 * Getters/Setters
+	 */
 
 	public int getId() {
 		return this.id;
@@ -71,10 +97,18 @@ public class EventVO {
 		this.theDefault = theDefault;
 	}
 
+	public byte[] getImageFile() {
+		return imageFile;
+	}
+
+	public void setImageFile(byte[] imageFile) {
+		this.imageFile = imageFile;
+	}
 	public String toString() {
 		return "EventVO [" +
 		        this.getId() + ", " +
 		        this.getName() + ", " +
+		        this.getImageFile() + ", " +
 		        this.isTheDefault() + ", " +
 		        "]";
 	}
