@@ -49,7 +49,8 @@ public class InitBean implements IEJBInitRemote {
 
     // Events
     private static final String EVENT_NAME_0 = "Foulees de Crossey 2010";
-    private static final String EVENT_DATE_0 = "10/10/2010";
+    private static final String EVENT_DATE_0 = "17/10/2010";
+    private static final String EVENT_IMAGE_0 = "logo_cross_crossey.png";
 
     // Competitions
     private static final String NOCOMPETITION_NAME = "Unknown";
@@ -202,7 +203,7 @@ public class InitBean implements IEJBInitRemote {
         // Init Events
     	IEntityEvent event = null;
 		try {
-			event = admin.createEvent(EVENT_NAME_0, df.parse(EVENT_DATE_0));
+			event = admin.createEvent(EVENT_NAME_0, df.parse(EVENT_DATE_0), EVENT_IMAGE_0 );
 		} catch (ParseException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

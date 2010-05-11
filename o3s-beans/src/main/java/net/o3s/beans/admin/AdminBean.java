@@ -23,11 +23,17 @@
  */
 package net.o3s.beans.admin;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.EJB;
@@ -59,14 +65,76 @@ import net.o3s.persistence.Event;
 @Remote(IEJBAdminRemote.class)
 public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
+	/**
+	 * Logger
+	 */
     private static Logger logger = Logger.getLogger(AdminBean.class.getName());
 
+    /**
+     * Persistent manager
+     */
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * Notification EJB
+     */
     @EJB
     private IEJBNotificationProducerLocal notification;
 
+
+    /**
+     * Read an image file and returns it as a byte array
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    private byte[] readImage(String fileName) throws IOException {
+      logger.fine("[Open File] " + fileName);
+      File file = null;
+      InputStream is = null;
+      int length = 0;
+      // first try with the absolute path
+      try {
+    	  file = new File(fileName);
+    	  if (! file.exists()) {
+    		  // second try through the classloader
+    		  ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    		  is = cl.getResourceAsStream(fileName);
+    		  length = (int) 100 * 1024;
+
+    	  } else {
+    		  length = (int) file.length();
+        	  is = new FileInputStream(file);
+    	  }
+
+      } catch (Exception e) {
+    	  throw new IOException(e.getMessage());
+      }
+
+      // Create the byte array to hold the data
+      byte[] bytes = new byte[length];
+
+      // Read in the bytes
+      int offset = 0;
+      int numRead = 0;
+      while (offset < bytes.length && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+        offset += numRead;
+      }
+      // Ensure all the bytes have been read in
+      if (offset >= bytes.length) {
+        throw new IOException("Could not completely read file " + fileName);
+      }
+      // Close the input stream and return bytes
+      is.close();
+      return bytes;
+    }
+
+    /**
+     * get event from id
+     * @param id event id
+     * @return IEntityEvent
+     */
     public IEntityEvent findEventFromId(final int id) {
         IEntityEvent event = null;
         try {
@@ -120,7 +188,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         return event;
     }
 
-    public IEntityEvent createEvent(final String name, final Date date) {
+    public IEntityEvent createEvent(final String name, final Date date, final String fileName) {
     	IEntityEvent event = null;
 
     	event = findEventFromName(name);
@@ -129,6 +197,16 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
             event.setName(name);
             event.setDate(date);
             event.setTheDefault(false);
+
+            if (fileName != null) {
+				try {
+					// Lets open an image file
+					event.setImageFile(readImage(fileName));
+				} catch (Exception ex) {
+					logger.log(Level.SEVERE, null, ex);
+				}
+            }
+
             this.entityManager.persist(event);
         }
         return event;
@@ -143,7 +221,6 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     		newDefaultEvent.setTheDefault(true);
         	oldDefaultEvent.setTheDefault(false);
     	}
-
     }
 
     public IEntityCompetition findCompetitionFromName(final String name) {
@@ -184,8 +261,6 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         }
         return competitions;
     }
-
-
 
     @SuppressWarnings("unchecked")
     public  List<IEntityEvent> findAllEvents() {
@@ -306,7 +381,6 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         	categories = new ArrayList<IEntityCategory>();
         }
 
-
         return categories;
 
     }
@@ -338,7 +412,6 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         	category.setSex(sex);
         	category.setShortName(shortName);
         	category.setEvent(event);
-
         	category.setCompetitions(new HashSet(Arrays.asList(competitions)));
 
             this.entityManager.persist(category);
@@ -346,6 +419,5 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
         return category;
     }
-
 
 }
