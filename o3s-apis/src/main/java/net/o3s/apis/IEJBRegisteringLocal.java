@@ -28,8 +28,8 @@ import java.util.List;
 
 public interface IEJBRegisteringLocal {
 
-	IEntityPerson createPerson(final String lastname, final String firstname, final String club, final String email, final char sex, final Date birthday) throws RegisteringException;
-	IEntityPerson updatePerson(final int id, final String lastname, final String firstname, final String club, final String email, final char sex, final Date birthday) throws RegisteringException;
+	IEntityPerson createPerson(final String lastname, final String firstname, final String club, final String license, final String email, final char sex, final Date birthday) throws RegisteringException;
+	IEntityPerson updatePerson(final int id, final String lastname, final String firstname, final String club, final String license, final String email, final char sex, final Date birthday) throws RegisteringException;
 	IEntityPerson updatePerson(IEntityPerson person) throws RegisteringException;
 	IEntityPerson findPersonFromId(final int id);
 	IEntityPerson findPersonFromLastnameFirstNameBirthDay(final String lastname, final String firstname, final Date birthday);

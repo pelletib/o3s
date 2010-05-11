@@ -42,6 +42,10 @@ public interface IEntityPerson {
 
 	void setClub(String club);
 
+	String getLicense();
+
+	void setLicense(String license);
+
 	String getEmail();
 
 	void setEmail(String email);
