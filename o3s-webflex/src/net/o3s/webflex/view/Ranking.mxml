@@ -25,6 +25,7 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 -->
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+           xmlns:components="net.o3s.webflex.components.*"
            width="100%" height="100%"
            creationComplete="init()"
            defaultButton="{B_getRankingPdf}"
@@ -81,9 +82,6 @@
          public var categoryList:ArrayCollection;
 
          [Bindable]
-         private var event:MyEvent;
-
-         [Bindable]
          public var submitButtonEnabled:Boolean = false;
 
          [Bindable]
@@ -130,16 +128,8 @@
 			}
 
          public function refreshAdminData():void {
-
-            RO_admin.getDefaultEvent();
             RO_admin.getCompetitions();
             RO_admin.getCategories();
-         }
-
-         private function resultGetDefaultEvent(event:ResultEvent):void {
-            this.event = event.result as MyEvent;
-            eventLabel.text = this.event.name;
-
          }
 
          private function resultGetCompetitions(event:ResultEvent):void {
@@ -150,10 +140,8 @@
             categoryList = event.result as ArrayCollection;
          }
 
-
 			// Clear the form and reset validation.
-			private function clearFormHandler():void
-			{
+			private function clearFormHandler():void {
 			   selectedScratch=false;
             CB_scratch.selected = false;
             changeStateCBScratch(true);
@@ -173,16 +161,14 @@
 				resetFocus();
 			}
 
-         private function clearAll():void
-         {
+         private function clearAll():void {
             clearFormHandler();
          }
 
 
 			// Helper method. Sets the focus on the first field so
 			// user does not have to mouse over to it.
-			private function resetFocus():void
-			{
+			private function resetFocus():void {
             if (focusManager != null) {
                focusManager.setFocus(CB_competition);
             }
@@ -234,7 +220,6 @@
          private function refreshSubmitButtonEnabled():void {
 
             submitButtonEnabled = true;
-
             submitButtonEnabled = submitButtonEnabled && !competitionIsEmpty;
             submitButtonEnabled = submitButtonEnabled && (selectedCategories.length > 0 || selectedScratch);
 
@@ -243,13 +228,11 @@
         // Set the scratch when change
          private function modifyScratch(event:Event):void {
 
-            if (CB_scratch.selected == true)
-            {
+            if (CB_scratch.selected == true) {
                selectedScratch=true;
                changeStateCBCategories(false);
             }
-            else
-            {
+            else {
                selectedScratch=false;
                changeStateCBCategories(true);
             }
@@ -261,8 +244,7 @@
         // Set all categories when change
          private function modifyAllCategories(event:Event):void {
 
-            if (CB_allCategories.selected == true)
-            {
+            if (CB_allCategories.selected == true) {
                 changeStateCBScratch(false);
                 selectedCategories.removeAll();
                 var idx:int;
@@ -273,8 +255,7 @@
 
                 }
             }
-            else
-            {
+            else {
                 changeStateCBScratch(true);
                 var idx:int;
                 var len:int = categoryList.length;
@@ -282,9 +263,7 @@
                   CB_categories[idx].selected=false;
                 }
                 selectedCategories.removeAll();
-
             }
-
             refreshSubmitButtonEnabled();
 
          }
@@ -386,7 +365,6 @@
    <mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
       <mx:method name="getCompetitions" result="resultGetCompetitions(event)"/>
       <mx:method name="getCategories" result="resultGetCategories(event)"/>
-      <mx:method name="getDefaultEvent" result="resultGetDefaultEvent(event)"/>
    </mx:RemoteObject>
 
    <mx:RemoteObject id="RO_reporting" destination="reporting" fault="onFault(event)">
@@ -398,11 +376,7 @@
 
 	<mx:VBox width="95%" height="60%">
 
-		<mx:HBox width="100%" height="10%">
-			<mx:Panel title="Evenement" width="100%" height="100%" horizontalAlign="center">
-				<mx:Label id="eventLabel" fontSize="14" fontWeight="bold"/>
-			</mx:Panel>
-		</mx:HBox>
+      <components:EventPanel id="MyEventPanel"  width="100%"/>
 		<mx:HBox width="100%" height="40%">
 			<mx:Panel title="Selection du classement" width="100%" height="100%" horizontalAlign="center">
            <mx:HBox width="100%" height="20%">

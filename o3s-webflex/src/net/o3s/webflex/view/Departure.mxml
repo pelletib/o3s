@@ -30,7 +30,6 @@
 
 	<mx:Script>
 		<![CDATA[
-			import net.o3s.webflex.bean.MyEvent;
 			import net.o3s.webflex.bean.Competition;
 
 			import mx.collections.ArrayCollection;
@@ -43,9 +42,6 @@
 
          [Bindable]
          private var competitionList:ArrayCollection;
-
-   		[Bindable]
-         private var event:MyEvent;
 
 	  	   [Bindable]
 		   public var competitionIsEmpty:Boolean = true;
@@ -61,46 +57,33 @@
          public function refreshAdminData():void {
             RO_admin.getCompetitions();
             RO_admin.getStartedCompetitions();
-            RO_admin.getDefaultEvent();
          }
 
-
-        private function onFault(ev:Event):void
-         {
-			Alert.show( ObjectUtil.toString(ev) );
+         private function onFault(ev:Event):void {
+			   Alert.show( ObjectUtil.toString(ev) );
          }
 
          private function resultGetCompetition(event:ResultEvent):void {
             competitionList = event.result as ArrayCollection;
             competitionList.filterFunction = Util.competitionFilter;
             competitionList.refresh();
-
          }
 
-         private function resultGetDefaultEvent(event:ResultEvent):void {
-            this.event = event.result as MyEvent;
-			eventLabel.text = this.event.name;
-
-         }
-
-		private function resultSetStartDate(event:ResultEvent):void {
-			var mytime:Date = event.result as Date;
-
-			Alert.show("Date enregistree : " + mytime);
+		 private function resultSetStartDate(event:ResultEvent):void {
+         var mytime:Date = event.result as Date;
+			   Alert.show("Date enregistree : " + mytime);
          refreshAdminData();
-		}
+		 }
 
-		private function setCompetition(event:Event):void {
+		 private function setCompetition(event:Event):void {
 			competition=event.currentTarget.selectedItem as Competition;
 			if (competition.name != "Unknown") {
 				competitionIsEmpty = false;
 			}
 		}
 
-		private function registerStartTime(event:Event):void
-		{
+		private function registerStartTime(event:Event):void {
 			RO_admin.setStartDate(competition.id);
-
 		}
 
 
@@ -109,17 +92,12 @@
 
    <mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
       <mx:method name="getCompetitions" result="resultGetCompetition(event)"/>
-      <mx:method name="getDefaultEvent" result="resultGetDefaultEvent(event)"/>
 	  <mx:method name="setStartDate" result="resultSetStartDate(event)"  />
    </mx:RemoteObject>
 
 	<mx:VBox width="95%" height="60%">
 
-		<mx:HBox width="100%" height="10%">
-			<mx:Panel title="Evenement" width="100%" height="100%" horizontalAlign="center">
-				<mx:Label id="eventLabel" fontSize="14" fontWeight="bold"/>
-			</mx:Panel>
-		</mx:HBox>
+      <components:EventPanel id="MyEventPanel"  width="100%"/>
 
 		<mx:HBox width="100%" height="10%">
 			<mx:Panel title="Competition" width="100%" height="100%" horizontalAlign="center">

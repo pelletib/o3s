@@ -25,19 +25,18 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 -->
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+         xmlns:components="net.o3s.webflex.components.*"
          xmlns:util="util.*"
          width="100%" height="100%" creationComplete="init()">
 
    <mx:Script>
       <![CDATA[
-         import net.o3s.webflex.bean.MyEvent;
          import net.o3s.webflex.bean.MyLabel;
 
          import mx.collections.ArrayCollection;
          import mx.controls.Alert;
          import mx.rpc.events.ResultEvent;
          import mx.utils.ObjectUtil;
-
 
          [Bindable]
          private var terminalList:ArrayCollection= new ArrayCollection(
@@ -46,9 +45,6 @@
 
          [Bindable]
          private var labelList:ArrayCollection = new ArrayCollection([]);
-
-         [Bindable]
-         private var event:MyEvent;
 
          [Bindable]
          public var terminalIsEmpty:Boolean = true;
@@ -62,7 +58,6 @@
          }
 
          public function refreshAdminData():void {
-            RO_admin.getDefaultEvent();
          }
 
          private function onFault(ev:Event):void
@@ -83,27 +78,19 @@
 
          }
 
-
          private function setTerminal(event:Event):void {
             terminal=event.currentTarget.selectedItem.name as String;
             terminalIsEmpty = false;
          }
 
-          private function resultGetDefaultEvent(event:ResultEvent):void {
-            this.event = event.result as MyEvent;
-            eventLabel.text = this.event.name;
-         }
-
          private function setLabelValue(event:Event):void {
             var labelValue:String=TI_labelValue.text;
-
             L_processing.text = "Numero de dossard <" + labelValue + "> en cours d'envoi ..." ;
             RO_tracking.createArrivalEvent(terminal,labelValue);
 
          }
 
-        public function getDateLabel(item:Object,column:DataGridColumn):String
-         {
+        public function getDateLabel(item:Object,column:DataGridColumn):String {
             return formatDate.format(item[column.dataField]);
          }
 
@@ -116,17 +103,9 @@
      <mx:method name="createArrivalEvent" result="resultCreateArrivalEvent(event)"/>
    </mx:RemoteObject>
 
-   <mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
-      <mx:method name="getDefaultEvent" result="resultGetDefaultEvent(event)"/>
-   </mx:RemoteObject>
-
    <mx:VBox width="95%" height="60%">
 
-      <mx:HBox width="100%" height="10%">
-         <mx:Panel title="Evenement" width="100%" height="100%" horizontalAlign="center">
-            <mx:Label id="eventLabel" fontSize="14" fontWeight="bold"/>
-         </mx:Panel>
-      </mx:HBox>
+      <components:EventPanel id="MyEventPanel"  width="100%"/>
 
       <mx:HBox width="100%" height="10%">
          <mx:Panel title="Terminal" width="100%" height="100%" horizontalAlign="center">
@@ -154,7 +133,6 @@
 
                <mx:columns>
                   <mx:DataGridColumn headerText="Value" dataField="value" width="100"/>
-
                   <mx:DataGridColumn headerText="Date" dataField="creationDate" width="150" labelFunction="getDateLabel"/>
                </mx:columns>
 

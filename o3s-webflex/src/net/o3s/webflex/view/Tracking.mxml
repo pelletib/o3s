@@ -102,8 +102,8 @@
 
          <mx:Panel width="100%" height="30%" layout="vertical" title="Derniere notification" horizontalAlign="center">
 
-            <mx:Label id="textTypeNotif" fontSize="30" color="blue" fontWeight="bold"/>
-            <mx:Label id="textMessageNotif" fontSize="30" color="blue" fontStyle="italic"/>
+            <mx:Label id="textTypeNotif" fontSize="30" fontWeight="bold"/>
+            <mx:Label id="textMessageNotif" fontSize="30" fontStyle="italic"/>
 
          </mx:Panel>
 

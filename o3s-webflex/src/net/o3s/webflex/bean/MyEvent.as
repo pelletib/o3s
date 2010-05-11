@@ -24,6 +24,7 @@
 package net.o3s.webflex.bean
 {
 	import mx.charts.chartClasses.DataDescription;
+   import flash.utils.ByteArray;
 
 	[Bindable]
 	[RemoteClass(alias="net.o3s.web.vo.EventVO")] //mapping vers la classe java
@@ -33,6 +34,7 @@ package net.o3s.webflex.bean
 		private var _id:int;
 		private var _date:Date;
 		private var _theDefault:Boolean;
+      private var _imageFile:ByteArray;
 
 		public function MyEvent()
 		{
@@ -79,5 +81,14 @@ package net.o3s.webflex.bean
 			_theDefault = value;
 		}
 
+      public function get imageFile():ByteArray
+      {
+         return _imageFile;
+      }
+
+      public function set imageFile(value:ByteArray):void
+      {
+         _imageFile = value;
+      }
 	}
 }
