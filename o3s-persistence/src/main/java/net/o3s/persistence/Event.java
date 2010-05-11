@@ -26,10 +26,13 @@ package net.o3s.persistence;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
@@ -48,18 +51,57 @@ import net.o3s.apis.IEntityEvent;
 	@NamedQuery(name = "ALL_EVENTS", query = "SELECT e FROM Event e") })
 public class Event implements IEntityEvent, Serializable {
 
+	/**
+	 * Serial version number
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Id
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
+
+	/**
+	 * Name
+	 */
 	private String name;
+
+	/**
+	 * Date
+	 */
 	@Temporal(TemporalType.DATE)
 	private Date date;
+
+	/**
+	 * Default ?
+	 */
 	private boolean theDefault = false;
 
-	private static final long serialVersionUID = 1L;
+	/**
+	 * Logo
+	 */
+	@Lob
+	@Basic(fetch=FetchType.LAZY) // this gets ignored anyway, but it is recommended for blobs
+	private  byte[]  imageFile;
 
+	/**
+	 * Constructor
+	 */
 	public Event() {
 		super();
+	}
+
+	/**
+	 * Getters/Setters
+	 */
+	public byte[] getImageFile() {
+		return imageFile;
+	}
+
+	public void setImageFile(byte[] imageFile) {
+		this.imageFile = imageFile;
 	}
 
 	public int getId() {
@@ -92,7 +134,6 @@ public class Event implements IEntityEvent, Serializable {
 	public void setDate(Date date) {
 		this.date = date;
 	}
-
 
 	public String toString() {
 		return "Event [" +
