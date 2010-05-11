@@ -53,24 +53,64 @@ import net.o3s.apis.IEntityPerson;
 	@NamedQuery(name = "ALL_PERSONS", query = "SELECT p FROM Person p") })
 public class Person implements IEntityPerson, Serializable {
 
+	/**
+	 * Serial version id
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Id
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
+
+	/**
+	 * Lastname
+	 */
 	private String lastname;
+
+	/**
+	 * Firstname
+	 */
 	private String firstname;
+
+	/**
+	 * Club
+	 */
 	private String club;
+
+	/**
+	 * License
+	 */
+	private String license;
+
+	/**
+	 * Email
+	 */
 	private String email;
 
-
+	/**
+	 * Birthday
+	 */
 	@Temporal(TemporalType.DATE)
 	private Date birthday;
-	private char sex;
-	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Sex
+	 */
+	private char sex;
+
+	/**
+	 * Constructor
+	 */
 	public Person() {
 		super();
 	}
 
+	/**
+	 * Getters/Setters
+	 */
 	public int getId() {
 		return this.id;
 	}
@@ -124,6 +164,15 @@ public class Person implements IEntityPerson, Serializable {
 	public void setSex(char sex) {
 		this.sex = sex;
 	}
+
+	public String getLicense() {
+		return license;
+	}
+
+	public void setLicense(String license) {
+		this.license = license;
+	}
+
 	public String toString() {
 		return "Person [" +
 		        this.getId() + ", " +
@@ -131,6 +180,7 @@ public class Person implements IEntityPerson, Serializable {
 		        this.getLastname() + ", " +
 		        this.getBirthday() + ", " +
 		        this.getClub() + ", " +
+		        this.getLicense() + ", " +
 		        this.getEmail() + ", " +
 		        this.getSex() + ", " +
 		        "]";
