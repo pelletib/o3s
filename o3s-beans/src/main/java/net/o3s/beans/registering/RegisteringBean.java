@@ -61,15 +61,30 @@ import net.o3s.persistence.Registered;
 @Remote(IEJBRegisteringRemote.class)
 public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemote {
 
+	/**
+	 * Logger
+	 */
     private static Logger logger = Logger.getLogger(RegisteringBean.class.getName());
 
+    /**
+     * Persistent manager
+     */
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * Admin EJB
+     */
     @EJB
     private IEJBAdminLocal admin;
 
 
+    /**
+     * Check competition against category
+     * @param competition
+     * @param category
+     * @throws RegisteringException
+     */
     private void checkCompetitionCategory(IEntityCompetition competition, IEntityCategory category) throws RegisteringException {
 
     	boolean found = false;
@@ -87,6 +102,11 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	return;
     }
 
+    /**
+     * Get label from value
+     * @param value
+     * @return
+     */
     private IEntityLabel findLabelFromValue(final String value) {
         Query query = this.entityManager.createNamedQuery("LABEL_FROM_VALUE");
         query.setParameter("VALUE", value);
@@ -102,6 +122,11 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    /**
+     * Get label from number
+     * @param number
+     * @return
+     */
     private IEntityLabel findLabelFromNumber(final int number) {
         Query query = this.entityManager.createNamedQuery("LABEL_FROM_NUMBER");
         query.setParameter("NUMBER", number);
@@ -117,6 +142,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    /**
+     * Get all labels
+     */
     @SuppressWarnings("unchecked")
     public List<IEntityLabel> findAllLabels() {
         Query query = this.entityManager.createNamedQuery("ALL_LABELS");
@@ -131,11 +159,24 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    /**
+     * String padding at left
+     * @param s
+     * @param n
+     * @return
+     */
     private String padLeft(String s, int n) {
         return String.format("%1$#" + n + "s", s);
     }
 
-
+    /**
+     * Create new label
+     * @param competition
+     * @param category
+     * @param name
+     * @return
+     * @throws RegisteringException
+     */
     private IEntityLabel createLabel(IEntityCompetition competition, IEntityCategory category, String name) throws RegisteringException {
     	IEntityLabel label = null;
 
@@ -163,8 +204,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	return label;
     }
 
-
-
+    /**
+     * Get person from lastname/firstname/birthday
+     */
     public IEntityPerson findPersonFromLastnameFirstNameBirthDay(final String lastname, final String firstname, final Date birthday) {
         Query query = this.entityManager.createNamedQuery("PERSON_FROM_LASTNAME_FIRSTNAME_BIRTHDAY");
         query.setParameter("LASTNAME", normalizeLastname(lastname));
@@ -182,6 +224,11 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    /**
+     * Normalize lastname
+     * @param lastname
+     * @return
+     */
     private String normalizeLastname(final String lastname) {
     	if (lastname != null) {
     		return lastname.toUpperCase();
@@ -190,6 +237,11 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	}
     }
 
+    /**
+     * Normalize firstname
+     * @param firstname
+     * @return
+     */
     private String normalizeFirstname(final String firstname) {
     	if (firstname != null) {
     		String capitalized = "";
@@ -204,7 +256,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	}
     }
 
-    public IEntityPerson createPerson(final String lastname, final String firstname, final String club, final String email, final char sex, final Date birthday) throws RegisteringException {
+    /**
+     * Create new Person
+     */
+    public IEntityPerson createPerson(final String lastname, final String firstname, final String club, final String license, final String email, final char sex, final Date birthday) throws RegisteringException {
     	IEntityPerson person = null;
 
     	person = findPersonFromLastnameFirstNameBirthDay(lastname, firstname, birthday);
@@ -214,6 +269,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	person.setLastname(normalizeLastname(lastname));
         	person.setFirstname(normalizeFirstname(firstname));
         	person.setClub(club);
+        	person.setLicense(license);
         	person.setEmail(email);
         	person.setSex(sex);
         	person.setBirthday(birthday);
@@ -225,7 +281,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return person;
     }
 
-    public IEntityPerson updatePerson(final int id, final String lastname, final String firstname, final String club, final String email, final char sex, final Date birthday) throws RegisteringException {
+    /**
+     * Update a person
+     */
+    public IEntityPerson updatePerson(final int id, final String lastname, final String firstname, final String club, final String license, final String email, final char sex, final Date birthday) throws RegisteringException {
     	IEntityPerson person = null;
 
     	person = findPersonFromId(id);
@@ -233,6 +292,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	person.setLastname(normalizeLastname(lastname));
         	person.setFirstname(normalizeFirstname(firstname));
         	person.setClub(club);
+        	person.setLicense(license);
         	person.setEmail(email);
         	person.setSex(sex);
         	person.setBirthday(birthday);
@@ -242,6 +302,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return person;
     }
 
+    /**
+     * Update person
+     */
     public IEntityPerson updatePerson(IEntityPerson person) throws RegisteringException {
 
     	if (person == null) {
@@ -253,6 +316,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	p.setLastname(normalizeLastname(person.getLastname()));
         	p.setFirstname(normalizeFirstname(person.getFirstname()));
         	p.setClub(person.getClub());
+        	person.setLicense(person.getLicense());
         	p.setEmail(person.getEmail());
         	p.setSex(person.getSex());
         	p.setBirthday(person.getBirthday());
@@ -262,6 +326,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return person;
     }
 
+    /**
+     * Get person from id
+     */
     public IEntityPerson findPersonFromId(final int id) {
     	IEntityPerson person = null;
         try {
@@ -271,6 +338,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return person;
     }
 
+    /**
+     * Find all lastnames
+     */
     @SuppressWarnings("unchecked")
     public List<String> findAllLastName(final String prefix) {
     	List<String> lastNameList = null;
@@ -291,6 +361,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    /**
+     * Find all firstnames
+     */
     @SuppressWarnings("unchecked")
     public List<String> findAllFirstName(final String prefix) {
 
@@ -313,8 +386,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
-
-
+    /**
+     * Remove a person
+     */
     public void removePerson(final int id) throws RegisteringException {
 
     	IEntityPerson person = findPersonFromId(id);
@@ -325,6 +399,11 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	this.entityManager.remove(person);
     }
 
+    /**
+     * Get registered from name
+     * @param name
+     * @return
+     */
     private IEntityRegistered findRegisteredFromName(final String name) {
     	IEntityEvent event = admin.findDefaultEvent();
 
@@ -343,6 +422,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    /**
+     * Get registered from person id
+     */
     public IEntityRegistered findRegisteredFromPerson(final int personId) {
 
     	IEntityEvent event = admin.findDefaultEvent();
@@ -361,8 +443,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
-
-
+    /**
+     * Get registered from label
+     */
     public IEntityRegistered findRegisteredFromLabel(final String labelValue) throws RegisteringException {
         Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_LABEL");
         query.setParameter("VALUE", labelValue);
@@ -386,6 +469,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    /**
+     * Get registered from id
+     */
     public IEntityRegistered findRegisteredFromId(final int id) {
     	IEntityRegistered registered = null;
         try {
@@ -395,6 +481,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return registered;
     }
 
+    /**
+     * Remove a registered
+     */
     public void removeRegistered(final int id) throws RegisteringException {
 
     	IEntityRegistered registered = findRegisteredFromId(id);
@@ -405,6 +494,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	this.entityManager.remove(registered);
     }
 
+    /**
+     * Get registered on a competition order by duration
+     */
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByDuration(final int competitionId) throws RegisteringException {
 
@@ -423,14 +515,13 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         } catch (Exception e){
         	e.printStackTrace();
         	throw new RegisteringException("Unable to find competitionId [" + competitionId + "]", e);
-
         }
-
-
         return registereds;
-
     }
 
+    /**
+     * Get registered on competition order by category and duration
+     */
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId) throws RegisteringException {
     	IEntityEvent event = admin.findDefaultEvent();
@@ -448,14 +539,13 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         } catch (Exception e){
         	e.printStackTrace();
         	throw new RegisteringException("Unable to find competitionId [" + competitionId + "]", e);
-
         }
-
-
         return registereds;
-
     }
 
+    /**
+     * Count number of registered for a given competition
+     */
     @SuppressWarnings("unchecked")
     public int countRegisteredFromCompetition(final int competitionId) throws RegisteringException {
     	IEntityEvent event = admin.findDefaultEvent();
@@ -476,6 +566,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return count;
     }
 
+    /**
+     * Count number of arrivals for a given competition
+     */
     @SuppressWarnings("unchecked")
     public int countArrivalFromCompetition(final int competitionId) throws RegisteringException {
     	IEntityEvent event = admin.findDefaultEvent();
@@ -496,6 +589,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return count;
     }
 
+    /**
+     * Count number of registered for a given competition and category
+     */
     @SuppressWarnings("unchecked")
     public int countRegisteredFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException {
     	IEntityEvent event = admin.findDefaultEvent();
@@ -518,6 +614,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    /**
+     * Count number of arrivals for a given competition and category
+     */
     @SuppressWarnings("unchecked")
     public int countArrivalFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException {
     	IEntityEvent event = admin.findDefaultEvent();
@@ -540,6 +639,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    /**
+     * Get all registered
+     */
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findAllRegistered() {
         Query query = this.entityManager.createNamedQuery("ALL_REGISTERED");
@@ -555,6 +657,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     }
 
+    /**
+     * Get all registered on default event
+     */
     @SuppressWarnings("unchecked")
     public  List<IEntityRegistered> findAllRegisteredFromDefaultEvent() {
         Query query = this.entityManager.createNamedQuery("ALL_REGISTERED_FROM_EVENT");
@@ -570,6 +675,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return registereds;
     }
 
+    /**
+     * Create a new registered
+     */
     // TODO : deal with homonym
     @SuppressWarnings("unchecked")
 	public List<IEntityRegistered> createRegistered(final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid) throws RegisteringException {
@@ -654,6 +762,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return registeredsReturn;
     }
 
+    /**
+     * Update a registered
+     */
     @SuppressWarnings("unchecked")
 	public IEntityRegistered updateRegistered(final int id, final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid) throws RegisteringException {
     	IEntityRegistered registered = null;
@@ -737,6 +848,4 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return registered;
 
     }
-
-
 }
