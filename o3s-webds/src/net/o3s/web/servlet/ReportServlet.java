@@ -31,11 +31,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.EJB;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.o3s.apis.IEJBAdminRemote;
 import net.o3s.apis.IEJBReportLocal;
 import net.o3s.apis.IEJBReportRemote;
 import net.o3s.apis.ReportException;
@@ -59,11 +62,27 @@ public class ReportServlet extends HttpServlet{
 	private static final String TYPE_CATEGORIES_RANKING = "categoriesRanking";
 	private static final String TYPE_LABEL = "label";
 
-
 	@EJB
 	private IEJBReportLocal report;
 
+	private void setReportEJB() {
+
+		InitialContext context=null;
+
+		if (report == null) {
+			try {
+				context = new InitialContext();
+				report = (IEJBReportRemote) context.lookup("net.o3s.beans.report.ReportBean_net.o3s.apis.IEJBReportRemote@Remote");
+
+			} catch (NamingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
+
+		setReportEJB();
 
 		if (request.getParameter(PRM_TYPE) == null) {
 			throw new IOException("parameter '"+ PRM_TYPE + "' is missing");

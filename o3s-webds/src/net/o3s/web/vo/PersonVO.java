@@ -31,6 +31,9 @@ public class PersonVO {
 	private String lastname;
 	private String firstname;
 	private String club;
+	private String license;
+
+
 	private String email;
 	private Date birthday;
 	private char sex;
@@ -56,6 +59,7 @@ public class PersonVO {
         		this.getLastname() + ", " +
         		this.getBirthday() + ", " +
         		this.getClub() + ", " +
+        		this.getLicense() + ", " +
         		this.getEmail() + ", " +
         		this.getSex() + ", " +
         		this.getComputedCategory() + ", " +
@@ -118,4 +122,11 @@ public class PersonVO {
 		this.computedCategory = computedCategory;
 	}
 
+	public String getLicense() {
+		return license;
+	}
+
+	public void setLicense(String license) {
+		this.license = license;
+	}
 }

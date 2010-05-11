@@ -33,9 +33,11 @@ import net.o3s.apis.IEntityEvent;
 import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
+import net.o3s.web.service.Registering;
 import net.o3s.web.vo.CategoryVO;
 import net.o3s.web.vo.CompetitionVO;
 import net.o3s.web.vo.EventVO;
+import net.o3s.web.vo.FlexException;
 import net.o3s.web.vo.LabelVO;
 import net.o3s.web.vo.PersonVO;
 import net.o3s.web.vo.RegisteredVO;
@@ -136,34 +138,44 @@ public class Util {
 		return labelVO;
 	}
 
-	public static PersonVO createPersonVO(IEntityPerson person) {
+	public static PersonVO createPersonVO(IEntityPerson person, Registering service) {
 		PersonVO personVO = new PersonVO();
 		if (person != null) {
 			personVO.setId(person.getId());
 			personVO.setBirthday(person.getBirthday());
 			personVO.setClub(person.getClub());
+			personVO.setLicense(person.getLicense());
 			personVO.setEmail(person.getEmail());
 			personVO.setFirstname(person.getFirstname());
 			personVO.setLastname(person.getLastname());
 			personVO.setSex(person.getSex());
+
+			// get the related category
+			try {
+				IEntityCategory category = service.getCategory(person);
+				personVO.setComputedCategory(category.getName());
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new FlexException(e.getMessage());
+			}
 		}
 		return personVO;
 	}
 
 
 
-	public static List<PersonVO> createPersonListVO(Set<IEntityPerson> persons) {
+	public static List<PersonVO> createPersonListVO(Set<IEntityPerson> persons, Registering service) {
 		List<PersonVO> personsVO = new ArrayList<PersonVO>();
 
 		for(IEntityPerson person:persons) {
-			personsVO.add(createPersonVO(person));
+			personsVO.add(createPersonVO(person, service));
 		}
 		return personsVO;
 	}
 
 
 
-	public static RegisteredVO createRegisteredVO(IEntityRegistered registered) {
+	public static RegisteredVO createRegisteredVO(IEntityRegistered registered, Registering service) {
 		RegisteredVO registeredVO = new RegisteredVO();
 		if (registered != null) {
 			registeredVO.setId(registered.getId());
@@ -175,7 +187,7 @@ public class Util {
 			registeredVO.setEvent(createEventVO(registered.getEvent()));
 			registeredVO.setLabel(createLabelVO(registered.getLabel()));
 			registeredVO.setPaid(registered.isPaid());
-			registeredVO.setPersons(createPersonListVO(registered.getPersons()));
+			registeredVO.setPersons(createPersonListVO(registered.getPersons(), service));
 			registeredVO.setRegisteringDate(registered.getRegisteringDate());
 			registeredVO.setTeamed(registered.isTeamed());
 		}
@@ -183,11 +195,11 @@ public class Util {
 
 	}
 
-	public static List<RegisteredVO> createRegisteredListVO(List<IEntityRegistered> registereds) {
+	public static List<RegisteredVO> createRegisteredListVO(List<IEntityRegistered> registereds, Registering service) {
 		List<RegisteredVO> registeredsVO = new ArrayList<RegisteredVO>();
 
 		for(IEntityRegistered registered:registereds) {
-			registeredsVO.add(createRegisteredVO(registered));
+			registeredsVO.add(createRegisteredVO(registered, service));
 		}
 		return registeredsVO;
 	}

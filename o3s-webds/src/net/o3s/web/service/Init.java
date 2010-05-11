@@ -102,22 +102,22 @@ public class Init {
 		List<IEntityPerson> team11 = new ArrayList<IEntityPerson>();
 
 		try {
-			team0.add( registering.createPerson("PELLETIER", "Benoit", "Crossey", "btpelletier@gmail.com", 'M', df.parse("09/12/1971")));
-			team1.add( registering.createPerson("PELLETIER", "Lea", "Crossey", "leapelletier@gmail.com", 'F', df.parse("06/02/2000")));
+			team0.add( registering.createPerson("PELLETIER", "Benoit", "Crossey", "L0", "btpelletier@gmail.com", 'M', df.parse("09/12/1971")));
+			team1.add( registering.createPerson("PELLETIER", "Lea", "Crossey", "L1", "leapelletier@gmail.com", 'F', df.parse("06/02/2000")));
 
-			team2.add( registering.createPerson("PELLETIER", "Cleo", "Crossey", "cleopelletier@gmail.com", 'F', df.parse("18/04/2002")));
-			team2.add( registering.createPerson("PELLETIER", "Lou", "Crossey", "loupelletier@gmail.com", 'F', df.parse("19/07/2006")));
-			team2.add( registering.createPerson("PELLETIER", "sophie", "Crossey", "sophiepelletier@gmail.com", 'F', df.parse("06/01/1971")));
+			team2.add( registering.createPerson("PELLETIER", "Cleo", "Crossey", "L2-1", "cleopelletier@gmail.com", 'F', df.parse("18/04/2002")));
+			team2.add( registering.createPerson("PELLETIER", "Lou", "Crossey", "L2-2", "loupelletier@gmail.com", 'F', df.parse("19/07/2006")));
+			team2.add( registering.createPerson("PELLETIER", "sophie", "Crossey", "L2-3", "sophiepelletier@gmail.com", 'F', df.parse("06/01/1971")));
 
-			team3.add( registering.createPerson("DUPONT", "Jean", "Paris", "jean.dupont@paris.fr", 'M', df.parse("18/11/1972")));
-			team4.add( registering.createPerson("LACAPERE", "Jerome", "Crossey", "jerome.lacapere@free.fr", 'M', df.parse("06/11/1978")));
-			team5.add( registering.createPerson("BOURGEOIS", "Christian", "Grenoble", "christian.bourgeois@free.fr", 'M', df.parse("20/05/1967")));
-			team6.add( registering.createPerson("VOORSPOELS", "Alain", "Crossey", "alain.voerspoels@free.fr", 'M', df.parse("04/02/1970")));
-			team7.add( registering.createPerson("PERGE", "Laurent", "Crossey", "laurent.perge@neuf.fr", 'M', df.parse("25/07/1971")));
-			team8.add( registering.createPerson("PATOU", "Louis", "GrandeVille", "louis.patou@free.fr", 'M', df.parse("01/11/1971")));
-			team9.add( registering.createPerson("TROPLENT", "Jean-Louis", "Paris", "jean.troplent@paris.fr", 'M', df.parse("25/12/1971")));
-			team10.add( registering.createPerson("TROPRAPIDE", "truc", "machin", "truc@machin.fr", 'M', df.parse("25/09/1955")));
-			team11.add( registering.createPerson("SPEEDY", "Gonzales", "Mexico", "sg@mexico.com", 'M', df.parse("25/09/1982")));
+			team3.add( registering.createPerson("DUPONT", "Jean", "Paris", "L3", "jean.dupont@paris.fr", 'M', df.parse("18/11/1972")));
+			team4.add( registering.createPerson("LACAPERE", "Jerome", "Crossey", "L4", "jerome.lacapere@free.fr", 'M', df.parse("06/11/1978")));
+			team5.add( registering.createPerson("BOURGEOIS", "Christian", "Grenoble", "L5", "christian.bourgeois@free.fr", 'M', df.parse("20/05/1967")));
+			team6.add( registering.createPerson("VOORSPOELS", "Alain", "Crossey", "L6", "alain.voerspoels@free.fr", 'M', df.parse("04/02/1970")));
+			team7.add( registering.createPerson("PERGE", "Laurent", "Crossey", "L7", "laurent.perge@neuf.fr", 'M', df.parse("25/07/1971")));
+			team8.add( registering.createPerson("PATOU", "Louis", "GrandeVille", "L8", "louis.patou@free.fr", 'M', df.parse("01/11/1971")));
+			team9.add( registering.createPerson("TROPLENT", "Jean-Louis", "Paris", "L9", "jean.troplent@paris.fr", 'M', df.parse("25/12/1971")));
+			team10.add( registering.createPerson("TROPRAPIDE", "truc", "machin", "L10", "truc@machin.fr", 'M', df.parse("25/09/1955")));
+			team11.add( registering.createPerson("SPEEDY", "Gonzales", "Mexico", "L11", "sg@mexico.com", 'M', df.parse("25/09/1982")));
 
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block

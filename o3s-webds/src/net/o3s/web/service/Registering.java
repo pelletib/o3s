@@ -89,7 +89,7 @@ public class Registering {
 		setRegisteringEJB();
 		List<IEntityRegistered> registereds = registering.findAllRegisteredFromDefaultEvent();
 		System.out.println("registereds=" + registereds);
-		return Util.createRegisteredListVO(registereds);
+		return Util.createRegisteredListVO(registereds, this);
 	}
 
 	// get all registered
@@ -97,7 +97,7 @@ public class Registering {
 		setRegisteringEJB();
 		List<IEntityRegistered> registereds = registering.findAllRegistered();
 		System.out.println("registereds=" + registereds);
-		return Util.createRegisteredListVO(registereds);
+		return Util.createRegisteredListVO(registereds, this);
 	}
 
 	// get first name list
@@ -117,12 +117,12 @@ public class Registering {
 	}
 
 	// get category associated with a person
-	private IEntityCategory getCategory(IEntityPerson person) throws RegisteringException {
+	public IEntityCategory getCategory(IEntityPerson person) throws RegisteringException {
 		setAdminEJB();
 		System.out.println("getCategory:person " + person);
     	List<IEntityCategory> categories = admin.findCategoryFromDatesAndSex(person.getBirthday(), person.getSex());
     	if (categories == null || categories.isEmpty()){
-    		throw new RegisteringException("Category not found for (birthday/sex):" + person.getBirthday() + "," + person.getSex());
+    		throw new RegisteringException("Categorie non trouvee pour le couple (date de naissance/sexe):" + person.getBirthday() + "," + person.getSex());
     	}
     	// get the first one (almost equiv to random)
     	return categories.get(0);
@@ -133,22 +133,13 @@ public class Registering {
 		setRegisteringEJB();
 		IEntityPerson person = null;
 		try {
-			person = registering.createPerson(personVO.getLastname(), personVO.getFirstname(), personVO.getClub(), personVO.getEmail(), personVO.getSex(), personVO.getBirthday());
+			person = registering.createPerson(personVO.getLastname(), personVO.getFirstname(), personVO.getClub(), personVO.getLicense(), personVO.getEmail(), personVO.getSex(), personVO.getBirthday());
 		} catch (RegisteringException e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
 		}
 
-		PersonVO pVO = Util.createPersonVO(person);
-
-		// get the related category
-		try {
-			IEntityCategory category = getCategory(person);
-			pVO.setComputedCategory(category.getName());
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new FlexException(e.getMessage());
-		}
+		PersonVO pVO = Util.createPersonVO(person, this);
 
 		System.out.println("person=" + pVO);
 		return pVO;
@@ -161,13 +152,13 @@ public class Registering {
 		System.out.println("update person" + personVO.getId());
 
 		try {
-			person = registering.updatePerson(personVO.getId(), personVO.getLastname(), personVO.getFirstname(), personVO.getClub(), personVO.getEmail(), personVO.getSex(), personVO.getBirthday());
+			person = registering.updatePerson(personVO.getId(), personVO.getLastname(), personVO.getFirstname(), personVO.getClub(), personVO.getLicense(), personVO.getEmail(), personVO.getSex(), personVO.getBirthday());
 		} catch (RegisteringException e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
 		}
 
-		PersonVO pVO = Util.createPersonVO(person);
+		PersonVO pVO = Util.createPersonVO(person, this);
 
 		// get the related category
 		try {
@@ -207,7 +198,7 @@ public class Registering {
 		PersonVO pVO = null;
 
 		if (person != null) {
-			pVO = Util.createPersonVO(person);
+			pVO = Util.createPersonVO(person, this);
 		}
 		System.out.println("person=" + pVO);
 		return pVO;
@@ -260,7 +251,7 @@ public class Registering {
 
 		System.out.println("registereds=" + registereds);
 
-		return Util.createRegisteredListVO(registereds);
+		return Util.createRegisteredListVO(registereds, this);
 
 	}
 
@@ -295,7 +286,7 @@ public class Registering {
 			throw new FlexException(e.getMessage());
 		}
 
-		RegisteredVO rVO = Util.createRegisteredVO(registered);
+		RegisteredVO rVO = Util.createRegisteredVO(registered, this);
 
 		System.out.println("registered=" + rVO);
 		return rVO;
