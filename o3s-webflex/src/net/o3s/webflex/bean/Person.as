@@ -41,6 +41,8 @@ package net.o3s.webflex.bean
 
 		private var _club:String;
 
+		private var _license:String;
+
 		private var _email:String;
 
 		private var _computedCategory:String;
@@ -118,6 +120,16 @@ package net.o3s.webflex.bean
 		public function set club(value:String):void
 		{
 			_club = value;
+		}
+
+		public function get license():String
+		{
+			return _license;
+		}
+
+		public function set license(value:String):void
+		{
+			_license = value;
 		}
 
 		public function get computedCategory():String

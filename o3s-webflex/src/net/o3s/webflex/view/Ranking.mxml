@@ -155,6 +155,7 @@
             }
             CB_competition.selectedItem = -1;
             selectedCompetition=null;
+            competitionIsEmpty = true;
             refreshSubmitButtonEnabled();
 				// Set the focus on the first field so
 				// user does not have to mouse over to it.

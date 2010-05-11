@@ -196,6 +196,7 @@
 							";" + p.birthday +
 							";" + p.sex +
 							";" + p.club +
+                     ";" + p.license +
 							";" + p.email +
 							"]";
 

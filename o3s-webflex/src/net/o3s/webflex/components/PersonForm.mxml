@@ -63,6 +63,7 @@
 		private var personLastnameValidator:StringValidator;
 		private var personSexValidator:StringValidator;
 		private var personClubValidator:StringValidator;
+      private var personLicenseValidator:StringValidator;
 		private var personEmailValidator:EmailValidator;
 		private var personBirthdayValidator:DateValidator;
 
@@ -96,6 +97,7 @@
 			_person.birthday = DF_personBirthday.selectedDate;
 			_person.email = StringUtil.trim(TI_personEmail.text);
 			_person.club = StringUtil.trim(TI_personClub.text);
+         _person.license = StringUtil.trim(TI_personLicense.text);
 			return _person;
 		}
 
@@ -108,13 +110,13 @@
 			displayAge(DF_personBirthday.selectedDate);
 			TI_personEmail.text = _person.email;
 			TI_personClub.text = _person.club;
+         TI_personLicense.text = _person.license;
 
 		}
 
 		private function refreshPredictList():void {
 			RO_registering.getFirstNameWithPrefix(null);
 			RO_registering.getLastNameWithPrefix(null);
-
 		}
 
 		private function resultGetFirstNameWithPrefix(event:ResultEvent):void {
@@ -154,6 +156,12 @@
 			personClubValidator.minLength = 2;
 			personClubValidator.required=false;
 
+         personLicenseValidator = new StringValidator();
+         personLicenseValidator.source = TI_personLicense;
+         personLicenseValidator.property = "text";
+         personLicenseValidator.minLength = 2;
+         personLicenseValidator.required=false;
+
 			personBirthdayValidator = new DateValidator();
 			personBirthdayValidator.source = DF_personBirthday;
 			personBirthdayValidator.property = "text";
@@ -178,6 +186,7 @@
 			TI_personLastname.text = "";
 			TI_personEmail.text = "";
 			TI_personClub.text = "";
+         TI_personLicense.text = "";
 			DF_personBirthday.text = "";
 			DF_personBirthday.selectedDate = null;
 			CB_personSex.selectedIndex=-1;
@@ -189,6 +198,7 @@
 			TI_personLastname.errorString = "";
 			TI_personEmail.errorString = "";
 			TI_personClub.errorString = "";
+         TI_personLicense.errorString = "";
 			DF_personBirthday.errorString = "";
 			CB_personSex.errorString = "";
 
@@ -228,6 +238,7 @@
 			validatePerson(personBirthdayValidator);
 			validatePerson(personEmailValidator);
 			validatePerson(personClubValidator);
+         validatePerson(personLicenseValidator);
 
 			this.parentDocument.resultValidatePersonForm(formIsValid);
 
@@ -266,11 +277,8 @@
 		// Compute Age from date of birthday
 		private function computeAge(userDOB:Date):int {
 			var today : Date = new Date();
-
 			var diff : Date = new Date(); diff.setTime( today.getTime() - userDOB.getTime() );
-
 			var userAge : int = diff.getFullYear() - 1970;
-
 			return userAge;
 		}
 
@@ -431,7 +439,8 @@
 			<mx:ComboBox id="CB_personSex" dataProvider="{sexList}" width="50" change="removeDisplayList();validateForm(event);"/>
 		</mx:FormItem>
 
-		<mx:FormItem label="Date de naissance (DD/MM/YYYY)" >
+		<mx:FormItem label="Date de naissance" >
+         <mx:HBox>
 			<mx:DateField id="DF_personBirthday"
 						  yearNavigationEnabled="true"
 						  editable="true"
@@ -442,12 +451,16 @@
 						  change="removeDisplayList();validateForm(event);displayAge(DateField(event.target).selectedDate);"
 						  focusOut="checkIfPersonExist()"/>
 
-			<mx:Label id="L_age" color="blue" text="Age: N/A" textAlign="right"/>
+			<mx:Label id="L_age" text="Age: N/A" textAlign="right"/>
+         </mx:HBox>
 		</mx:FormItem>
 
 		<mx:FormItem label="Club" direction="horizontal" >
 			<mx:TextInput id="TI_personClub" width="150" change="removeDisplayList();validateForm(event);"/>
 		</mx:FormItem>
+      <mx:FormItem label="License" direction="horizontal" >
+         <mx:TextInput id="TI_personLicense" width="150" change="removeDisplayList();validateForm(event);"/>
+      </mx:FormItem>
 		<mx:FormItem label="Email" direction="horizontal" >
 			<mx:TextInput id="TI_personEmail" width="150" restrict="A-Za-z0-9\-_@." change="removeDisplayList();validateForm(event);"/>
 		</mx:FormItem>

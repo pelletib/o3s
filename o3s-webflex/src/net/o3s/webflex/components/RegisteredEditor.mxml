@@ -175,8 +175,8 @@
 			msg = msg + "\n\n";
 
 			msg = msg + "Nous sommes impatients de vous retrouver au '" +
-				parentDocument.event.name + "' le " +
-				formatDateDDMMYYY.format(parentDocument.event.date) + ".";
+				parentDocument.MyEventPanel.event.name + "' le " +
+				formatDateDDMMYYY.format(parentDocument.MyEventPanel.event.date) + ".";
 
 			myAlert = Alert.show(msg, "Inscription ok");
 			myAlert.height=300;
@@ -237,7 +237,7 @@
 			if (mode == "create") {
 				var registered:Registered = new Registered();
 				registered.persons = MyPersonsEditor.personList;
-				registered.event = parentDocument.event;
+				registered.event = parentDocument.MyEventPanel.event;
 				registered.competition = selectedCompetition;
 				if (currentState == "team") {
 					registered.name = MyTeamEditor.teamName;

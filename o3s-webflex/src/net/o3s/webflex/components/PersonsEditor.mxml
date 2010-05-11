@@ -237,6 +237,7 @@
 				myString = myString + item.birthday + ",";
 				myString = myString + item.email + ",";
 				myString = myString + item.club + ",";
+            myString = myString + item.license + ",";
 				myString = myString + item.computedCategory + "\n";
 			} */
 			return myString;
@@ -280,21 +281,22 @@
 
 	<mx:Panel title="Personne(s)" width="100%" height="100%">
 		<mx:HBox width="100%" height="90%">
-			<mx:VBox width="40%" height="100%">
+			<mx:VBox width="30%" height="100%">
 				<components:PersonForm id="MyPersonForm"/>
 			</mx:VBox>
-			<mx:VBox width="60%" height="100%">
+			<mx:VBox width="70%" height="100%">
 				<mx:DataGrid id="DG_persons" dataProvider="{this.personList}" width="100%"  height="90%" editable="true"
 							 dropEnabled="true" dragEnabled="true" dataTipFunction="buildPersonTip"
 							 doubleClickEnabled="true" itemDoubleClick="rollOverPerson(event);" rowCount="6" verticalScrollPolicy="on">
 					<mx:columns>
-						<mx:DataGridColumn dataField="firstname" headerText="prenom" editable="false" showDataTips="true"/>
-						<mx:DataGridColumn dataField="lastname" headerText="nom" editable="false" sortable="true" showDataTips="true"/>
-						<mx:DataGridColumn dataField="sex" headerText="sexe" editable="false" minWidth="10" showDataTips="true"/>
-						<mx:DataGridColumn dataField="birthday" headerText="date de naissance" editable="false" minWidth="25" showDataTips="true" labelFunction="getDateDDMMYYYLabel"/>
-						<mx:DataGridColumn dataField="email" headerText="email" editable="false" minWidth="10" showDataTips="true"/>
-						<mx:DataGridColumn dataField="club" headerText="club" editable="false" minWidth="10" showDataTips="true"/>
-						<mx:DataGridColumn dataField="computedCategory" headerText="categorie" editable="false" minWidth="50" showDataTips="true"/>
+						<mx:DataGridColumn dataField="firstname" headerText="Prenom" editable="false" showDataTips="true"/>
+						<mx:DataGridColumn dataField="lastname" headerText="Nom" editable="false" sortable="true" showDataTips="true"/>
+						<mx:DataGridColumn dataField="sex" headerText="Sexe" editable="false" minWidth="5" showDataTips="true"/>
+						<mx:DataGridColumn dataField="birthday" headerText="Date Naissance" editable="false" minWidth="25" showDataTips="true" labelFunction="getDateDDMMYYYLabel"/>
+						<mx:DataGridColumn dataField="email" headerText="Email" editable="false" minWidth="10" showDataTips="true"/>
+                  <mx:DataGridColumn dataField="club" headerText="Club" editable="false" minWidth="10" showDataTips="true"/>
+						<mx:DataGridColumn dataField="license" headerText="License" editable="false" minWidth="10" showDataTips="true"/>
+						<mx:DataGridColumn dataField="computedCategory" headerText="Categorie" editable="false" minWidth="10" showDataTips="true"/>
 					</mx:columns>
 				</mx:DataGrid>
 				<mx:Spacer height="5" />
