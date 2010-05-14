@@ -26,6 +26,8 @@ package net.o3s.web.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -37,6 +39,7 @@ import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
+import net.o3s.beans.registering.RegisteringBean;
 import net.o3s.web.common.Util;
 import net.o3s.web.vo.FlexException;
 import net.o3s.web.vo.PersonVO;
@@ -44,6 +47,11 @@ import net.o3s.web.vo.RegisteredStatisticsVO;
 import net.o3s.web.vo.RegisteredVO;
 
 public class Registering {
+
+	/**
+	 * Logger
+	 */
+    private static Logger logger = Logger.getLogger(Registering.class.getName());
 
 	//@EJB
 	private IEJBRegisteringRemote registering;
@@ -371,5 +379,94 @@ public class Registering {
 		statistics.add(registeredStatisticsVO);
 
 		return statistics;
+    }
+
+    public void importRegistered(List<RegisteredVO> registeredsVO) throws RegisteringException {
+
+   		setRegisteringEJB();
+   		setAdminEJB();
+
+		logger.log(Level.FINE, "input <" + registeredsVO + ">");
+
+   		for (RegisteredVO registeredVO : registeredsVO) {
+
+   			List<IEntityPerson> persons = new ArrayList<IEntityPerson>();
+
+   			List<PersonVO> personsVO = registeredVO.getPersons();
+
+   			// create person
+   			for (PersonVO personVO:personsVO) {
+   				try {
+   					if (personVO.getLastname() == null || personVO.getLastname().equals("") ||
+   							personVO.getFirstname() == null || personVO.getFirstname().equals("") ||
+   							personVO.getBirthday() == null ||
+   							!(personVO.getSex()=='F' || personVO.getSex()=='M')) {
+   						throw new Exception("Les champs <Nom/Prenom/DdN/Sexe> sont obligatoires!");
+   					}
+
+
+   					IEntityPerson person = null;
+   					person = registering.createPerson(personVO.getLastname(),
+   							personVO.getFirstname(),
+   							personVO.getClub(),
+   							personVO.getLicense(),
+   							personVO.getEmail(),
+   							personVO.getSex(),
+   							personVO.getBirthday());
+   					persons.add(person);
+   					logger.log(Level.FINE, "import Person <" + person + ">");
+
+   				} catch (Exception e) {
+   					e.printStackTrace();
+   					logger.log(Level.SEVERE, "Unable to import person <" + personVO + ">", e);
+   					continue;
+   					//throw new FlexException(e.getMessage());
+   				}
+   			}
+
+   			try {
+
+   				// create registered
+   				if (registeredVO.getCompetition() == null || registeredVO.getCompetition().equals("Unknown")) {
+
+   					// Compute the category
+   					List<IEntityCategory> categories = admin.findCategoryFromDatesAndSex(persons.get(0).getBirthday(), persons.get(0).getSex());
+   					if (categories == null || categories.isEmpty()){
+   						throw new RegisteringException("Categorie non trouvee pour le couple (date naissance/sexe):" + persons.get(0).getBirthday() + "," + persons.get(0).getSex());
+   					}
+
+   					// get the first one (almost equiv to random)
+   					IEntityCategory category = categories.get(0);
+   					for(IEntityCompetition competition:category.getCompetitions()) {
+   	   					logger.log(Level.FINE, "Selected competition (1st) <" + competition + ">");
+   	   					registeredVO.setCompetition(Util.createCompetitionVO(competition));
+   	   					break;
+   					}
+
+   				}
+   			} catch (Exception e) {
+	    			e.printStackTrace();
+	    			logger.log(Level.SEVERE, "Unable to get competition for registered <" + registeredVO + ">", e);
+	    			continue;
+	    			//throw new FlexException(e.getMessage());
+			}
+
+    		List<IEntityRegistered> registereds = null;
+    		try {
+    			registereds = registering.createRegistered(
+    					persons,
+    					registeredVO.getCompetition().getId(),
+    					registeredVO.isTeamed(),
+    					registeredVO.getName(),
+    					registeredVO.isPaid());
+    			logger.log(Level.FINE, "import Registered <" + registereds + ">");
+
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    			logger.log(Level.SEVERE, "Unable to import registered <" + registeredVO + ">", e);
+
+    			//throw new FlexException(e.getMessage());
+    		}
+   		}
     }
 }
