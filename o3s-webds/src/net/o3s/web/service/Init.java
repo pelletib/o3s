@@ -36,6 +36,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import net.o3s.apis.AdminException;
+import net.o3s.apis.AlreadyExistException;
 import net.o3s.apis.IEJBAdminRemote;
 import net.o3s.apis.IEJBEventMessageProducerRemote;
 import net.o3s.apis.IEJBInitRemote;
@@ -124,6 +125,8 @@ public class Init {
 			e.printStackTrace();
 		} catch (RegisteringException e) {
 			e.printStackTrace();
+		} catch (AlreadyExistException e) {
+			e.printStackTrace();
 		}
 		IEntityCompetition competition1 = admin.findCompetitionFromId(9);
 		IEntityCompetition competition2 = admin.findCompetitionFromId(4);
@@ -146,6 +149,8 @@ public class Init {
 			vregistered.addAll(registering.createRegistered(team10, competition1.getId(), false, "", true));
 			vregistered.addAll(registering.createRegistered(team11, competition1.getId(), false, "", true));
 		} catch (RegisteringException e) {
+			e.printStackTrace();
+		} catch (AlreadyExistException e) {
 			e.printStackTrace();
 		}
 	}

@@ -257,9 +257,6 @@ public class Notification implements javax.jms.MessageListener {
 					logger.fine("Unable to process the Notification: " + e.getMessage());
 				} catch (NotificationMessageException e) {
 					logger.fine("Unable to process the Notification: " + e.getMessage());
-				}
-				catch (IllegalStateException e) {
-					//logger.fine("Unable to process the Notification: " + e.getMessage());
 				} catch (Exception e) {
 					e.printStackTrace();
 					logger.fine("Unable to process the Notification: " + e.getMessage());

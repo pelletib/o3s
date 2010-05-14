@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import net.o3s.apis.AlreadyExistException;
 import net.o3s.apis.IEJBAdminRemote;
 import net.o3s.apis.IEJBRegisteringRemote;
 import net.o3s.apis.IEntityCategory;
@@ -39,7 +40,6 @@ import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
-import net.o3s.beans.registering.RegisteringBean;
 import net.o3s.web.common.Util;
 import net.o3s.web.vo.FlexException;
 import net.o3s.web.vo.PersonVO;
@@ -136,8 +136,8 @@ public class Registering {
     	return categories.get(0);
 	}
 
-	// create person
-	public PersonVO createPerson(PersonVO personVO) {
+	// create person (if exist and force, update it)
+	public PersonVO createPerson(PersonVO personVO, Boolean force) {
 		setRegisteringEJB();
 		IEntityPerson person = null;
 		try {
@@ -145,6 +145,15 @@ public class Registering {
 		} catch (RegisteringException e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
+		} catch (AlreadyExistException e) {
+			if (force == true) {
+				person = registering.findPersonFromLastnameFirstNameBirthDay(personVO.getLastname(),personVO.getFirstname(), personVO.getBirthday());
+				personVO.setId(person.getId());
+				return updatePerson(personVO);
+			} else {
+				e.printStackTrace();
+				throw new FlexException(e.getMessage());
+			}
 		}
 
 		PersonVO pVO = Util.createPersonVO(person, this);
@@ -255,6 +264,9 @@ public class Registering {
 		} catch (RegisteringException e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
+		} catch (AlreadyExistException e) {
+				e.printStackTrace();
+				throw new FlexException(e.getMessage());
 		}
 
 		System.out.println("registereds=" + registereds);
