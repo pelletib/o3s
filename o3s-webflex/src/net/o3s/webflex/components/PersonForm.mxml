@@ -25,6 +25,7 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 -->
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+         preinitialize="preInit()"
 		   creationComplete="init()">
 <mx:Script>
 	<![CDATA[
@@ -127,34 +128,36 @@
 			lastNameList = event.result as ArrayCollection;
 		}
 
+      private function preInit():void {
+
+      }
+
 		private function init():void {
-			//
-			// Create validators
-			//
-			personFirstnameValidator = new StringValidator();
-			personFirstnameValidator.source = TI_personFirstname;
-			personFirstnameValidator.property = "text";
-			personFirstnameValidator.minLength = 2;
-			personFirstnameValidator.required=true;
 
-			personLastnameValidator = new StringValidator();
-			personLastnameValidator.source = TI_personLastname;
-			personLastnameValidator.property = "text";
-			personLastnameValidator.minLength = 2;
-			personLastnameValidator.required=true;
+        personFirstnameValidator = new StringValidator();
+         personFirstnameValidator.source = TI_personFirstname;
+         personFirstnameValidator.property = "text";
+         personFirstnameValidator.minLength = 2;
+         personFirstnameValidator.required=true;
 
-			personSexValidator = new StringValidator();
-			personSexValidator.source = CB_personSex;
-			personSexValidator.property = "text";
-			personSexValidator.minLength = 1;
-			personSexValidator.maxLength = 1;
-			personSexValidator.required=true;
+         personLastnameValidator = new StringValidator();
+         personLastnameValidator.source = TI_personLastname;
+         personLastnameValidator.property = "text";
+         personLastnameValidator.minLength = 2;
+         personLastnameValidator.required=true;
 
-			personClubValidator = new StringValidator();
-			personClubValidator.source = TI_personClub;
-			personClubValidator.property = "text";
-			personClubValidator.minLength = 2;
-			personClubValidator.required=false;
+         personSexValidator = new StringValidator();
+         personSexValidator.source = CB_personSex;
+         personSexValidator.property = "text";
+         personSexValidator.minLength = 1;
+         personSexValidator.maxLength = 1;
+         personSexValidator.required=true;
+
+         personClubValidator = new StringValidator();
+         personClubValidator.source = TI_personClub;
+         personClubValidator.property = "text";
+         personClubValidator.minLength = 2;
+         personClubValidator.required=false;
 
          personLicenseValidator = new StringValidator();
          personLicenseValidator.source = TI_personLicense;
@@ -162,20 +165,19 @@
          personLicenseValidator.minLength = 2;
          personLicenseValidator.required=false;
 
-			personBirthdayValidator = new DateValidator();
-			personBirthdayValidator.source = DF_personBirthday;
-			personBirthdayValidator.property = "text";
-			personBirthdayValidator.allowedFormatChars="/";
-			personBirthdayValidator.inputFormat="DD/MM/YYYY";
-			personBirthdayValidator.required=true;
+         personBirthdayValidator = new DateValidator();
+         personBirthdayValidator.source = DF_personBirthday;
+         personBirthdayValidator.property = "text";
+         personBirthdayValidator.allowedFormatChars="/";
+         personBirthdayValidator.inputFormat="DD/MM/YYYY";
+         personBirthdayValidator.required=true;
 
-			personEmailValidator = new EmailValidator();
-			personEmailValidator.source = TI_personEmail;
-			personEmailValidator.property = "text";
-			personEmailValidator.required=false;
+         personEmailValidator = new EmailValidator();
+         personEmailValidator.source = TI_personEmail;
+         personEmailValidator.property = "text";
+         personEmailValidator.required=false;
 
-			removeDisplayList();
-
+         removeDisplayList();
 			refreshPredictList();
 		}
 
@@ -214,7 +216,7 @@
 		}
 
 		// Validate the form
-		private function validateForm(event:Event):void	{
+		public function validateForm(event:Event):void	{
 			// Save a reference to the currently focussed form control
 			// so that the isValid() helper method can notify only
 			// the currently focussed form control and not affect
@@ -294,6 +296,12 @@
 		}
 
 		private function predictFirstName(p_event:Event):void {
+
+         // predict feature is only available if logged
+         if (StaticVars.isLogged == false) {
+            return;
+         }
+
 			var predictText:String = p_event.target.text;
 
 			removeDisplayFirstNameList();
@@ -341,6 +349,12 @@
 
 
 		private function predictLastName(p_event:Event):void {
+
+         // predict feature is only available if logged
+         if (StaticVars.isLogged == false) {
+            return;
+         }
+
 			var predictText:String = p_event.target.text;
 
 			removeDisplayLastNameList();
@@ -386,6 +400,11 @@
 		}
 
 		private function removeDisplayList():void {
+         // predict feature is only available if logged
+         if (StaticVars.isLogged == false) {
+            return;
+         }
+
 			removeDisplayLastNameList();
 			removeDisplayFirstNameList();
 		}
@@ -410,10 +429,9 @@
 			var person:Person = event.result as Person;
 
 			if (person != null) {
-				this.parentDocument.editPerson(person);
-				//Alert.show("person exist");
+				this.parentDocument.editExistingPerson(person);
 			} else {
-				//Alert.show("person doesn't exist");
+            this.parentDocument.editNotExistingPerson(event);
 			}
 		}
 

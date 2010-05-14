@@ -164,7 +164,7 @@
          </mx:AddChild>
       </mx:State>
 
-		<mx:State name="login" basedOn="">
+		<mx:State name="login" basedOn="init">
 
 			<mx:AddChild relativeTo="{VB_o3s}" position="lastChild" creationPolicy="all"	>
 
@@ -196,7 +196,7 @@
 
 		</mx:State>
 
-		<mx:State name="logged" basedOn="">
+		<mx:State name="logged" basedOn="init">
 
 			<mx:RemoveChild target="{VBox_registering}"/>
 

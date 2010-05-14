@@ -26,6 +26,7 @@
 -->
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
 		   xmlns:components="net.o3s.webflex.components.*"
+         preinitialize="preInit()"
 		   creationComplete="init()"
 		   width="100%">
 <mx:Script>
@@ -64,16 +65,20 @@
 		// control on the form.
 		private var focussedFormControl:DisplayObject;
 
-		private function init():void {
-			//
-			// Create validators
-			//
-			teamNameValidator = new StringValidator();
-			teamNameValidator.source = TI_teamName;
-			teamNameValidator.property = "text";
-			teamNameValidator.minLength = 2;
-			teamNameValidator.required=false;
+      private function preInit():void {
 
+      }
+
+		private function init():void {
+
+        //
+         // Create validators
+         //
+         teamNameValidator = new StringValidator();
+         teamNameValidator.source = TI_teamName;
+         teamNameValidator.property = "text";
+         teamNameValidator.minLength = 2;
+         teamNameValidator.required=false;
 		}
 
 		// Clear the form and reset validation.
@@ -93,7 +98,7 @@
 		}
 
 		// Validate the form
-		private function validateForm(event:Event):void
+		public function validateForm(event:Event):void
 		{
 			// Save a reference to the currently focussed form control
 			// so that the isValid() helper method can notify only
@@ -148,10 +153,15 @@
 		}
 
 		public function set4Update(tn:String):void {
+         // by default in the update mode, form is valid
+         formIsValid = true;
 			teamName = tn;
 			TI_teamName.text=tn ;
 
 		}
+
+
+
 
 	]]>
 </mx:Script>

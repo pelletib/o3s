@@ -246,7 +246,9 @@
 				}
 				registered.teamed = selectedCompetition.teamed;
 				registered.paid = false;
-				RO_registering.createRegistered(registered);
+
+  			   RO_registering.createRegistered(registered);
+
 			} else if (mode == "update") {
 				updateRegistered.persons = MyPersonsEditor.personList;
 				updateRegistered.competition = selectedCompetition;
@@ -297,10 +299,11 @@
 
 				//set team
 				if (updateRegistered.teamed == true) {
-					MyTeamEditor.set4Update(updateRegistered.name);
+               if (MyTeamEditor != null) {
+					 MyTeamEditor.set4Update(updateRegistered.name);
+               }
 				}
 
-				//set others informations
 			}
 
 		}
@@ -318,7 +321,7 @@
 			} else {
 				this.currentState="individual";
 			}
-			submitRegisteredButton.label="Update registered";
+			submitRegisteredButton.label="Mettre a jour inscription";
 		}
 
 		// callback set by the caller if wanted
