@@ -23,8 +23,6 @@
  */
 package net.o3s.webflex.bean
 {
-	import mx.charts.chartClasses.DataDescription;
-
 	[Bindable]
 	[RemoteClass(alias="net.o3s.web.vo.NotificationVO")] //mapping vers la classe java
 	public class Notification

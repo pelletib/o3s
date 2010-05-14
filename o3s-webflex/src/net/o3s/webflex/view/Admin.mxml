@@ -35,6 +35,12 @@
          import mx.controls.Alert;
          import mx.utils.ObjectUtil;
 
+
+         public function init():void {
+            refreshAdminData();
+         }
+
+
          public function onClickRefresh(ev:Event):void {
             refreshAdminData();
          }
@@ -42,13 +48,11 @@
 			public function refreshAdminData():void {
 
             	RO_admin.getAllEvents();
-				RO_admin.getAllCompetitions();
-				RO_admin.getAllCategories();
+				  RO_admin.getAllCompetitions();
+				  RO_admin.getAllCategories();
 			}
 
-			public function init():void {
-				refreshAdminData();
-			}
+
 
 			private function displayEvent(item:Object, col:DataGridColumn):String
 			{
@@ -154,8 +158,11 @@
 		 <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Action">
 
           <mx:ControlBar horizontalAlign="center">
-             <mx:Button label="Refresh" id="B_refresh"
+            <mx:HBox width="100%" horizontalAlign="center">
+                <mx:Button label="Refresh" id="B_refresh"
                          click="onClickRefresh(event)" enabled="true"/>
+            </mx:HBox>
+
           </mx:ControlBar>
 
 		 </mx:Panel>

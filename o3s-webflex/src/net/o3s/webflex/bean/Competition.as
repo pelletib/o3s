@@ -23,8 +23,6 @@
  */
 package net.o3s.webflex.bean
 {
-	import mx.charts.chartClasses.DataDescription;
-
 	[Bindable]
 	[RemoteClass(alias="net.o3s.web.vo.CompetitionVO")] //mapping vers la classe java
 	public class Competition

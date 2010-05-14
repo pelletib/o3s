@@ -23,7 +23,6 @@
  */
 package net.o3s.webflex.bean
 {
-	import mx.charts.chartClasses.DataDescription;
    import flash.utils.ByteArray;
 
 	[Bindable]
