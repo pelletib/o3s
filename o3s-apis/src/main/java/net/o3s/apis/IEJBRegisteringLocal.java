@@ -28,7 +28,7 @@ import java.util.List;
 
 public interface IEJBRegisteringLocal {
 
-	IEntityPerson createPerson(final String lastname, final String firstname, final String club, final String license, final String email, final char sex, final Date birthday) throws RegisteringException;
+	IEntityPerson createPerson(final String lastname, final String firstname, final String club, final String license, final String email, final char sex, final Date birthday) throws AlreadyExistException,RegisteringException;
 	IEntityPerson updatePerson(final int id, final String lastname, final String firstname, final String club, final String license, final String email, final char sex, final Date birthday) throws RegisteringException;
 	IEntityPerson updatePerson(IEntityPerson person) throws RegisteringException;
 	IEntityPerson findPersonFromId(final int id);
@@ -42,7 +42,7 @@ public interface IEJBRegisteringLocal {
 	IEntityRegistered findRegisteredFromLabel(final String labelValue)  throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByDuration(final int competitionId) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId) throws RegisteringException;
-	List<IEntityRegistered> createRegistered(final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid)  throws RegisteringException;
+	List<IEntityRegistered> createRegistered(final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid)  throws AlreadyExistException,RegisteringException;
 	IEntityRegistered findRegisteredFromId(final int id);
 	IEntityRegistered findRegisteredFromPerson(final int personId);
 	void removeRegistered(final int id) throws RegisteringException;

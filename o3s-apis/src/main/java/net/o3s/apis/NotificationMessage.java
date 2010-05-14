@@ -211,9 +211,13 @@ public class NotificationMessage implements Serializable {
 			e1.printStackTrace();
 			throw new NotificationMessageException("Error when parsing the XML string <" + xmlString + ">", e1);
 
-		} catch (SAXException e1) {
-			e1.printStackTrace();
-			throw new NotificationMessageException("Error when parsing the XML string <" + xmlString + ">", e1);
+		} catch (SAXException e2) {
+			e2.printStackTrace();
+			throw new NotificationMessageException("Error when parsing the XML string <" + xmlString + ">", e2);
+
+		} catch (IllegalStateException e3) {
+			e3.printStackTrace();
+			throw new NotificationMessageException("Unexpected error <" + xmlString + ">", e3);
 
 		}
 		// create an XML reader
