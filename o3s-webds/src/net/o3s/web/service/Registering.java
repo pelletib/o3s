@@ -192,15 +192,15 @@ public class Registering {
 
 
 
-	public PersonVO removePerson(PersonVO personVO) {
+	public int removePerson(int personId) {
 		try {
-			registering.removePerson(personVO.getId());
+			registering.removePerson(personId);
 		} catch (RegisteringException e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
 		}
-		System.out.println("remove person=" + personVO);
-		return personVO;
+		System.out.println("remove person=" + personId);
+		return personId;
 
 	}
 
