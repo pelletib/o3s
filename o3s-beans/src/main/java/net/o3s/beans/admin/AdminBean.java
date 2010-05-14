@@ -251,12 +251,15 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     public  List<IEntityCompetition> findAllCompetitionsFromDefaultEvent() {
         Query query = this.entityManager.createNamedQuery("ALL_COMPETITIONS_FROM_EVENT");
         IEntityEvent event = findDefaultEvent();
-        query.setParameter("EVENT_ID", event.getId());
 
         List<IEntityCompetition> competitions = null;
         try {
-        	competitions = query.getResultList();
+            query.setParameter("EVENT_ID", event.getId());
+            competitions = query.getResultList();
         } catch (javax.persistence.NoResultException e) {
+        	competitions = new ArrayList<IEntityCompetition>();
+        } catch (Exception e1) {
+        	logger.log(Level.WARNING, "error", e1);
         	competitions = new ArrayList<IEntityCompetition>();
         }
         return competitions;
