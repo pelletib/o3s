@@ -39,6 +39,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import net.o3s.apis.AlreadyExistException;
 import net.o3s.apis.IEJBAdminLocal;
 import net.o3s.apis.IEJBRegisteringLocal;
 import net.o3s.apis.IEJBRegisteringRemote;
@@ -259,7 +260,13 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     /**
      * Create new Person
      */
-    public IEntityPerson createPerson(final String lastname, final String firstname, final String club, final String license, final String email, final char sex, final Date birthday) throws RegisteringException {
+    public IEntityPerson createPerson(final String lastname,
+    		                          final String firstname,
+    		                          final String club,
+    		                          final String license,
+    		                          final String email,
+    		                          final char sex,
+    		                          final Date birthday) throws AlreadyExistException,RegisteringException {
     	IEntityPerson person = null;
 
     	person = findPersonFromLastnameFirstNameBirthDay(lastname, firstname, birthday);
@@ -276,7 +283,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
             this.entityManager.persist(person);
         } else {
-        	throw new RegisteringException("La personne <" + lastname + ", " + firstname + ", " + birthday + "> existe deja !");
+        	throw new AlreadyExistException("La personne <" + lastname + ", " + firstname + ", " + birthday + "> existe deja !");
         }
         return person;
     }
@@ -680,7 +687,12 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      */
     // TODO : deal with homonym
     @SuppressWarnings("unchecked")
-	public List<IEntityRegistered> createRegistered(final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid) throws RegisteringException {
+	public List<IEntityRegistered> createRegistered(
+			final List<IEntityPerson> persons,
+			final int competitionId,
+			boolean isTeamed,
+			final String name,
+			final boolean isPaid) throws AlreadyExistException, RegisteringException {
     	IEntityRegistered registered = null;
 		List<IEntityRegistered> registeredsReturn = new ArrayList<IEntityRegistered>();
 		String registeredName = null;
@@ -698,8 +710,13 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
            		registeredName = name;
            	}
 
-    		if (findRegisteredFromName(name) != null) {
-            	throw new RegisteringException("L'inscrit <" + name + "> existe deja !");
+    		if (findRegisteredFromName(registeredName) != null) {
+            	throw new AlreadyExistException("L'inscrit <" + registeredName + "> existe deja !");
+    		}
+
+    		IEntityRegistered clone = findRegisteredFromPerson(person.getId());
+    		if ( clone != null) {
+            	throw new AlreadyExistException("L'inscrit <" + registeredName + "> existe deja !" + clone);
     		}
 
         	registered = new Registered();
