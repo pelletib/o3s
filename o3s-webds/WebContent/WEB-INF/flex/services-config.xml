@@ -4,19 +4,19 @@
     <services>
         <service-include file-path="remoting-config.xml" />
         <service-include file-path="proxy-config.xml" />
-        <service-include file-path="messaging-config.xml" />        
+        <service-include file-path="messaging-config.xml" />
     </services>
 
     <security>
         <login-command class="flex.messaging.security.TomcatLoginCommand" server="Tomcat"/>
         <!-- Uncomment the correct app server
         <login-command class="flex.messaging.security.TomcatLoginCommand" server="JBoss">
-		<login-command class="flex.messaging.security.JRunLoginCommand" server="JRun"/>        
+		<login-command class="flex.messaging.security.JRunLoginCommand" server="JRun"/>
         <login-command class="flex.messaging.security.WeblogicLoginCommand" server="Weblogic"/>
         <login-command class="flex.messaging.security.WebSphereLoginCommand" server="WebSphere"/>
         -->
 
-        <!-- 
+        <!--
         <security-constraint id="basic-read-access">
             <auth-method>Basic</auth-method>
             <roles>
@@ -65,7 +65,7 @@
     </channels>
 
     <logging>
-        <target class="flex.messaging.log.ConsoleTarget" level="Error">
+        <target class="flex.messaging.log.ConsoleTarget" level="Warn">
             <properties>
                 <prefix>[BlazeDS] </prefix>
                 <includeDate>false</includeDate>
@@ -84,7 +84,7 @@
     <system>
         <redeploy>
             <enabled>false</enabled>
-            <!-- 
+            <!--
             <watch-interval>20</watch-interval>
             <watch-file>{context.root}/WEB-INF/flex/services-config.xml</watch-file>
             <watch-file>{context.root}/WEB-INF/flex/proxy-config.xml</watch-file>
