@@ -106,12 +106,12 @@
 		}
 
 		private function resultRemovePerson(event:ResultEvent):void {
-			var person:Person = event.result as Person;
+			var id:int = event.result as int;
 			var idx:int = -1;
 
 			for(var count:int = 0; count < personList.length; count++) {
 				var p:Person = personList.getItemAt(count, 0) as Person;
-				if (p.id == person.id) {
+				if (p.id == id) {
 					idx = count;
 					break;
 				}
@@ -273,7 +273,25 @@
 
 		private function trash_dragDrop(evt:DragEvent):void {
 			var person:Person = DG_persons.selectedItem as Person;
-			RO_registering.removePerson(person);
+         // disable the effective removing (not sure what to do in this case)
+
+			//RO_registering.removePerson(person.id);
+
+         // just remove it from the list
+         var id:int = person.id;
+         var idx:int = -1;
+
+         for(var count:int = 0; count < personList.length; count++) {
+            var p:Person = personList.getItemAt(count, 0) as Person;
+            if (p.id == id) {
+               idx = count;
+               break;
+            }
+         }
+
+         personList.removeItemAt(idx);
+         clearFormHandler();
+
 		}
 
 		// form component is valid ?

@@ -82,6 +82,10 @@
 			[Bindable]
 			public var printDialog:Boolean = false;
 
+         [Bindable]
+         public var deleteMode:String="onlyRegistered";
+
+
          public var importFileRef:FileReference = new FileReference;
          private var importFileFilter:FileFilter = new FileFilter("CSV File (*.csv)", "*.csv");
 
@@ -122,6 +126,7 @@
 				printDialog=false;
 				selectAll=false;
 				currentState="";
+            deleteMode="onlyRegistered";
 
             // Register event listeners for file select and load complete
             importFileRef.addEventListener(Event.SELECT, handleImportFileSelect);
@@ -608,16 +613,35 @@
 
 					for(var count:int = 0; count < selectedItems.length; count++) {
 						var id:int = selectedItems.getItemAt(count, 0) as int;
-						RO_registering.removeRegistered(id);
+                  var registered:Registered = getRegistered(id);
+
+                  if (registered != null) {
+
+                     if (deleteMode == "all") {
+                        for(var count:int = 0; count < registered.persons.length; count++) {
+                           var p:Person = registered.persons.list.getItemAt(count, 0) as Person;
+                           RO_registering.removePerson(p.id);
+                        }
+                     }
+   						RO_registering.removeRegistered(id);
+                  }
 					}
 					selectedItems.removeAll();
 					actionSelectionEnabled = false;
 					selectAll=false;
+               deleteMode="onlyRegistered";
+
 				}
 			}
 
 			private function confirmClickDeleteSelection():void {
-				Alert.show("Etes-vous sure de vouloir supprimer ces " + selectedItems.length + " enregistrements ?",
+            var msg:String="";
+            if (deleteMode == "all") {
+               msg = "inscrits + personnes";
+            } else {
+               msg = "inscrits";
+            }
+				Alert.show("Etes-vous sure de vouloir supprimer ces " + selectedItems.length + " enregistrements <" + msg + "> ?",
 					"Suppression ?",
 					Alert.OK | Alert.CANCEL,
 					this,
@@ -721,8 +745,8 @@
 
 	<mx:VBox id="VB_label" width="95%">
       <components:EventPanel id="MyEventPanel"  width="100%"/>
-		<mx:HBox id="HB_FiltersActions" width="100%" height="10%">
-			<mx:Panel width="50%" height="100%" horizontalAlign="center" title="Filtres">
+		<mx:HBox id="HB_FiltersActions" width="100%" height="15%">
+			<mx:Panel width="40%" height="100%" horizontalAlign="center" title="Filtres">
 				<mx:VBox width="100%" height="100%">
 					<mx:Form>
 						<mx:FormItem label="Filtre par competition" >
@@ -737,31 +761,27 @@
 					</mx:Form>
 				</mx:VBox>
 			</mx:Panel>
-			<mx:Panel width="50%" height="100%" horizontalAlign="center" title="Actions">
+			<mx:Panel width="60%" height="100%" horizontalAlign="center" title="Actions">
 				<mx:HBox width="100%" height="100%">
-					<mx:Tile direction="horizontal" borderStyle="none"
-							 horizontalGap="5" verticalGap="5"
-							 paddingLeft="5" paddingTop="5" paddingBottom="5" paddingRight="5">
-                  <mx:VBox width="100%" horizontalAlign="center">
+					<mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
 
  						<mx:Button label="Reinit/Refresh" id="B_refresh" click="onClickRefresh(event)" enabled="true"/>
-                  <mx:HBox width="100%" horizontalAlign="center">
-
-                     <mx:Button id="importFileButton" label="Import CSV" width="200" click="importFileRef.browse([importFileFilter]);" enabled="true"/>
+                  <mx:Button id="importFileButton" label="Import CSV" click="importFileRef.browse([importFileFilter]);" enabled="true"/>
                    <!--  <mx:ProgressBar id="progressBar" indeterminate="true" visible="false" /> -->
-                  </mx:HBox>
-                  </mx:VBox>
+					</mx:VBox>
+               <mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
 
+                  <mx:CheckBox id="CB_selectAll" label="Selectionner tout" selected="false" click="modifySelectAll(event)"/>
+                  <mx:CheckBox id="CB_printDialog" label="Activer la boite de dialogue d'impression" selected="false" click="modifyPrintDialog(event)"/>
 
-					</mx:Tile>
-					<mx:Tile direction="vertical" borderStyle="none"
-							 horizontalGap="5" verticalGap="5"
-							 paddingLeft="5" paddingTop="5" paddingBottom="5" paddingRight="5">
-						<mx:CheckBox id="CB_selectAll" label="Selectionner tout" selected="false" click="modifySelectAll(event)"/>
-						<mx:CheckBox id="CB_printDialog" label="Activer la boite de dialogue d'impression" selected="false" click="modifyPrintDialog(event)"/>
-						<mx:Button label="Supprimer la selection" id="B_delete" click="confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
+               </mx:VBox>
+
+               <mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
+
+						<mx:Button label="Supprimer la selection (inscrits)" id="B_delete1" click="deleteMode='onlyRegistered';confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
+                  <mx:Button label="Supprimer la selection (inscrits + personnes)" id="B_delete2" click="deleteMode='all';confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
 						<mx:Button label="Imprimer la selection" id="B_print" click="onClickPrintSelection(event)" enabled="{actionSelectionEnabled}"/>
-					</mx:Tile>
+               </mx:VBox>
 				</mx:HBox>
 			</mx:Panel>
 		</mx:HBox>
