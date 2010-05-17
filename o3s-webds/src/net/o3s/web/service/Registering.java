@@ -40,7 +40,9 @@ import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
+import net.o3s.apis.ReportException;
 import net.o3s.web.common.Util;
+import net.o3s.web.vo.CategoryVO;
 import net.o3s.web.vo.FlexException;
 import net.o3s.web.vo.PersonVO;
 import net.o3s.web.vo.RegisteredStatisticsVO;
@@ -99,6 +101,53 @@ public class Registering {
 		System.out.println("registereds=" + registereds);
 		return Util.createRegisteredListVO(registereds, this);
 	}
+
+	// get arrivals order by duration
+	public List<RegisteredVO> getArrivalsFromCompetition(final int competitionId) throws RegisteringException {
+
+		setRegisteringEJB();
+
+		List<IEntityRegistered> registereds = null;
+		try {
+			registereds = this.registering.findRegisteredFromCompetitionOrderByDuration(competitionId);
+		} catch (RegisteringException re) {
+			re.printStackTrace();
+    		throw new RegisteringException("Unable to find registereds for competition " + competitionId, re);
+		}
+
+		System.out.println("registereds=" + registereds);
+
+    	return Util.createRegisteredListVO(registereds, this);
+	}
+
+	// get arrivals order by category and duration
+	public List<RegisteredVO> getArrivalsFromCompetitionOrderByCategory(final int competitionId, List<CategoryVO> categoriesVO) throws RegisteringException {
+
+		setRegisteringEJB();
+
+		List<Integer> categoriesId = new ArrayList<Integer>();
+		if (categoriesVO != null) {
+			for (CategoryVO categoryVO:categoriesVO) {
+				categoriesId.add(categoryVO.getId());
+			}
+		}
+		List<IEntityRegistered> registereds = null;
+		try {
+			registereds = this.registering.findRegisteredFromCompetitionOrderByCategoryAndDuration(competitionId, categoriesId);
+		} catch (RegisteringException re) {
+			re.printStackTrace();
+    		throw new RegisteringException("Unable to find registereds for competition " + competitionId, re);
+		} catch (Exception e) {
+			e.printStackTrace();
+    		throw new RegisteringException("Unable to find registereds for competition " + competitionId, e);
+		}
+
+
+		System.out.println("registereds=" + registereds);
+
+    	return Util.createRegisteredListVO(registereds, this);
+	}
+
 
 	// get all registered
 	public List<RegisteredVO> getAllRegistereds() {
