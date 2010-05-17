@@ -35,6 +35,7 @@ import java.util.Vector;
 import javax.ejb.EJB;
 
 import net.o3s.apis.AdminException;
+import net.o3s.apis.AlreadyExistException;
 import net.o3s.apis.IEJBAdminRemote;
 import net.o3s.apis.IEJBEventMessageProducerRemote;
 import net.o3s.apis.IEJBInitRemote;
@@ -124,6 +125,9 @@ public class Main {
 			e.printStackTrace();
 		} catch (RegisteringException e) {
 			e.printStackTrace();
+		} catch (AlreadyExistException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		IEntityCompetition competition1 = admin.findCompetitionFromId(9);
 		IEntityCompetition competition2 = admin.findCompetitionFromId(4);
@@ -146,6 +150,9 @@ public class Main {
 			vregistered.addAll(registering.createRegistered(team10, competition1.getId(), false, "", true));
 			vregistered.addAll(registering.createRegistered(team11, competition1.getId(), false, "", true));
 		} catch (RegisteringException e) {
+			e.printStackTrace();
+		} catch (AlreadyExistException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
