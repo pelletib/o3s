@@ -32,7 +32,13 @@ package net.o3s.webflex.components
 	import mx.rpc.Fault;
 	import mx.rpc.events.FaultEvent;
 	import flash.events.Event;
+	import mx.controls.dataGridClasses.DataGridColumn;
+	import 	mx.formatters.DateFormatter;
+
 	import net.o3s.webflex.bean.Competition;
+	import net.o3s.webflex.bean.Category;
+	import net.o3s.webflex.bean.Registered;
+	import net.o3s.webflex.bean.Person;
 
 
 	public class Util
@@ -76,6 +82,117 @@ package net.o3s.webflex.components
 			var c:Competition = item as Competition;
 			return (c.name != "Unknown");
 		}
+
+		public static function displayCompetition(item:Object, col:DataGridColumn):String {
+			return item.competition.name;
+		}
+
+		public static function displayCategory(item:Object, col:DataGridColumn):String {
+			return item.category.name;
+		}
+
+		public static function displayLabel(item:Object, col:DataGridColumn):String {
+			return item.label.value;
+		}
+		public static function displayTeam(item:Object, col:DataGridColumn):String	{
+			if (item.teamed == true) {
+				return "Y";
+			}
+			else {
+				return "N";
+			}
+		}
+
+		public static function displayPaid(item:Object, col:DataGridColumn):String {
+			if (item.paid == true) {
+				return "Y";
+			}
+			else {
+				return "N";
+			}
+		}
+
+		public static function displayPersonsIdAsString(item:Object, col:DataGridColumn):String {
+
+			if (item.persons == null) {
+				Alert.show("error, persons is null");
+				return null;
+
+			} else {
+				var msg:String="";
+				var registered:Registered = item as Registered;
+
+				for(var count:int = 0; count < registered.persons.length; count++) {
+					var p:Person = registered.persons.list.getItemAt(count, 0) as Person;
+					if (count > 0) {
+						msg += "," ;
+					}
+
+					msg += p.id ;
+
+				}
+
+				return msg;
+			}
+
+		}
+
+		public static function displayPersonsAsString(item:Object):String	{
+			if (item.persons == null) {
+				Alert.show("error, persons is null");
+				return null;
+
+			} else {
+				var msg:String="";
+
+				var registered:Registered = item as Registered;
+
+				for(var count:int = 0; count < registered.persons.length; count++) {
+					var p:Person = registered.persons.list.getItemAt(count, 0) as Person;
+					if (count > 0) {
+						msg += "," ;
+					}
+
+					msg += "[" + p.id +
+						";" + p.firstname +
+						";" + p.lastname +
+						";" + p.birthday +
+						";" + p.sex +
+						";" + p.club +
+						";" + p.license +
+						";" + p.email +
+						"]";
+
+				}
+
+				return msg;
+			}
+		}
+
+		public static function getDateLabel(item:Object,column:DataGridColumn):String
+		{
+
+			var df:DateFormatter = new DateFormatter;
+			df.formatString="DD/MM/YY HH:NN:SS";
+
+			return df.format(item[column.dataField]);
+		}
+
+		public static function getElapsedTimeLabel(item:Object,column:DataGridColumn):String
+		{
+			var timetmsec:uint = item[column.dataField] as uint;
+			var timet:uint = timetmsec / 1000;
+
+			var hours:uint = timet/(60*60);
+			var minutes:uint = (timet/60)-(hours*60);
+			var seconds:uint = timet-(minutes*60)-(hours*3600);
+			var mseconds:uint = timetmsec - (seconds*1000) - (minutes*60*1000) - (hours*3600*1000);
+
+			var myElapsedTimeStr:String = hours + ":" + minutes + ":" + seconds + ":" + mseconds;
+			return myElapsedTimeStr;
+			//return formatElapsedTime.format(new Date(timet));
+		}
+
 
 	}
 }

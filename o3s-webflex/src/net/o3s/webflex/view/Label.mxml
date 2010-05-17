@@ -34,6 +34,7 @@
 			import net.o3s.webflex.bean.Category;
 			import net.o3s.webflex.bean.Registered;
 			import net.o3s.webflex.bean.Person;
+         import net.o3s.webflex.components.Util;
 
 			import mx.rpc.events.ResultEvent;
 			import mx.controls.Alert;
@@ -297,93 +298,6 @@
          }
 
 
-			private function displayCompetition(item:Object, col:DataGridColumn):String {
-				return item.competition.name;
-			}
-
-			private function displayCategory(item:Object, col:DataGridColumn):String {
-				return item.category.name;
-			}
-
-			private function displayLabel(item:Object, col:DataGridColumn):String {
-				return item.label.value;
-			}
-
-			private function displayTeam(item:Object, col:DataGridColumn):String	{
-				if (item.teamed == true) {
-					return "Y";
-				}
-				else {
-					return "N";
-				}
-			}
-
-			private function displayPaid(item:Object, col:DataGridColumn):String {
-				if (item.paid == true) {
-					return "Y";
-				}
-				else {
-					return "N";
-				}
-			}
-
-			private function displayPersonsIdAsString(item:Object, col:DataGridColumn):String {
-
-				if (item.persons == null) {
-					Alert.show("error, persons is null");
-					return null;
-
-				} else {
-					var msg:String="";
-					var registered:Registered = item as Registered;
-
-					for(var count:int = 0; count < registered.persons.length; count++) {
-						var p:Person = registered.persons.list.getItemAt(count, 0) as Person;
-						if (count > 0) {
-							msg += "," ;
-						}
-
-						msg += p.id ;
-
-					}
-
-					return msg;
-				}
-
-			}
-
-			private function displayPersonsAsString(item:Object):String	{
-				if (item.persons == null) {
-					Alert.show("error, persons is null");
-					return null;
-
-				} else {
-					var msg:String="";
-
-					var registered:Registered = item as Registered;
-
-					for(var count:int = 0; count < registered.persons.length; count++) {
-						var p:Person = registered.persons.list.getItemAt(count, 0) as Person;
-						if (count > 0) {
-							msg += "," ;
-						}
-
-						msg += "[" + p.id +
-							";" + p.firstname +
-							";" + p.lastname +
-							";" + p.birthday +
-							";" + p.sex +
-							";" + p.club +
-                     ";" + p.license +
-							";" + p.email +
-							"]";
-
-					}
-
-					return msg;
-				}
-			}
-
 
 			private function onFault(ev:Event):void {
             Alert.show( ObjectUtil.toString(ev) );
@@ -402,7 +316,7 @@
 					//myString = myString + item.category.name + ",";
 					//myString = myString + item.label.name + ",";
 
-					myString += displayPersonsAsString(item) ;
+					myString += Util.displayPersonsAsString(item) ;
 
 					//myString = myString + item.teamed + ",";
 					//myString = myString + item.paid + ",";
@@ -448,25 +362,6 @@
             setFilters();
 			}
 
-			public function getDateLabel(item:Object,column:DataGridColumn):String
-			{
-				return formatDate.format(item[column.dataField]);
-			}
-
-			public function getElapsedTimeLabel(item:Object,column:DataGridColumn):String
-			{
-				var timetmsec:uint = item[column.dataField] as uint;
-				var timet:uint = timetmsec / 1000;
-
-				var hours:uint = timet/(60*60);
-				var minutes:uint = (timet/60)-(hours*60);
-				var seconds:uint = timet-(minutes*60)-(hours*3600);
-				var mseconds:uint = timetmsec - (seconds*1000) - (minutes*60*1000) - (hours*3600*1000);
-
-				var myElapsedTimeStr:String = hours + ":" + minutes + ":" + seconds + ":" + mseconds;
-				return myElapsedTimeStr;
-				//return formatElapsedTime.format(new Date(timet));
-			}
 
 			private function resultRemoveRegistered(event:ResultEvent):void {
 				RO_registering.getRegistereds();
@@ -701,9 +596,6 @@
 		]]>
 	</mx:Script>
 
-	<mx:DateFormatter formatString="DD/MM/YY HH:NN:SS" id="formatDate"/>
-	<mx:DateFormatter formatString="DD/MM/YY HH:NN:SS" id="formatElapsedTime"/>
-
 	<mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
 		<mx:method name="getCompetitions" result="resultGetCompetitions(event)"/>
 		<mx:method name="getCategories" result="resultGetCategories(event)"/>
@@ -792,17 +684,17 @@
 					<mx:columns>
 						<mx:DataGridColumn headerText="Id" dataField="id" showDataTips="true" width="30"/>
 						<mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="150"/>
-						<mx:DataGridColumn headerText="Competition" labelFunction="displayCompetition" showDataTips="true" width="115"/>
-						<mx:DataGridColumn headerText="Categorie" labelFunction="displayCategory" showDataTips="true" width="115"/>
-						<mx:DataGridColumn headerText="Dossard" labelFunction="displayLabel" showDataTips="true" width="70"/>
+						<mx:DataGridColumn headerText="Competition" labelFunction="Util.displayCompetition" showDataTips="true" width="115"/>
+						<mx:DataGridColumn headerText="Categorie" labelFunction="Util.displayCategory" showDataTips="true" width="115"/>
+						<mx:DataGridColumn headerText="Dossard" labelFunction="Util.displayLabel" showDataTips="true" width="70"/>
 
-						<mx:DataGridColumn headerText="Personnes" labelFunction="displayPersonsIdAsString" showDataTips="true" width="80"/>
+						<mx:DataGridColumn headerText="Personnes" labelFunction="Util.displayPersonsIdAsString" showDataTips="true" width="80"/>
 
-						<mx:DataGridColumn headerText="Equipe" labelFunction="displayTeam" showDataTips="true" width="30"/>
-						<mx:DataGridColumn headerText="Paye" labelFunction="displayPaid" showDataTips="true" width="30"/>
-						<mx:DataGridColumn headerText="Date d'enregistrement" dataField="registeringDate" showDataTips="true" width="120" labelFunction="getDateLabel"/>
-						<mx:DataGridColumn headerText="Date d'arrivee" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="getDateLabel"/>
-						<mx:DataGridColumn headerText="Temps ecoule" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="getElapsedTimeLabel"/>
+						<mx:DataGridColumn headerText="Equipe" labelFunction="Util.displayTeam" showDataTips="true" width="30"/>
+						<mx:DataGridColumn headerText="Paye" labelFunction="Util.displayPaid" showDataTips="true" width="30"/>
+						<mx:DataGridColumn headerText="Date d'enregistrement" dataField="registeringDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
+						<mx:DataGridColumn headerText="Date d'arrivee" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
+						<mx:DataGridColumn headerText="Temps ecoule" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="Util.getElapsedTimeLabel"/>
 						<mx:DataGridColumn width="100" headerText="Actions"
 										   itemRenderer="net.o3s.webflex.components.ActionLabelDataGridColumnItemRenderer" />
 					</mx:columns>
