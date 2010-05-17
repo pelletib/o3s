@@ -551,6 +551,50 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     }
 
     /**
+     * Get registered on competition order by category and duration for a list of categories
+     */
+    @SuppressWarnings("unchecked")
+    public List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId,  List<Integer> categoriesId) throws RegisteringException {
+    	IEntityEvent event = admin.findDefaultEvent();
+
+    	Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_CATEGORY_ETIME");
+        query.setParameter("COMPETITION", competitionId);
+        query.setParameter("EVENTID", event.getId());
+
+        List<IEntityRegistered> registereds = null;
+        try {
+
+        	registereds = query.getResultList();
+        } catch (javax.persistence.NoResultException e) {
+        	registereds = new ArrayList<IEntityRegistered>();
+        } catch (Exception e){
+        	e.printStackTrace();
+        	throw new RegisteringException("Unable to find competitionId [" + competitionId + "]", e);
+        }
+
+
+       	// filter the registered according to the categories list
+    	List<IEntityRegistered> filteredRegistereds;
+
+    	if (categoriesId != null) {
+    		filteredRegistereds = new ArrayList<IEntityRegistered>();
+			for (IEntityRegistered registered : registereds) {
+				for (Integer categoryId : categoriesId) {
+					if (registered.getCategory().getId() == categoryId
+							.intValue()) {
+						filteredRegistereds.add(registered);
+						break;
+					}
+				}
+			}
+    	} else {
+    		filteredRegistereds = registereds;
+    	}
+
+        return filteredRegistereds;
+    }
+
+    /**
      * Count number of registered for a given competition
      */
     @SuppressWarnings("unchecked")

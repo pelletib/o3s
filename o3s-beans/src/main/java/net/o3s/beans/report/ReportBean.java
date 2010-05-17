@@ -434,7 +434,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
      	List<IEntityRegistered> registereds;
 		try {
-			registereds = this.registering.findRegisteredFromCompetitionOrderByCategoryAndDuration(competitionId);
+			registereds = this.registering.findRegisteredFromCompetitionOrderByCategoryAndDuration(competitionId, categoriesId);
 		} catch (RegisteringException re) {
 			re.printStackTrace();
     		return false;
@@ -444,26 +444,6 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     		logger.warning("No yet arrived!");
     		return false;
         }
-
-    	if (categoriesId != null) {
-
-    		// filter the registered according to the categories list
-    		List<IEntityRegistered> filteredRegistereds = new ArrayList<IEntityRegistered>();
-
-    		for (IEntityRegistered registered:registereds) {
-    			for (Integer categoryId:categoriesId) {
-    				if ( registered.getCategory().getId() == categoryId.intValue()) {
-    					filteredRegistereds.add(registered);
-    					break;
-    				}
-    			}
-    		}
-
-    		if (filteredRegistereds.isEmpty()) {
-    			logger.warning("No yet arrived!");
-    			return false;
-    		}
-    	}
 
     	return true;
     }
@@ -502,25 +482,13 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
      	List<IEntityRegistered> registereds;
 		try {
-			registereds = this.registering.findRegisteredFromCompetitionOrderByCategoryAndDuration(competitionId);
+			registereds = this.registering.findRegisteredFromCompetitionOrderByCategoryAndDuration(competitionId, categoriesId);
 		} catch (RegisteringException re) {
 			re.printStackTrace();
     		throw new ReportException("Unable to generate report for competition " + competitionId, re);
 		}
 
-    	// filter the registered according to the categories list
-    	List<IEntityRegistered> filteredRegistereds = new ArrayList<IEntityRegistered>();
-
-    	for (IEntityRegistered registered:registereds) {
-    		for (Integer categoryId:categoriesId) {
-    			if ( registered.getCategory().getId() == categoryId.intValue()) {
-    				filteredRegistereds.add(registered);
-    				break;
-    			}
-    		}
-    	}
-
-    	if (filteredRegistereds.isEmpty()) {
+    	if (registereds.isEmpty()) {
     		throw new ReportException("No yet arrived!");
         }
 
@@ -533,7 +501,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		logger.fine("eventName=" + competition.getEvent().getName());
 
 		String sourceFileName = CATEGORIES_RANKING_REPORT + ".jrxml";
-		invokeJasperReportStream(sourceFileName, outputStream, parameters, filteredRegistereds);
+		invokeJasperReportStream(sourceFileName, outputStream, parameters, registereds);
 
     }
 
