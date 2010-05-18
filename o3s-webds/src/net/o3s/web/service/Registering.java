@@ -117,7 +117,16 @@ public class Registering {
 
 		System.out.println("registereds=" + registereds);
 
-    	return Util.createRegisteredListVO(registereds, this);
+		List<RegisteredVO> registeredsVO = Util.createRegisteredListVO(registereds, this);
+
+		// set the rank
+		int rank = 1;
+		for (RegisteredVO registeredVO:registeredsVO) {
+			registeredVO.setRank(rank);
+			rank++;
+		}
+
+    	return registeredsVO;
 	}
 
 	// get arrivals order by category and duration
@@ -145,7 +154,21 @@ public class Registering {
 
 		System.out.println("registereds=" + registereds);
 
-    	return Util.createRegisteredListVO(registereds, this);
+		List<RegisteredVO> registeredsVO = Util.createRegisteredListVO(registereds, this);
+
+		// set the rank
+		int rank = 1;
+		int catId = -1;
+		for (RegisteredVO registeredVO:registeredsVO) {
+			if (registeredVO.getCategory().getId() != catId) {
+				rank = 1;
+				catId = registeredVO.getCategory().getId();
+			}
+			registeredVO.setRank(rank);
+			rank++;
+		}
+
+    	return registeredsVO;
 	}
 
 

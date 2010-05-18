@@ -190,6 +190,7 @@ public class Util {
 			registeredVO.setPersons(createPersonListVO(registered.getPersons(), service));
 			registeredVO.setRegisteringDate(registered.getRegisteringDate());
 			registeredVO.setTeamed(registered.isTeamed());
+			registeredVO.setRank(-1);
 		}
 		return registeredVO;
 

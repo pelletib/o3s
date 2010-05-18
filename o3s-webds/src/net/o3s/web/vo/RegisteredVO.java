@@ -40,7 +40,7 @@ public class RegisteredVO {
     private LabelVO label;
     private CategoryVO category;
 	private List<PersonVO> persons;
-
+	private int rank;
 
 	public RegisteredVO() {
 		super();
@@ -75,6 +75,7 @@ public class RegisteredVO {
 				this.getEvent() + ", " +
 				this.getCompetition() + ", " +
 				this.getCategory() + ", " +
+				this.getRank() + ", " +
 				"]";
 	}
 
@@ -156,5 +157,13 @@ public class RegisteredVO {
 
 	public void setPersons(List<PersonVO> persons) {
 		this.persons = persons;
+	}
+
+	public int getRank() {
+		return rank;
+	}
+
+	public void setRank(int rank) {
+		this.rank = rank;
 	}
 }
