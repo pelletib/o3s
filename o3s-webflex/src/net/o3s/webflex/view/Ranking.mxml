@@ -86,6 +86,12 @@
          private var arrivalsList:ArrayCollection= new ArrayCollection([]);
 
          [Bindable]
+         public var selectedNameFilter:String="";
+
+         [Bindable]
+         public var selectedLabelFilter:String="";
+
+         [Bindable]
          public var submitButtonGetRankingPDFEnabled:Boolean = false;
 
          [Bindable]
@@ -116,15 +122,15 @@
 
          public function resetRegisteredData():void {
 
+            arrivalsList.removeAll();
             arrivalsList.filterFunction = null;
-            //selectedCompetitionFilter=null;
-            //selectedNameFilter="";
-            //selectedLabelFilter = "";
+            selectedNameFilter="";
+            selectedLabelFilter = "";
 
-            //CB_competition.selectedItem = -1;
-            //TI_selectedNameFilter.text="";
-            //TI_selectedLabelFilter.text="";
-            //refreshRegisteredData();
+            TI_selectedNameFilter.text="";
+            TI_selectedLabelFilter.text="";
+            setFilters();
+
          }
 
 			private function init():void {
@@ -180,6 +186,7 @@
             selectedCompetition=null;
             competitionIsEmpty = true;
             refreshSubmitButtonEnabled();
+            resetRegisteredData();
 				// Set the focus on the first field so
 				// user does not have to mouse over to it.
 				resetFocus();
@@ -389,7 +396,45 @@
 
          private function resultGetArrivals(ev:ResultEvent):void {
             arrivalsList = ev.result as ArrayCollection;
-            //setFilters();
+            setFilters();
+         }
+
+         private function setFilters():void {
+
+            if (selectedNameFilter != "" || selectedLabelFilter != "") {
+               arrivalsList.filterFunction = processFilters;
+            } else {
+               arrivalsList.filterFunction = null;
+            }
+            arrivalsList.refresh();
+         }
+
+
+         private function setFilterByName(event:Event):void {
+            selectedNameFilter=StringUtil.trim(TI_selectedNameFilter.text);
+            setFilters();
+         }
+
+         private function setFilterByLabel(event:Event):void {
+            selectedLabelFilter=StringUtil.trim(TI_selectedLabelFilter.text);
+            setFilters();
+         }
+
+         private function processFilters(item:Object):Boolean {
+
+            var resultNameFilter:Boolean = true;
+            var resultLabelFilter:Boolean = true;
+            var registered:Registered = item as Registered;
+
+            if (selectedNameFilter != "") {
+               resultNameFilter = registered.name.toLowerCase().match(selectedNameFilter.toLowerCase());
+            }
+
+            if (selectedLabelFilter != "") {
+               resultLabelFilter = registered.label.value.match(selectedLabelFilter);
+            }
+
+            return (resultNameFilter && resultLabelFilter);
          }
 
 
@@ -422,8 +467,8 @@
       <components:EventPanel id="MyEventPanel"  width="100%"/>
 		<mx:HBox width="100%" height="30%">
 			<mx:Panel title="Selection du classement" width="100%" height="100%" horizontalAlign="center">
-           <mx:HBox width="100%" height="20%">
-             <mx:Label id="L_competition" color="blue" text="Selectionner une competition: " textAlign="right"/>
+           <mx:HBox width="100%" height="20%" horizontalAlign="center">
+             <mx:Label id="L_competition" text="Selectionner une competition: " textAlign="right"/>
 		 		 <mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setCompetition(event)" />
              <mx:CheckBox id="CB_scratch" label="Classement scratch" selected="false" click="modifyScratch(event)"/>
             <mx:CheckBox id="CB_allCategories" label="Classement par categorie (toutes ou selection)" selected="false" click="modifyAllCategories(event)"/>
@@ -439,7 +484,7 @@
 
               </mx:Repeater>
             </mx:Tile>
-           <mx:HBox width="100%" height="20%">
+           <mx:HBox width="100%" height="20%" horizontalAlign="center">
              <mx:ControlBar horizontalAlign="center">
                  <mx:Button
                      id="B_getRankingOnline"
@@ -472,19 +517,25 @@
 		</mx:HBox>
 
 		<mx:HBox width="100%" height="70%">
-			<mx:Panel title="Resultat(s)" width="100%" height="100%">
+			<mx:Panel title="Resultat(s)" width="100%" height="100%" horizontalAlign="center">
+            <mx:HBox width="100%" height="100%" horizontalAlign="center">
+                  <mx:FormItem label="Filtre par nom" >
+                     <mx:TextInput id="TI_selectedNameFilter" width="150" change="setFilterByName(event);"/>
+                  </mx:FormItem>
+                  <mx:FormItem label="Filtre par dossard" >
+                     <mx:TextInput id="TI_selectedLabelFilter" width="150" change="setFilterByLabel(event);"/>
+                  </mx:FormItem>
+            </mx:HBox>
 
             <mx:DataGrid id="DG_arrivals" dataProvider="{arrivalsList}"
                       rowCount="20"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
                <mx:columns>
+                  <mx:DataGridColumn headerText="Rang" dataField="rank" width="50"/>
+                  <mx:DataGridColumn headerText="Name" dataField="name" width="150"/>
                   <mx:DataGridColumn headerText="Competition" labelFunction="Util.displayCompetition" showDataTips="true" width="115"/>
                   <mx:DataGridColumn headerText="Categorie" labelFunction="Util.displayCategory" showDataTips="true" width="115"/>
-                  <mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="150"/>
-                  <mx:DataGridColumn headerText="Equipe" labelFunction="Util.displayTeam" showDataTips="true" width="50"/>
-                  <mx:DataGridColumn headerText="Personnes" labelFunction="Util.displayPersonsIdAsString" showDataTips="true" width="200"/>
                   <mx:DataGridColumn headerText="Dossard" labelFunction="Util.displayLabel" showDataTips="true" width="100"/>
-                  <mx:DataGridColumn headerText="Date d'arrivee" dataField="arrivalDate" showDataTips="true" width="150" labelFunction="Util.getDateLabel"/>
-                  <mx:DataGridColumn headerText="Temps ecoule" dataField="elapsedTime" showDataTips="true" width="150" labelFunction="Util.getElapsedTimeLabel"/>
+                  <mx:DataGridColumn headerText="Temps" dataField="elapsedTime" showDataTips="true" width="150" labelFunction="Util.getElapsedTimeLabel"/>
                </mx:columns>
             </mx:DataGrid>
 

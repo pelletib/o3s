@@ -53,6 +53,9 @@ package net.o3s.webflex.bean
 
       private var _category:Category;
 
+	  private var _rank:int;
+
+
 		public function Registered()
 		{
 			//TODO: implement function
@@ -175,5 +178,14 @@ package net.o3s.webflex.bean
          _paid = value;
       }
 
+	  public function get rank():int
+	  {
+		  return _rank;
+	  }
+
+	  public function set rank(value:int):void
+	  {
+		  _rank = value;
+	  }
 	}
 }

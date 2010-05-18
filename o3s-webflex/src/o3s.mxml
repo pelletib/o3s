@@ -159,9 +159,18 @@
 	<mx:states>
       <mx:State name="init" basedOn="">
 
-         <mx:AddChild relativeTo="{VB_o3s}" position="firstChild" creationPolicy="all"  >
-            <view:Registering id="VBox_registering" label="Registering" />
+         <mx:AddChild relativeTo="{HB_linkLogin}" position="before" creationPolicy="all"  >
+            <mx:ToggleButtonBar id="TBB_minStack" dataProvider="{this.minStack}" width="50%"/>
          </mx:AddChild>
+
+         <mx:AddChild relativeTo="{HB_linkLogin}"  position="before" creationPolicy="all" >
+
+            <mx:ViewStack id="minStack" width="100%" height="100%" >
+               <view:Registering id="VBox_registering" label="Registering" />
+               <view:Ranking id="VBox_ranking" label="Classement" />
+            </mx:ViewStack>
+         </mx:AddChild>
+
       </mx:State>
 
 		<mx:State name="login" basedOn="init">
@@ -198,21 +207,22 @@
 
 		<mx:State name="logged" basedOn="init">
 
-			<mx:RemoveChild target="{VBox_registering}"/>
+			<mx:RemoveChild target="{TBB_minStack}"/>
+         <mx:RemoveChild target="{minStack}"/>
 
 			<mx:AddChild relativeTo="{HB_linkLogin}" position="before" creationPolicy="all"	>
-				<mx:ToggleButtonBar dataProvider="{this.stack}"/>
+				<mx:ToggleButtonBar dataProvider="{this.fullStack}"/>
 			</mx:AddChild>
 
 			<mx:AddChild relativeTo="{HB_linkLogin}"  position="before" creationPolicy="all"	>
 
-				<mx:ViewStack id="stack" width="100%" height="100%" >
+				<mx:ViewStack id="fullStack" width="100%" height="100%" >
 					<view:Registering id="VS_registering" label="Inscriptions" />
+               <view:Ranking id="VS_ranking" label="Classement" />
 					<view:Label label="Liste des inscrits" />
 					<view:Departure label="Depart" />
 					<view:Arrival label="Arrivee" />
 					<view:Tracking label="Suivi" />
-					<view:Ranking label="Classement" />
 					<view:Admin label="Admin" />
 					<view:Statistics label="Stats" />
 					<view:Test label="Test" />

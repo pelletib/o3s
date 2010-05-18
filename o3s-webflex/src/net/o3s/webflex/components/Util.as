@@ -188,7 +188,7 @@ package net.o3s.webflex.components
 			var seconds:uint = timet-(minutes*60)-(hours*3600);
 			var mseconds:uint = timetmsec - (seconds*1000) - (minutes*60*1000) - (hours*3600*1000);
 
-			var myElapsedTimeStr:String = hours + ":" + minutes + ":" + seconds + ":" + mseconds;
+			var myElapsedTimeStr:String = hours + "h " + minutes + "m " + seconds + "s " + mseconds + "ms";
 			return myElapsedTimeStr;
 			//return formatElapsedTime.format(new Date(timet));
 		}
