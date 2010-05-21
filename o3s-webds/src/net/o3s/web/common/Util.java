@@ -173,6 +173,17 @@ public class Util {
 		return personsVO;
 	}
 
+	public static List<PersonVO> createPersonListVO(List<IEntityPerson> persons, Registering service) {
+		List<PersonVO> personsVO = new ArrayList<PersonVO>();
+
+		for(IEntityPerson person:persons) {
+			personsVO.add(createPersonVO(person, service));
+		}
+		return personsVO;
+	}
+
+
+
 
 
 	public static RegisteredVO createRegisteredVO(IEntityRegistered registered, Registering service) {

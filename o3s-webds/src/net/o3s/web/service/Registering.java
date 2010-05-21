@@ -102,6 +102,14 @@ public class Registering {
 		return Util.createRegisteredListVO(registereds, this);
 	}
 
+	// get registered from default event
+	public List<PersonVO> getPersons() {
+		setRegisteringEJB();
+		List<IEntityPerson> persons = registering.findAllPersons();
+		System.out.println("registereds=" + persons);
+		return Util.createPersonListVO(persons, this);
+	}
+
 	// get arrivals order by duration
 	public List<RegisteredVO> getArrivalsFromCompetition(final int competitionId) throws RegisteringException {
 
