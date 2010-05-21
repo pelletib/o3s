@@ -727,6 +727,22 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     }
 
     /**
+     * Get all persons
+     */
+    @SuppressWarnings("unchecked")
+    public  List<IEntityPerson> findAllPersons() {
+        Query query = this.entityManager.createNamedQuery("ALL_PERSONS");
+
+        List<IEntityPerson> persons = null;
+        try {
+        	persons = query.getResultList();
+        } catch (javax.persistence.NoResultException e) {
+        	persons = new ArrayList<IEntityPerson>();
+        }
+        return persons;
+    }
+
+    /**
      * Create a new registered
      */
     // TODO : deal with homonym
