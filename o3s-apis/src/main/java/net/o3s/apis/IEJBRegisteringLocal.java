@@ -36,6 +36,7 @@ public interface IEJBRegisteringLocal {
 	void removePerson(final int id) throws RegisteringException;
 	List<String> findAllLastName(final String prefix);
 	List<String> findAllFirstName(final String prefix);
+	List<IEntityPerson> findAllPersons();
 
 	List<IEntityRegistered> findAllRegistered();
 	List<IEntityRegistered> findAllRegisteredFromDefaultEvent();
