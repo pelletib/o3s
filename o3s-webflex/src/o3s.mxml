@@ -220,6 +220,7 @@
 					<view:Registering id="VS_registering" label="Inscriptions" />
                <view:Ranking id="VS_ranking" label="Classement" />
 					<view:Label label="Liste des inscrits" />
+               <view:PersonTab label="Liste des personnes" />
 					<view:Departure label="Depart" />
 					<view:Arrival label="Arrivee" />
 					<view:Tracking label="Suivi" />

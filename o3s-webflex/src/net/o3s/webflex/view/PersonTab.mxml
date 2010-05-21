@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:components="net.o3s.webflex.components.*"
+		   width="100%" height="100%" creationComplete="init()">
+
+	<mx:Script>
+		<![CDATA[
+			import net.o3s.webflex.bean.Registered;
+			import net.o3s.webflex.bean.Person;
+         import net.o3s.webflex.components.Util;
+
+			import mx.rpc.events.ResultEvent;
+			import mx.controls.Alert;
+			import mx.utils.ObjectUtil;
+			import mx.collections.ArrayCollection;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.utils.URLUtil;
+			import mx.core.Application;
+			import mx.utils.StringUtil;
+			import mx.events.CloseEvent;
+         import mx.controls.DateField;
+
+			[Bindable]
+			private var personList:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			public var selectedNameFilter:String="";
+
+			// list of persons that are selected in the datagrid
+			[Bindable]
+			public var selectedItems:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			public var actionSelectionEnabled:Boolean = false;
+
+			[Bindable]
+			public var selectAll:Boolean = false;
+
+			public function onClickRefresh(ev:Event):void {
+            resetPersonData();
+         }
+
+         public function resetPersonData():void {
+            selectAll=false;
+            CB_selectAll.selected = false;
+            selectedItems.removeAll();
+            personList.filterFunction = null;
+            selectedNameFilter="";
+            TI_selectedNameFilter.text="";
+            refreshPersonData();
+         }
+
+			public function refreshPersonData():void {
+				RO_registering.getPersons();
+			}
+
+			public function init():void {
+				refreshPersonData();
+            resetPersonData();
+				selectAll=false;
+			}
+
+			private function onFault(ev:Event):void {
+            Alert.show( ObjectUtil.toString(ev) );
+			}
+
+			private function resultGetPerson(event:ResultEvent):void {
+				personList = event.result as ArrayCollection;
+
+           // refresh selected list if some items have been removed
+            var found:Boolean = false;
+            for(var i:int = 0; i < selectedItems.length; i++) {
+               var id:int = selectedItems.getItemAt(i, 0) as int;
+               found = false;
+               for(var j:int = 0; j < personList.length; j++) {
+                  var p:Person = personList.getItemAt(j, 0) as Person;
+                  if (p.id == id) {
+                     found = true;
+                     break;
+                  }
+               }
+               if (found == false) {
+                  selectedItems.removeItemAt(i);
+               }
+            }
+            // action buttons has to be disabled ?
+            actionSelectionEnabled = (selectedItems.length > 0);
+
+            // apply filter
+            setFilters();
+			}
+
+
+			private function resultRemovePerson(event:ResultEvent):void {
+				RO_registering.getPersons();
+			}
+
+			public function removePerson(id:int):void {
+				removeSelectedItem(id);
+				RO_registering.removePerson(id);
+			}
+
+         // return null if not found
+         private function getPerson(id:int):Person {
+
+            for(var count:int = 0; count < personList.length; count++) {
+               var p:Person = personList.getItemAt(count, 0) as Person;
+               if (p.id == id) {
+                  return p;
+               }
+            }
+            return null;
+         }
+
+			private function setFilters():void {
+
+				if ( selectedNameFilter != "" ) {
+					personList.filterFunction = processFilters;
+				} else {
+					personList.filterFunction = null;
+				}
+				personList.refresh();
+			}
+
+			private function setFilterByName(event:Event):void {
+				selectedNameFilter=StringUtil.trim(TI_selectedNameFilter.text);
+				setFilters();
+			}
+
+			private function processFilters(item:Object):Boolean {
+
+				var resultNameFilter:Boolean = true;
+				var person:Person = item as Person;
+
+				if (selectedNameFilter != "") {
+					resultNameFilter = person.lastname.toLowerCase().match(selectedNameFilter.toLowerCase()) || person.firstname.toLowerCase().match(selectedNameFilter.toLowerCase());
+				}
+
+				return (resultNameFilter);
+			}
+
+			public function addSelectedPerson(id:int):void {
+				selectedItems.addItem(id);
+				actionSelectionEnabled = true;
+
+			}
+
+			// return -1 if not found
+			public function getIdxSelectedPerson(id:int):int {
+
+				for(var count:int = 0; count < selectedItems.length; count++) {
+					var i:int = selectedItems.getItemAt(count, 0) as int;
+					if (i == id) {
+						return count;
+					}
+				}
+				return -1;
+			}
+
+			public function removeSelectedItem(id:int):void {
+
+				var idx:int = getIdxSelectedPerson(id);
+				if (idx != -1) {
+					selectedItems.removeItemAt(idx);
+				}
+				actionSelectionEnabled = (selectedItems.length > 0);
+			}
+
+			public function onClickDeleteSelection(event:CloseEvent):void {
+				if(event.detail == Alert.OK) {
+
+					for(var count:int = 0; count < selectedItems.length; count++) {
+						var id:int = selectedItems.getItemAt(count, 0) as int;
+                  var person:Person = getPerson(id);
+
+                  if (person != null) {
+   						RO_registering.removePerson(id);
+                  }
+					}
+					selectedItems.removeAll();
+					actionSelectionEnabled = false;
+					selectAll=false;
+				}
+			}
+
+			private function confirmClickDeleteSelection():void {
+            var msg:String="";
+            msg = "personnes";
+
+				Alert.show("Etes-vous sure de vouloir supprimer ces " + selectedItems.length + " enregistrements <" + msg + "> ?",
+					"Suppression ?",
+					Alert.OK | Alert.CANCEL,
+					this,
+					onClickDeleteSelection,
+					null,
+					Alert.OK);
+			}
+
+			// Set the scratch when change
+			private function modifySelectAll(event:Event):void {
+
+				if (CB_selectAll.selected == true) {
+					selectAll=true;
+					selectedItems.removeAll();
+					for(var j:int = 0; j < personList.length; j++) {
+						var p:Person = personList.getItemAt(j, 0) as Person;
+						selectedItems.addItem(p.id);
+					}
+				} else {
+					selectAll=false;
+					selectedItems.removeAll();
+				}
+
+				refreshPersonData();
+			}
+
+		]]>
+	</mx:Script>
+
+	<mx:RemoteObject id="RO_registering" destination="registering" fault="onFault(event)">
+		<mx:method name="getPersons" result="resultGetPerson(event)"/>
+      <mx:method name="removePerson" result="resultRemovePerson(event)"/>
+	</mx:RemoteObject>
+
+	<mx:VBox id="VB_person" width="95%">
+      <components:EventPanel id="MyEventPanel"  width="100%"/>
+		<mx:HBox id="HB_FiltersActions" width="100%" height="15%">
+			<mx:Panel width="40%" height="100%" horizontalAlign="center" title="Filtres">
+				<mx:VBox width="100%" height="100%">
+					<mx:Form>
+						<mx:FormItem label="Filtre par nom ou prenom" >
+							<mx:TextInput id="TI_selectedNameFilter" width="150" change="setFilterByName(event);"/>
+						</mx:FormItem>
+					</mx:Form>
+				</mx:VBox>
+			</mx:Panel>
+			<mx:Panel width="60%" height="100%" horizontalAlign="center" title="Actions">
+				<mx:HBox width="100%" height="100%">
+					<mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
+ 						<mx:Button label="Reinit/Refresh" id="B_refresh" click="onClickRefresh(event)" enabled="true"/>
+					</mx:VBox>
+               <mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
+                  <mx:CheckBox id="CB_selectAll" label="Selectionner tout" selected="false" click="modifySelectAll(event)"/>
+               </mx:VBox>
+
+               <mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
+                  <mx:Button label="Supprimer la selection" id="B_delete2" click="confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
+               </mx:VBox>
+				</mx:HBox>
+			</mx:Panel>
+		</mx:HBox>
+		<mx:HBox id="HB_persons" width="100%" height="80%">
+			<mx:Panel width="100%" height="100%" horizontalAlign="center" title="Liste des personnes">
+				<mx:DataGrid id="DG_persons" dataProvider="{RO_registering.getPersons.lastResult}"
+							 rowCount="20"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
+					<mx:columns>
+						<mx:DataGridColumn headerText="Id" dataField="id" showDataTips="false" width="30"/>
+                  <mx:DataGridColumn headerText="Nom" dataField="lastname" showDataTips="false" width="150"/>
+						<mx:DataGridColumn headerText="Prenom" dataField="firstname" showDataTips="false" width="150"/>
+                  <mx:DataGridColumn headerText="Date de naissance" dataField="birthday" showDataTips="false" width="120" labelFunction="Util.getDateLabel"/>
+						<mx:DataGridColumn headerText="Sexe" dataField="sex" showDataTips="false" width="50"/>
+                  <mx:DataGridColumn headerText="Club" dataField="club" showDataTips="false" width="150"/>
+                  <mx:DataGridColumn headerText="Licence" dataField="license" showDataTips="false" width="150"/>
+                  <mx:DataGridColumn headerText="Email" dataField="email" showDataTips="false" width="150"/>
+                  <mx:DataGridColumn headerText="Categorie" dataField="computedCategory" showDataTips="false" width="150"/>
+					</mx:columns>
+				</mx:DataGrid>
+			</mx:Panel>
+		</mx:HBox>
+	</mx:VBox>
+</mx:Canvas>
