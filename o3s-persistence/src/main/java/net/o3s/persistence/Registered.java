@@ -64,6 +64,7 @@ import net.o3s.apis.IEntityRegistered;
 	@NamedQuery(name = "COUNT_ARRIVAL_FROM_COMPETITION_AND_CATEGORY",
 			query = "SELECT count(r) FROM Registered r WHERE r.event.id = :EVENTID AND r.competition.id = :COMPETITION AND r.category.id = :CATEGORY AND r.arrivalDate IS NOT NULL"),
 	@NamedQuery(name = "REGISTERED_FROM_NAME", query = "SELECT r FROM Registered r WHERE r.name = :NAME AND r.event.id = :EVENTID"),
+	@NamedQuery(name = "REGISTERED_FROM_PERSONID_ALL_EVENTS", query = "SELECT r FROM Registered r INNER JOIN r.persons p WHERE p.id = :PERSONID"),
 	@NamedQuery(name = "REGISTERED_FROM_PERSONID", query = "SELECT r FROM Registered r INNER JOIN r.persons p WHERE p.id = :PERSONID AND r.event.id = :EVENTID"),
     @NamedQuery(name = "REGISTERED_FROM_LABEL", query = "SELECT r FROM Registered r WHERE r.label.value LIKE :VALUE"),
     @NamedQuery(name = "REGISTERED_FROM_COMPETITION_ORDERBY_ETIME",
