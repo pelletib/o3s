@@ -158,6 +158,15 @@ public class Util {
 				e.printStackTrace();
 				throw new FlexException(e.getMessage());
 			}
+
+			// check if the person is already registered (in all events)
+			try {
+				Boolean isRegistered = service.isAlreadyRegisteredForAllEvent(person.getId());
+				personVO.setRegistered(isRegistered);
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new FlexException(e.getMessage());
+			}
 		}
 		return personVO;
 	}
@@ -179,6 +188,8 @@ public class Util {
 		for(IEntityPerson person:persons) {
 			personsVO.add(createPersonVO(person, service));
 		}
+		System.out.println("personsVO=" + personsVO);
+
 		return personsVO;
 	}
 

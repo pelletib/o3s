@@ -106,7 +106,7 @@ public class Registering {
 	public List<PersonVO> getPersons() {
 		setRegisteringEJB();
 		List<IEntityPerson> persons = registering.findAllPersons();
-		System.out.println("registereds=" + persons);
+		System.out.println("persons=" + persons);
 		return Util.createPersonListVO(persons, this);
 	}
 
@@ -187,6 +187,7 @@ public class Registering {
 		System.out.println("registereds=" + registereds);
 		return Util.createRegisteredListVO(registereds, this);
 	}
+
 
 	// get first name list
 	public List<String> getFirstNameWithPrefix(String prefix) {
@@ -273,6 +274,20 @@ public class Registering {
 
 
 	public int removePerson(int personId) {
+
+		// check if the person is not registered
+		setRegisteringEJB();
+		List<IEntityRegistered> registereds = null;
+		registereds = registering.findRegisteredFromPersonForAllEvent(personId);
+		if (registereds != null && !registereds.isEmpty()) {
+			String msg = "Impossible de supprimer une personne inscrite (" +
+			registereds.get(0).getEvent().getName() + "," +
+            registereds.get(0).getCompetition().getName() + "," +
+            registereds.get(0).getId() + ")";
+			logger.severe(msg);
+			throw new FlexException(msg);
+		}
+
 		try {
 			registering.removePerson(personId);
 		} catch (RegisteringException e) {
@@ -303,16 +318,30 @@ public class Registering {
 	}
 
 	// check if person if already registered
-	public Boolean isAlreadyRegistered(int personId) {
+	public Boolean isAlreadyRegisteredForDefaultEvent(int personId) {
 		setRegisteringEJB();
 		IEntityRegistered registered = null;
 		System.out.println("isAlreadyRegistered <" + personId + ">");
 
-		registered = registering.findRegisteredFromPerson(personId);
+		registered = registering.findRegisteredFromPersonForDefaultEvent(personId);
 
 		System.out.println("registered=" + registered);
 
 		return registered != null;
+
+	}
+
+	// check if person if already registered
+	public Boolean isAlreadyRegisteredForAllEvent(int personId) {
+		setRegisteringEJB();
+		List<IEntityRegistered> registereds = null;
+		System.out.println("isAlreadyRegistered <" + personId + ">");
+
+		registereds = registering.findRegisteredFromPersonForAllEvent(personId);
+
+		System.out.println("registereds=" + registereds);
+
+		return registereds != null && !registereds.isEmpty();
 
 	}
 

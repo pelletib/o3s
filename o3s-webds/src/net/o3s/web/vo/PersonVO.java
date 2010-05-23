@@ -39,6 +39,8 @@ public class PersonVO {
 	private char sex;
 	private String computedCategory;
 
+	private boolean registered;
+
 	public PersonVO() {
 		super();
 	}
@@ -63,6 +65,7 @@ public class PersonVO {
         		this.getEmail() + ", " +
         		this.getSex() + ", " +
         		this.getComputedCategory() + ", " +
+        		this.isRegistered() + ", " +
         		"]";
 	}
 
@@ -129,4 +132,13 @@ public class PersonVO {
 	public void setLicense(String license) {
 		this.license = license;
 	}
+
+	public boolean isRegistered() {
+		return registered;
+	}
+
+	public void setRegistered(boolean registered) {
+		this.registered = registered;
+	}
+
 }
