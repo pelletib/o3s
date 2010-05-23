@@ -46,7 +46,8 @@ public interface IEJBRegisteringLocal {
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId,  List<Integer> categoriesId) throws RegisteringException;
 	List<IEntityRegistered> createRegistered(final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid)  throws AlreadyExistException,RegisteringException;
 	IEntityRegistered findRegisteredFromId(final int id);
-	IEntityRegistered findRegisteredFromPerson(final int personId);
+	IEntityRegistered findRegisteredFromPersonForDefaultEvent(final int personId);
+	List<IEntityRegistered> findRegisteredFromPersonForAllEvent(final int personId);
 	void removeRegistered(final int id) throws RegisteringException;
 	IEntityRegistered updateRegistered(final int id, final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid) throws RegisteringException;
 	List<IEntityLabel> findAllLabels();
