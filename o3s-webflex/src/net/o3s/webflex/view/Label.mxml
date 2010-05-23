@@ -83,10 +83,6 @@
 			[Bindable]
 			public var printDialog:Boolean = false;
 
-         [Bindable]
-         public var deleteMode:String="onlyRegistered";
-
-
          public var importFileRef:FileReference = new FileReference;
          private var importFileFilter:FileFilter = new FileFilter("CSV File (*.csv)", "*.csv");
 
@@ -127,7 +123,6 @@
 				printDialog=false;
 				selectAll=false;
 				currentState="";
-            deleteMode="onlyRegistered";
 
             // Register event listeners for file select and load complete
             importFileRef.addEventListener(Event.SELECT, handleImportFileSelect);
@@ -413,7 +408,7 @@
 				RO_registering.removeRegistered(id);
 			}
 
-			public function getLabel4Printing(id:int):void {
+  			public function getLabel4Printing(id:int):void {
 				Alert.show("Generation du Pdf generation en cours pour l'enregistrement <" + id + ">");
 
 				var url:URLRequest;
@@ -512,30 +507,20 @@
 
                   if (registered != null) {
 
-                     if (deleteMode == "all") {
-                        for(var count:int = 0; count < registered.persons.length; count++) {
-                           var p:Person = registered.persons.list.getItemAt(count, 0) as Person;
-                           RO_registering.removePerson(p.id);
-                        }
-                     }
-   						RO_registering.removeRegistered(id);
+                     RO_registering.removeRegistered(id);
+
                   }
 					}
 					selectedItems.removeAll();
 					actionSelectionEnabled = false;
 					selectAll=false;
-               deleteMode="onlyRegistered";
 
 				}
 			}
 
 			private function confirmClickDeleteSelection():void {
             var msg:String="";
-            if (deleteMode == "all") {
-               msg = "inscrits + personnes";
-            } else {
-               msg = "inscrits";
-            }
+            msg = "inscrits";
 				Alert.show("Etes-vous sure de vouloir supprimer ces " + selectedItems.length + " enregistrements <" + msg + "> ?",
 					"Suppression ?",
 					Alert.OK | Alert.CANCEL,
@@ -670,8 +655,7 @@
 
                <mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
 
-						<mx:Button label="Supprimer la selection (inscrits)" id="B_delete1" click="deleteMode='onlyRegistered';confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
-                  <mx:Button label="Supprimer la selection (inscrits + personnes)" id="B_delete2" click="deleteMode='all';confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
+						<mx:Button label="Supprimer la selection (inscrits)" id="B_delete1" click="confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
 						<mx:Button label="Imprimer la selection" id="B_print" click="onClickPrintSelection(event)" enabled="{actionSelectionEnabled}"/>
                </mx:VBox>
 				</mx:HBox>

@@ -46,6 +46,9 @@ package net.o3s.webflex.bean
 
 		private var _computedCategory:String;
 
+		private var _registered:Boolean;
+
+
 		public function Person()
 		{
 			//TODO: implement function
@@ -139,6 +142,16 @@ package net.o3s.webflex.bean
 		public function set computedCategory(value:String):void
 		{
 			_computedCategory = value;
+		}
+
+		public function get registered():Boolean
+		{
+			return _registered;
+		}
+
+		public function set registered(value:Boolean):void
+		{
+			_registered = value;
 		}
 
 	}

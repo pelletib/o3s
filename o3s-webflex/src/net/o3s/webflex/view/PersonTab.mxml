@@ -239,12 +239,23 @@
 				refreshPersonData();
 			}
 
+         // return -1 if not found
+         public function getIdxSelectedRegistered(id:int):int {
+
+            for(var count:int = 0; count < selectedItems.length; count++) {
+               var i:int = selectedItems.getItemAt(count, 0) as int;
+               if (i == id) {
+                  return count;
+               }
+            }
+            return -1;
+         }
 		]]>
 	</mx:Script>
 
 	<mx:RemoteObject id="RO_registering" destination="registering" fault="onFault(event)">
 		<mx:method name="getPersons" result="resultGetPerson(event)"/>
-      <mx:method name="removePerson" result="resultRemovePerson(event)"/>
+      <mx:method name="removePerson" result="resultRemovePerson(event)" fault="Util.handleException(event)"/>
 	</mx:RemoteObject>
 
 	<mx:VBox id="VB_person" width="95%">
@@ -288,6 +299,9 @@
                   <mx:DataGridColumn headerText="Licence" dataField="license" showDataTips="false" width="150"/>
                   <mx:DataGridColumn headerText="Email" dataField="email" showDataTips="false" width="150"/>
                   <mx:DataGridColumn headerText="Categorie" dataField="computedCategory" showDataTips="false" width="150"/>
+                  <mx:DataGridColumn headerText="Inscrite" dataField="registered" showDataTips="false" width="50"/>
+                  <mx:DataGridColumn width="100" headerText="Actions"
+                                 itemRenderer="net.o3s.webflex.components.ActionPersonDataGridColumnItemRenderer" />
 					</mx:columns>
 				</mx:DataGrid>
 			</mx:Panel>

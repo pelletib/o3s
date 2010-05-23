@@ -218,7 +218,7 @@
          L_PersonForm.text="Personne existante dans la base ! ";
 
          // check if the person is already registered
-         RO_registering.isAlreadyRegistered(person.id);
+         RO_registering.isAlreadyRegisteredForDefaultEvent(person.id);
 
           // predict feature is only available if logged
          if (StaticVars.isLogged == false) {
@@ -230,7 +230,7 @@
 
 		}
 
-		private function resultIsAlreadyRegistered(event:ResultEvent):void {
+		private function resultIsAlreadyRegisteredForDefaultEvent(event:ResultEvent):void {
 			var isAlreadyRegistered:Boolean = event.result as Boolean;
 
          if (isAlreadyRegistered == true) {
@@ -317,7 +317,7 @@
 		<mx:method name="createPerson" result="resultCreatePerson(event)" fault="Util.handleException(event)"/>
 		<mx:method name="updatePerson" result="resultUpdatePerson(event)" fault="Util.handleException(event)"/>
 		<mx:method name="removePerson" result="resultRemovePerson(event)" fault="Util.handleException(event)"/>
-		<mx:method name="isAlreadyRegistered" result="resultIsAlreadyRegistered(event)" fault="Util.handleException(event)"/>
+		<mx:method name="isAlreadyRegisteredForDefaultEvent" result="resultIsAlreadyRegisteredForDefaultEvent(event)" fault="Util.handleException(event)"/>
 	</mx:RemoteObject>
 
 	<mx:DateFormatter formatString="DD/MM/YYYY" id="formatDateDDMMYYY"/>
