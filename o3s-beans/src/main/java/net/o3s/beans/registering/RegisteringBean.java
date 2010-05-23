@@ -432,7 +432,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     /**
      * Get registered from person id
      */
-    public IEntityRegistered findRegisteredFromPerson(final int personId) {
+    public IEntityRegistered findRegisteredFromPersonForDefaultEvent(final int personId) {
 
     	IEntityEvent event = admin.findDefaultEvent();
 
@@ -447,6 +447,28 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         }
 
         return registered;
+
+    }
+
+    /**
+     * Get registered from person id for all event
+     */
+    public List<IEntityRegistered> findRegisteredFromPersonForAllEvent(final int personId) {
+
+        Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_PERSONID_ALL_EVENTS");
+        query.setParameter("PERSONID", personId);
+
+        List<IEntityRegistered> registereds = null;
+        try {
+        	registereds = query.getResultList();
+        } catch (javax.persistence.NoResultException e) {
+        	registereds = new ArrayList<IEntityRegistered>();
+        } catch (Exception e){
+        	e.printStackTrace();
+        	registereds = new ArrayList<IEntityRegistered>();
+        }
+
+        return registereds;
 
     }
 
@@ -774,7 +796,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
             	throw new AlreadyExistException("L'inscrit <" + registeredName + "> existe deja !");
     		}
 
-    		IEntityRegistered clone = findRegisteredFromPerson(person.getId());
+    		IEntityRegistered clone = findRegisteredFromPersonForDefaultEvent(person.getId());
     		if ( clone != null) {
             	throw new AlreadyExistException("L'inscrit <" + registeredName + "> existe deja !" + clone);
     		}
