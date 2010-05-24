@@ -67,6 +67,8 @@
 
 		private var exitCallback:Function = null;
 
+      private var ask4print:Boolean=false;
+
 		public function refreshAdminData():void {
 
 			RO_admin.getCompetitions();
@@ -95,9 +97,11 @@
 
 			exitCallback = null;
 
+         ask4print = false;
+
 		}
 
-		private function clearAll():void {
+		public function clearAll():void {
 			if (currentState == "team") {
 				MyTeamEditor.clearAll();
 			}
@@ -112,6 +116,7 @@
 			if (exitCallback != null) {
 				exitCallback();
 			}
+         ask4print = false;
 		}
 
 		private function resultGetCompetition(event:ResultEvent):void {
@@ -158,10 +163,10 @@
 
 			var msg:String = "";
 
-			for(var count:int = 0; count < registereds.length; count++)
-			{
+			for(var count:int = 0; count < registereds.length; count++) {
 				var r:Registered = registereds.getItemAt(count, 0) as Registered;
-				if (count == 0) {
+
+ 				if (count == 0) {
 					msg = msg + "Vous etes inscrit a la competition" +
 						"'" + r.competition.name + "'" + "\n";
 				}
@@ -170,7 +175,16 @@
 				msg = msg + " est dans la categorie " +
 					"'" + r.category.name + "'" +
 					" avec le dossard " +
-					"'" + r.label.value + "'." + "\n" ;
+					"'" + r.label.value + "'." ;
+
+            if (ask4print == true) {
+               msg = msg + " Impression du dossard en cours.\n";
+               RO_reporting.printLabel(r.id, false);
+            } else {
+               msg = msg + "\n";
+            }
+
+
 			}
 			msg = msg + "\n\n";
 
@@ -197,7 +211,14 @@
 			msg = msg + " est dans la categorie " +
 					"'" + registered.category.name + "'" +
 					" avec le dossard " +
-					"'" + registered.label.value + "'." + "\n" ;
+					"'" + registered.label.value + "'.";
+
+         if (ask4print == true) {
+           msg = msg + "Impression du dossard en cours.\n";
+           RO_reporting.printLabel(registered.id, false);
+         } else {
+           msg = msg + "\n";
+         }
 
 			msg = msg + "\n\n";
 
@@ -233,7 +254,7 @@
 		}
 
 		// Submit form if everything is valid.
-		private function submitRegisteredForm(event:Event):void	{
+		public function submitRegisteredForm(event:Event):void	{
 			if (mode == "create") {
 				var registered:Registered = new Registered();
 				registered.persons = MyPersonsEditor.personList;
@@ -263,6 +284,12 @@
 			}
 
 		}
+
+      // Submit form if everything is valid.
+      public function submitRegisteredFormAndPrint(event:Event):void  {
+         ask4print=true;
+         submitRegisteredForm(event);
+      }
 
 		// when child component have changed
 		public function notifyChangeFromChildComponent():void {
@@ -321,13 +348,17 @@
 			} else {
 				this.currentState="individual";
 			}
-			submitRegisteredButton.label="Mettre a jour inscription";
+			MyRegisteredEditorSubmit.B_submitRegisteredButton.label="Mettre a jour inscription";
 		}
 
 		// callback set by the caller if wanted
 		public function setExitCallback(mycallback:Function):void {
 			exitCallback = mycallback;
 		}
+
+      private function resultPrintLabel(event:ResultEvent):void {
+      }
+
 
 	]]>
 </mx:Script>
@@ -340,6 +371,10 @@
 		<mx:method name="createRegistered" result="resultCreateRegistered(event)" fault="Util.handleException(event)"/>
 		<mx:method name="updateRegistered" result="resultUpdateRegistered(event)" fault="Util.handleException(event)"/>
 	</mx:RemoteObject>
+
+   <mx:RemoteObject id="RO_reporting" destination="reporting" fault="Util.onFault(event)">
+      <mx:method name="printLabel" result="resultPrintLabel(event)" fault="Util.handleException(event)"/>
+   </mx:RemoteObject>
 
 	<mx:DateFormatter formatString="DD/MM/YYYY" id="formatDateDDMMYYY"/>
 
@@ -391,20 +426,7 @@
 		</mx:HBox>
 
 		<mx:HBox id="HB_Submit" width="100%" height="10%">
-			<mx:Panel title="Inscription" width="100%" height="100%">
-				<mx:ControlBar horizontalAlign="center">
-					<mx:Button
-						id="submitRegisteredButton"
-						label="Soumettre inscription"
-						click="submitRegisteredForm(event);"
-						enabled="{submitRegisteredButtonEnabled} "
-						/>
-					<mx:Button
-						label="Effacer tout"
-						click="clearAll();"
-						/>
-				</mx:ControlBar>
-			</mx:Panel>
+         <components:RegisteredEditorSubmit id="MyRegisteredEditorSubmit"/>
 		</mx:HBox>
 	</mx:VBox>
 </mx:Canvas>
