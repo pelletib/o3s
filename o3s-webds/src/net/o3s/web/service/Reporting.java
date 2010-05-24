@@ -123,7 +123,11 @@ public class Reporting {
 			report.printLabel(registeredId, withPrintDialog);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new FlexException(e.getMessage());
+			String cause = "";
+			if (e.getCause() != null) {
+				cause = ", " + e.getCause().getMessage();
+			}
+			throw new FlexException(e.getMessage() + cause);
 		}
 	}
 }
