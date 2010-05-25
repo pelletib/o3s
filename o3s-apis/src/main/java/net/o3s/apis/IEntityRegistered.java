@@ -49,6 +49,9 @@ public interface IEntityRegistered {
 	Boolean isPaid();
 	void setIsPaid(boolean paid);
 
+	Boolean isProvidedHealthForm();
+	void setProvidedHealthForm(boolean providedHealthForm);
+
 	String getName();
 	void setName(String name);
 
