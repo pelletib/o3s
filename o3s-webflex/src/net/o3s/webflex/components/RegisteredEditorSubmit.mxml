@@ -41,6 +41,37 @@
          }
 
 		}
+
+      // print dialog is asked ?
+      private function modifySelectPaid(event:Event):void {
+
+            if (CB_paid.selected == true) {
+               this.parentDocument.paid=true;
+            }
+            else {
+               this.parentDocument.paid=false;
+            }
+     }
+
+     // print dialog is asked ?
+      private function modifySelectProvidedHealthForm(event:Event):void {
+
+            if (CB_providedHealthForm.selected == true) {
+               this.parentDocument.providedHealthForm=true;
+            }
+            else {
+               this.parentDocument.providedHealthForm=false;
+            }
+     }
+
+      public function clearAll():void {
+
+         if (currentState == "logged") {
+            CB_paid.selected = false;
+            CB_providedHealthForm.selected = false;
+         }
+      }
+
 	]]>
 </mx:Script>
 
@@ -53,6 +84,13 @@
                click="this.parentDocument.submitRegisteredFormAndPrint(event);"
                enabled="{this.parentDocument.submitRegisteredButtonEnabled} "
                />
+         </mx:AddChild>
+         <mx:AddChild relativeTo="{CB_RegisteredEditorSubmit}" position="before">
+            <mx:HBox width="100%" height="100%" horizontalAlign="center">
+               <mx:CheckBox id="CB_paid" label="Paye" selected="false" click="modifySelectPaid(event)"/>
+               <mx:CheckBox id="CB_providedHealthForm" label="Certificat medical" selected="false" click="modifySelectProvidedHealthForm(event)"/>
+            </mx:HBox>
+
          </mx:AddChild>
       </mx:State>
    </mx:states>

@@ -37,6 +37,8 @@ package net.o3s.webflex.bean
 
       private var _paid:Boolean;
 
+	  private var _providedHealthForm:Boolean;
+
 	  private var _arrivalDate:Date;
 
 	  private var _registeringDate:Date;
@@ -177,6 +179,16 @@ package net.o3s.webflex.bean
       {
          _paid = value;
       }
+
+	  public function get providedHealthForm():Boolean
+	  {
+		  return _providedHealthForm;
+	  }
+
+	  public function set providedHealthForm(value:Boolean):void
+	  {
+		  _providedHealthForm = value;
+	  }
 
 	  public function get rank():int
 	  {

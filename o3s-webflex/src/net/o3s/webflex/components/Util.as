@@ -105,7 +105,16 @@ package net.o3s.webflex.components
 
 		public static function displayPaid(item:Object, col:DataGridColumn):String {
 			if (item.paid == true) {
-				return "Y";
+				return "O";
+			}
+			else {
+				return "N";
+			}
+		}
+
+		public static function displayProvidedHealthForm(item:Object, col:DataGridColumn):String {
+			if (item.providedHealthForm == true) {
+				return "O";
 			}
 			else {
 				return "N";
@@ -181,16 +190,21 @@ package net.o3s.webflex.components
 		public static function getElapsedTimeLabel(item:Object,column:DataGridColumn):String
 		{
 			var timetmsec:uint = item[column.dataField] as uint;
-			var timet:uint = timetmsec / 1000;
 
-			var hours:uint = timet/(60*60);
-			var minutes:uint = (timet/60)-(hours*60);
-			var seconds:uint = timet-(minutes*60)-(hours*3600);
-			var mseconds:uint = timetmsec - (seconds*1000) - (minutes*60*1000) - (hours*3600*1000);
+			if (timetmsec != 0) {
+				var timet:uint = timetmsec / 1000;
 
-			var myElapsedTimeStr:String = hours + "h " + minutes + "m " + seconds + "s " + mseconds + "ms";
-			return myElapsedTimeStr;
-			//return formatElapsedTime.format(new Date(timet));
+				var hours:uint = timet/(60*60);
+				var minutes:uint = (timet/60)-(hours*60);
+				var seconds:uint = timet-(minutes*60)-(hours*3600);
+				var mseconds:uint = timetmsec - (seconds*1000) - (minutes*60*1000) - (hours*3600*1000);
+
+				var myElapsedTimeStr:String = hours + "h " + minutes + "m " + seconds + "s " + mseconds + "ms";
+				return myElapsedTimeStr;
+				//return formatElapsedTime.format(new Date(timet));
+			} else {
+				return "";
+			}
 		}
 
 

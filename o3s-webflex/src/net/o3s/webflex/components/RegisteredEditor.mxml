@@ -69,6 +69,9 @@
 
       private var ask4print:Boolean=false;
 
+      public var paid:Boolean=false;
+      public var providedHealthForm:Boolean=false;
+
 		public function refreshAdminData():void {
 
 			RO_admin.getCompetitions();
@@ -98,6 +101,8 @@
 			exitCallback = null;
 
          ask4print = false;
+         paid = false;
+         providedHealthForm = false;
 
 		}
 
@@ -117,6 +122,10 @@
 				exitCallback();
 			}
          ask4print = false;
+         paid = false;
+         providedHealthForm = false;
+         MyRegisteredEditorSubmit.clearAll();
+
 		}
 
 		private function resultGetCompetition(event:ResultEvent):void {
@@ -266,7 +275,8 @@
 					registered.name = "";
 				}
 				registered.teamed = selectedCompetition.teamed;
-				registered.paid = false;
+				registered.paid = paid;
+            registered.providedHealthForm = providedHealthForm;
 
   			   RO_registering.createRegistered(registered);
 
@@ -279,7 +289,9 @@
 					updateRegistered.name = "";
 				}
 				updateRegistered.teamed = selectedCompetition.teamed;
-				updateRegistered.paid = false;
+				updateRegistered.paid = paid;
+            updateRegistered.providedHealthForm = providedHealthForm;
+
 				RO_registering.updateRegistered(updateRegistered);
 			}
 
@@ -349,6 +361,8 @@
 				this.currentState="individual";
 			}
 			MyRegisteredEditorSubmit.B_submitRegisteredButton.label="Mettre a jour inscription";
+         MyRegisteredEditorSubmit.CB_paid.selected=registered.paid;
+         MyRegisteredEditorSubmit.CB_providedHealthForm.selected=registered.providedHealthForm;
 		}
 
 		// callback set by the caller if wanted
