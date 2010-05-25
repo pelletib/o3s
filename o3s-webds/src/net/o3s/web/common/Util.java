@@ -213,6 +213,7 @@ public class Util {
 			registeredVO.setRegisteringDate(registered.getRegisteringDate());
 			registeredVO.setTeamed(registered.isTeamed());
 			registeredVO.setRank(-1);
+			registeredVO.setProvidedHealthForm(registered.isProvidedHealthForm());
 		}
 		return registeredVO;
 
@@ -224,6 +225,8 @@ public class Util {
 		for(IEntityRegistered registered:registereds) {
 			registeredsVO.add(createRegisteredVO(registered, service));
 		}
+		System.out.println("registeredsVO=" + registeredsVO);
+
 		return registeredsVO;
 	}
 

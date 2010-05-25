@@ -41,6 +41,7 @@ public class RegisteredVO {
     private CategoryVO category;
 	private List<PersonVO> persons;
 	private int rank;
+	private boolean providedHealthForm=false;
 
 	public RegisteredVO() {
 		super();
@@ -61,6 +62,7 @@ public class RegisteredVO {
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String toString() {
 		return "RegisteredVO [" +
 				this.getId() + ", " +
@@ -76,6 +78,7 @@ public class RegisteredVO {
 				this.getCompetition() + ", " +
 				this.getCategory() + ", " +
 				this.getRank() + ", " +
+				this.isProvidedHealthForm() + "," +
 				"]";
 	}
 
@@ -93,6 +96,14 @@ public class RegisteredVO {
 
 	public void setPaid(boolean paid) {
 		this.paid = paid;
+	}
+
+	public boolean isProvidedHealthForm() {
+		return providedHealthForm;
+	}
+
+	public void setProvidedHealthForm(boolean providedHealthForm) {
+		this.providedHealthForm = providedHealthForm;
 	}
 
 	public Date getRegisteringDate() {
@@ -166,4 +177,5 @@ public class RegisteredVO {
 	public void setRank(int rank) {
 		this.rank = rank;
 	}
+
 }
