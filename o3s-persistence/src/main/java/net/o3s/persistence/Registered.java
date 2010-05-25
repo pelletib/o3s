@@ -96,6 +96,7 @@ public class Registered implements IEntityRegistered, Serializable {
     long elapsedTime;
 
     String name;
+    boolean providedHealthForm=false;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH, targetEntity=Event.class)
     private IEntityEvent event;
@@ -211,6 +212,14 @@ public class Registered implements IEntityRegistered, Serializable {
 		this.category = category;
 	}
 
+	public Boolean isProvidedHealthForm() {
+		return providedHealthForm;
+	}
+
+	public void setProvidedHealthForm(boolean providedHealthForm) {
+		this.providedHealthForm = providedHealthForm;
+	}
+
 	public String toString() {
 		return "Registered [" +
 		        this.getId() + ", " +
@@ -225,6 +234,7 @@ public class Registered implements IEntityRegistered, Serializable {
 		        this.getEvent() + ", " +
 		        this.getCompetition() + ", " +
 		        this.getCategory() + ", " +
+		        this.isProvidedHealthForm() + "," +
 		        "]";
 	}
 }
