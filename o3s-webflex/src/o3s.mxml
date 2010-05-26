@@ -224,8 +224,8 @@
 					<view:Departure label="Depart" />
 					<view:Arrival label="Arrivee" />
 					<view:Tracking label="Suivi" />
+               <view:Statistics label="Stats" />
 					<view:Admin label="Admin" />
-					<view:Statistics label="Stats" />
 					<view:Test label="Test" />
 				</mx:ViewStack>
 			</mx:AddChild>
