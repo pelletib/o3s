@@ -140,6 +140,7 @@ public class Event implements IEntityEvent, Serializable {
 		        this.getId() + ", " +
 		        this.getName() + ", " +
 		        this.isTheDefault() + ", " +
+		        this.getDate() + ", " +
 		        "]";
 	}
 }
