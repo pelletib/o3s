@@ -71,4 +71,21 @@ public class Tracking {
 		return dateCreation;
 
 	}
+
+	public Date createArrivalEvent(String origin, String labelValue, Date date) {
+
+		setTrackingEJB();
+
+		Date dateCreation = null;
+
+		try {
+			dateCreation = tracking.createEvent(origin, labelValue, TrackingMessage.EVENT_INT_TYPE_ARRIVAL, date);
+		} catch (TrackingMessageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return dateCreation;
+
+	}
 }
