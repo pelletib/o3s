@@ -188,7 +188,10 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         return event;
     }
 
-    public IEntityEvent createEvent(final String name, final Date date, final String fileName) {
+    public IEntityEvent createEvent(
+    		final String name,
+    		final Date date,
+    		final String fileName) {
     	IEntityEvent event = null;
 
     	event = findEventFromName(name);
