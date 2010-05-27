@@ -361,8 +361,12 @@
 				this.currentState="individual";
 			}
 			MyRegisteredEditorSubmit.B_submitRegisteredButton.label="Mettre a jour inscription";
-         MyRegisteredEditorSubmit.CB_paid.selected=registered.paid;
-         MyRegisteredEditorSubmit.CB_providedHealthForm.selected=registered.providedHealthForm;
+         if (MyRegisteredEditorSubmit.CB_paid != null) {
+            MyRegisteredEditorSubmit.CB_paid.selected=registered.paid;
+         }
+         if (MyRegisteredEditorSubmit.CB_providedHealthForm != null) {
+            MyRegisteredEditorSubmit.CB_providedHealthForm.selected=registered.providedHealthForm;
+         }
 		}
 
 		// callback set by the caller if wanted

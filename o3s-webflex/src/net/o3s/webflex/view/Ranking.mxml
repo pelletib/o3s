@@ -126,9 +126,12 @@
             arrivalsList.filterFunction = null;
             selectedNameFilter="";
             selectedLabelFilter = "";
-
-            TI_selectedNameFilter.text="";
-            TI_selectedLabelFilter.text="";
+            if (TI_selectedNameFilter != null) {
+               TI_selectedNameFilter.text="";
+            }
+            if (TI_selectedLabelFilter != null) {
+               TI_selectedLabelFilter.text="";
+            }
             setFilters();
 
          }
