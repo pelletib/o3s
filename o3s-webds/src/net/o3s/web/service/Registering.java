@@ -98,7 +98,7 @@ public class Registering {
 	public List<RegisteredVO> getRegistereds() {
 		setRegisteringEJB();
 		List<IEntityRegistered> registereds = registering.findAllRegisteredFromDefaultEvent();
-		System.out.println("registereds=" + registereds);
+		logger.fine("registereds=" + registereds);
 		return Util.createRegisteredListVO(registereds, this);
 	}
 
@@ -106,7 +106,7 @@ public class Registering {
 	public List<PersonVO> getPersons() {
 		setRegisteringEJB();
 		List<IEntityPerson> persons = registering.findAllPersons();
-		System.out.println("persons=" + persons);
+		logger.fine("persons=" + persons);
 		return Util.createPersonListVO(persons, this);
 	}
 
@@ -123,7 +123,7 @@ public class Registering {
     		throw new RegisteringException("Unable to find registereds for competition " + competitionId, re);
 		}
 
-		System.out.println("registereds=" + registereds);
+		logger.fine("registereds=" + registereds);
 
 		List<RegisteredVO> registeredsVO = Util.createRegisteredListVO(registereds, this);
 
@@ -160,7 +160,7 @@ public class Registering {
 		}
 
 
-		System.out.println("registereds=" + registereds);
+		logger.fine("registereds=" + registereds);
 
 		List<RegisteredVO> registeredsVO = Util.createRegisteredListVO(registereds, this);
 
@@ -184,7 +184,7 @@ public class Registering {
 	public List<RegisteredVO> getAllRegistereds() {
 		setRegisteringEJB();
 		List<IEntityRegistered> registereds = registering.findAllRegistered();
-		System.out.println("registereds=" + registereds);
+		logger.fine("registereds=" + registereds);
 		return Util.createRegisteredListVO(registereds, this);
 	}
 
@@ -193,7 +193,7 @@ public class Registering {
 	public List<String> getFirstNameWithPrefix(String prefix) {
 		setRegisteringEJB();
 		List<String> firstNameList = registering.findAllFirstName(prefix);
-		System.out.println("firstNameList=" + firstNameList);
+		logger.fine("firstNameList=" + firstNameList);
 		return firstNameList;
 	}
 
@@ -201,14 +201,14 @@ public class Registering {
 	public List<String> getLastNameWithPrefix(String prefix) {
 		setRegisteringEJB();
 		List<String> lastNameList = registering.findAllLastName(prefix);
-		System.out.println("lastNameList=" + lastNameList);
+		logger.fine("lastNameList=" + lastNameList);
 		return lastNameList;
 	}
 
 	// get category associated with a person
 	public IEntityCategory getCategory(IEntityPerson person) throws RegisteringException {
 		setAdminEJB();
-		System.out.println("getCategory:person " + person);
+		logger.fine("getCategory:person " + person);
     	List<IEntityCategory> categories = admin.findCategoryFromDatesAndSex(person.getBirthday(), person.getSex());
     	if (categories == null || categories.isEmpty()){
     		throw new RegisteringException("Categorie non trouvee pour le couple (date de naissance/sexe):" + person.getBirthday() + "," + person.getSex());
@@ -239,7 +239,7 @@ public class Registering {
 
 		PersonVO pVO = Util.createPersonVO(person, this);
 
-		System.out.println("person=" + pVO);
+		logger.fine("person=" + pVO);
 		return pVO;
 	}
 
@@ -247,7 +247,7 @@ public class Registering {
 	public PersonVO updatePerson(PersonVO personVO) {
 		setRegisteringEJB();
 		IEntityPerson person = null;
-		System.out.println("update person" + personVO.getId());
+		logger.fine("update person" + personVO.getId());
 
 		try {
 			person = registering.updatePerson(personVO.getId(), personVO.getLastname(), personVO.getFirstname(), personVO.getClub(), personVO.getLicense(), personVO.getEmail(), personVO.getSex(), personVO.getBirthday());
@@ -267,7 +267,7 @@ public class Registering {
 			throw new FlexException(e.getMessage());
 		}
 
-		System.out.println("person=" + pVO);
+		logger.fine("person=" + pVO);
 		return pVO;
 	}
 
@@ -294,7 +294,7 @@ public class Registering {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
 		}
-		System.out.println("remove person=" + personId);
+		logger.fine("remove person=" + personId);
 		return personId;
 
 	}
@@ -303,7 +303,7 @@ public class Registering {
 	public PersonVO getPerson(String lastname, String firstname, Date birthday) {
 		setRegisteringEJB();
 		IEntityPerson person = null;
-		System.out.println("getPerson <" + firstname + ", " + lastname + ", "  + birthday + ">");
+		logger.fine("getPerson <" + firstname + ", " + lastname + ", "  + birthday + ">");
 
 		person = registering.findPersonFromLastnameFirstNameBirthDay(lastname, firstname, birthday);
 
@@ -312,7 +312,7 @@ public class Registering {
 		if (person != null) {
 			pVO = Util.createPersonVO(person, this);
 		}
-		System.out.println("person=" + pVO);
+		logger.fine("person=" + pVO);
 		return pVO;
 
 	}
@@ -321,11 +321,11 @@ public class Registering {
 	public Boolean isAlreadyRegisteredForDefaultEvent(int personId) {
 		setRegisteringEJB();
 		IEntityRegistered registered = null;
-		System.out.println("isAlreadyRegistered <" + personId + ">");
+		logger.fine("isAlreadyRegistered <" + personId + ">");
 
 		registered = registering.findRegisteredFromPersonForDefaultEvent(personId);
 
-		System.out.println("registered=" + registered);
+		logger.fine("registered=" + registered);
 
 		return registered != null;
 
@@ -335,11 +335,11 @@ public class Registering {
 	public Boolean isAlreadyRegisteredForAllEvent(int personId) {
 		setRegisteringEJB();
 		List<IEntityRegistered> registereds = null;
-		System.out.println("isAlreadyRegistered <" + personId + ">");
+		logger.fine("isAlreadyRegistered <" + personId + ">");
 
 		registereds = registering.findRegisteredFromPersonForAllEvent(personId);
 
-		System.out.println("registereds=" + registereds);
+		logger.fine("registereds=" + registereds);
 
 		return registereds != null && !registereds.isEmpty();
 
@@ -351,7 +351,7 @@ public class Registering {
 		setRegisteringEJB();
 		List<IEntityPerson> persons = new ArrayList<IEntityPerson>();
 
-		System.out.println("registeredVO=" + registeredVO);
+		logger.fine("registeredVO=" + registeredVO);
 
 		List<PersonVO> personsVO = registeredVO.getPersons();
 		for (PersonVO personVO:personsVO) {
@@ -379,7 +379,7 @@ public class Registering {
 				throw new FlexException(e.getMessage());
 		}
 
-		System.out.println("registereds=" + registereds);
+		logger.fine("registereds=" + registereds);
 
 		return Util.createRegisteredListVO(registereds, this);
 
@@ -389,7 +389,7 @@ public class Registering {
 	public RegisteredVO updateRegistered(RegisteredVO registeredVO) {
 		setRegisteringEJB();
 
-		System.out.println("registeredVO=" + registeredVO);
+		logger.fine("registeredVO=" + registeredVO);
 
 		List<IEntityPerson> persons = new ArrayList<IEntityPerson>();
 
@@ -419,7 +419,7 @@ public class Registering {
 
 		RegisteredVO rVO = Util.createRegisteredVO(registered, this);
 
-		System.out.println("registered=" + rVO);
+		logger.fine("registered=" + rVO);
 		return rVO;
 	}
 
@@ -430,7 +430,7 @@ public class Registering {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
 		}
-		System.out.println("remove registered=" + id);
+		logger.fine("remove registered=" + id);
 	}
 
     public List<RegisteredStatisticsVO> getStatistics() throws RegisteringException {

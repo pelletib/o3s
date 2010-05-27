@@ -26,6 +26,7 @@ package net.o3s.web.common;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import net.o3s.apis.IEntityCategory;
 import net.o3s.apis.IEntityCompetition;
@@ -33,6 +34,7 @@ import net.o3s.apis.IEntityEvent;
 import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
+import net.o3s.beans.registering.RegisteringBean;
 import net.o3s.web.service.Registering;
 import net.o3s.web.vo.CategoryVO;
 import net.o3s.web.vo.CompetitionVO;
@@ -44,6 +46,12 @@ import net.o3s.web.vo.RegisteredVO;
 
 
 public class Util {
+
+	/**
+	 * Logger
+	 */
+    private static Logger logger = Logger.getLogger(Util.class.getName());
+
 
 	public static EventVO createEventVO(IEntityEvent event) {
 		EventVO eventVO = new EventVO();
@@ -188,7 +196,7 @@ public class Util {
 		for(IEntityPerson person:persons) {
 			personsVO.add(createPersonVO(person, service));
 		}
-		System.out.println("personsVO=" + personsVO);
+		logger.fine("personsVO=" + personsVO);
 
 		return personsVO;
 	}
@@ -225,7 +233,7 @@ public class Util {
 		for(IEntityRegistered registered:registereds) {
 			registeredsVO.add(createRegisteredVO(registered, service));
 		}
-		System.out.println("registeredsVO=" + registeredsVO);
+		logger.fine("registeredsVO=" + registeredsVO);
 
 		return registeredsVO;
 	}

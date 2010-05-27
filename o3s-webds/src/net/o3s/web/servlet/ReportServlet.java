@@ -24,33 +24,33 @@
 package net.o3s.web.servlet;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.o3s.apis.IEJBAdminRemote;
 import net.o3s.apis.IEJBReportLocal;
-import net.o3s.apis.IEJBReportRemote;
-import net.o3s.apis.ReportException;
-import net.o3s.web.vo.FlexException;
 
 
-public class ReportServlet extends HttpServlet{
+public class ReportServlet extends HttpServlet {
+
 
 	/**
-	 *
+	 * Logger
 	 */
-	private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(ReportServlet.class.getName());
+
+    /**
+     * Serial version number
+     */
+    private static final long serialVersionUID = 1L;
 
 	private static final String PRM_TYPE = "type";
 	private static final String PRM_REGISTERED_ID = "registeredId";
@@ -70,9 +70,10 @@ public class ReportServlet extends HttpServlet{
 		InitialContext context=null;
 
 		if (report == null) {
+			logger.warning("EJB injection failed, report=null");
 			try {
 				context = new InitialContext();
-				report = (IEJBReportRemote) context.lookup("net.o3s.beans.report.ReportBean_net.o3s.apis.IEJBReportRemote@Remote");
+				report = (IEJBReportLocal) context.lookup("net.o3s.beans.report.ReportBean_net.o3s.apis.IEJBReportLocal@Local");
 
 			} catch (NamingException e1) {
 				// TODO Auto-generated catch block

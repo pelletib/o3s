@@ -26,6 +26,7 @@ package net.o3s.web.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -42,6 +43,11 @@ import net.o3s.web.vo.EventVO;
 
 
 public class Admin {
+
+	/**
+	 * Logger
+	 */
+    private static Logger logger = Logger.getLogger(Admin.class.getName());
 
 	//@EJB
 	private IEJBAdminRemote admin;
@@ -81,7 +87,7 @@ public class Admin {
 	public EventVO getDefaultEvent() {
 		setAdminEJB();
 		IEntityEvent event = admin.findDefaultEvent();
-		System.out.println("Default event=" + event);
+		logger.fine("Default event=" + event);
 		return Util.createEventVO(event);
 	}
 
@@ -94,7 +100,7 @@ public class Admin {
 	public List<EventVO> getAllEvents() {
 		setAdminEJB();
 		List<IEntityEvent> events = admin.findAllEvents();
-		System.out.println("events=" + events);
+		logger.fine("events=" + events);
 		return Util.createEventListVO(events);
 	}
 
@@ -102,7 +108,7 @@ public class Admin {
 	public List<CompetitionVO> getCompetitions() {
 		setAdminEJB();
 		List<IEntityCompetition> competitions = admin.findAllCompetitionsFromDefaultEvent();
-		System.out.println("competitions=" + competitions);
+		logger.fine("competitions=" + competitions);
 		return Util.createCompetitionListVO(competitions);
 	}
 
@@ -117,14 +123,14 @@ public class Admin {
 			}
 
 		}
-		System.out.println("startedCompetitions=" + startedCompetitions);
+		logger.fine("startedCompetitions=" + startedCompetitions);
 		return startedCompetitions;
 	}
 
 	public List<CompetitionVO> getAllCompetitions() {
 		setAdminEJB();
 		List<IEntityCompetition> competitions = admin.findAllCompetitions();
-		System.out.println("competitions=" + competitions);
+		logger.fine("competitions=" + competitions);
 		return Util.createCompetitionListVO(competitions);
 	}
 
@@ -134,7 +140,7 @@ public class Admin {
 
 		setAdminEJB();
 		List<IEntityCategory> categories = admin.findAllCategoriesFromDefaultEvent();
-		System.out.println("categories=" + categories);
+		logger.fine("categories=" + categories);
 		return Util.createCategoryListVO(categories);
 	}
 
@@ -142,7 +148,7 @@ public class Admin {
 
 		setAdminEJB();
 		List<IEntityCategory> categories = admin.findAllCategories();
-		System.out.println("categories=" + categories);
+		logger.fine("categories=" + categories);
 		return Util.createCategoryListVO(categories);
 	}
 
