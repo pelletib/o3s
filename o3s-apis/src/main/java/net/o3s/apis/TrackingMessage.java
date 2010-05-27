@@ -33,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -45,6 +46,13 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class TrackingMessage implements Serializable {
+
+
+	/**
+	 * Logger
+	 */
+    private static Logger logger = Logger.getLogger(TrackingMessage.class.getName());
+
 
 	private static final long serialVersionUID = 4944647457727378441L;
 
@@ -213,7 +221,7 @@ public class TrackingMessage implements Serializable {
 			DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
 			return df.format(this.getCreationTime());
 		} catch (Exception e) {
-			System.out.println("Erreur getCreationTime2String - " + this.getCreationTime());
+			logger.severe("error parsing date - " + this.getCreationTime());
 			return "";
 		}
 	}
