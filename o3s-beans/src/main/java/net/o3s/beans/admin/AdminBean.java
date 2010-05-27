@@ -196,6 +196,8 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
     	event = findEventFromName(name);
     	if (event == null) {
+        	logger.fine("Create new event : " + name);
+
         	event = new Event();
             event.setName(name);
             event.setDate(date);
@@ -294,6 +296,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     	IEntityCompetition competition = null;
     	competition = findCompetitionFromName(name);
         if (competition == null) {
+        	logger.fine("Create new competition : " + name);
             competition = new Competition();
             competition.setName(name);
             competition.setLowerLabelNumber(lowerLabelNumber);
@@ -411,6 +414,8 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     	IEntityCategory category = null;
     	category = findCategoryFromNameAndSex(name, sex);
         if (category == null) {
+        	logger.fine("Create new category : " + name);
+
         	category = new Category();
         	category.setName(name + " (" + sex + ")");
         	category.setMinDate(minDate);

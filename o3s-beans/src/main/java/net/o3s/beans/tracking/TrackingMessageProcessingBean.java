@@ -87,7 +87,7 @@ public class TrackingMessageProcessingBean implements MessageListener {
 
 					// Compute the duration
 					if (registered.getCompetition().getStartingDate() == null) {
-						throw new TrackingMessageException ("Competition not started yet for the registered related to the event:" + trackingMessage);
+						throw new TrackingMessageException ("Competition pas encore demarree pour l'inscrit :" + trackingMessage);
 					}
 					registered.setElapsedTime(registered.getArrivalDate().getTime()-registered.getCompetition().getStartingDate().getTime());
 
