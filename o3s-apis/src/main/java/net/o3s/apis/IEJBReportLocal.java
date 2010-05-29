@@ -41,6 +41,12 @@ public interface IEJBReportLocal {
 	String buildCategoryFileName(final int competitionId)  throws ReportException;
 	Boolean isNotEmptyCategoryRanking(final int competitionId, List<Integer> categoriesId);
 
+	String getClubRankingPdfAsFileName(final int competitionId) throws ReportException;
+	void getClubRankingPdfAsByteArray(final int competitionId, final OutputStream outputStream)  throws ReportException;
+	byte[] getClubRankingPdfAsByteArray(final int competitionId) throws ReportException;
+	String buildClubFileName(final int competitionId)  throws ReportException;
+	Boolean isNotEmptyClubRanking(final int competitionId);
+
 	String getLabelPdfAsFileName(final int registeredId) throws ReportException;
 	void getLabelPdfAsByteArray(final int registeredId, final OutputStream outputStream) throws ReportException;
 	byte[] getLabelPdfAsByteArray(final int registeredId) throws ReportException;
