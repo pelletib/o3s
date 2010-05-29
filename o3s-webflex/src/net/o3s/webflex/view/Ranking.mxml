@@ -70,6 +70,9 @@
          [Bindable]
          public var selectedCategories:ArrayCollection = new ArrayCollection([]);
 
+         [Bindable]
+         public var selectedClub:Boolean = false;
+
 			[Bindable]
 			public var competitionList:ArrayCollection;
 
@@ -119,6 +122,10 @@
          private function changeStateCBScratch(state:Boolean):void {
             CB_scratch.enabled = state;
           }
+
+         private function changeStateCBClub(state:Boolean):void {
+            CB_club.enabled = state;
+         }
 
          public function resetRegisteredData():void {
 
@@ -177,6 +184,9 @@
 			   selectedScratch=false;
             CB_scratch.selected = false;
             changeStateCBScratch(true);
+            selectedClub=false;
+            CB_club.selected = false;
+            changeStateCBClub(true);
             selectedCategories.removeAll();
             CB_allCategories.selected = false;
             changeStateCBCategories(true);
@@ -228,14 +238,17 @@
             // if none category
             if (selectedNb == 0) {
                changeStateCBScratch(true);
+               changeStateCBClub(true);
                CB_allCategories.selected = false;
             } else if (selectedNb == len) {
             // if all categories are selected
                changeStateCBScratch(false);
+               changeStateCBClub(false);
                CB_allCategories.selected = true;
             } else {
             // if some (but not all) are selected
                changeStateCBScratch(false);
+               changeStateCBClub(false);
                CB_allCategories.selected = false;
             }
             refreshSubmitButtonEnabled();
@@ -255,7 +268,7 @@
 
             submitButtonGetRankingPDFEnabled = true;
             submitButtonGetRankingPDFEnabled = submitButtonGetRankingPDFEnabled && !competitionIsEmpty;
-            submitButtonGetRankingPDFEnabled = submitButtonGetRankingPDFEnabled && (selectedCategories.length > 0 || selectedScratch);
+            submitButtonGetRankingPDFEnabled = submitButtonGetRankingPDFEnabled && (selectedCategories.length > 0 || selectedScratch || selectedClub);
             submitButtonGenerateRankingPDFEnabled = submitButtonGetRankingPDFEnabled && StaticVars.isLogged;
 
          }
@@ -266,10 +279,30 @@
             if (CB_scratch.selected == true) {
                selectedScratch=true;
                changeStateCBCategories(false);
+               changeStateCBClub(false);
             }
             else {
                selectedScratch=false;
                changeStateCBCategories(true);
+               changeStateCBClub(true);
+            }
+
+            refreshSubmitButtonEnabled();
+
+         }
+
+       // Set the club when change
+         private function modifyClub(event:Event):void {
+
+            if (CB_club.selected == true) {
+               selectedClub=true;
+               changeStateCBCategories(false);
+               changeStateCBScratch(false);
+            }
+            else {
+               selectedClub=false;
+               changeStateCBCategories(true);
+               changeStateCBScratch(true);
             }
 
             refreshSubmitButtonEnabled();
@@ -281,6 +314,7 @@
 
             if (CB_allCategories.selected == true) {
                 changeStateCBScratch(false);
+                changeStateCBClub(false);
                 selectedCategories.removeAll();
                 var idx:int;
                 var len:int = categoryList.length;
@@ -292,6 +326,7 @@
             }
             else {
                 changeStateCBScratch(true);
+                changeStateCBClub(true);
                 var idx:int;
                 var len:int = categoryList.length;
                 for (idx=0; idx<len; idx++) {
@@ -307,13 +342,13 @@
             var isNotEmpty:Boolean = event.result as Boolean;
 
             if (isNotEmpty == false) {
-               Alert.show("Empty report!");
+               Alert.show("Rapport vide!");
             } else {
 
                if (resultOnServer == true) {
                   RO_reporting.getScratchRankingPdfAsFileName(selectedCompetition.id);
                } else {
-                  Alert.show("Pdf generation is in progress ...");
+                  Alert.show("Pdf en cours de generation ...");
                   var url:URLRequest;
                   url = new URLRequest(serverUrl +
                                        "report?type=scratchRanking&competitionId=" +
@@ -324,6 +359,26 @@
             }
          }
 
+         private function resultIsNotEmptyClubRanking(event:ResultEvent):void {
+            var isNotEmpty:Boolean = event.result as Boolean;
+
+            if (isNotEmpty == false) {
+               Alert.show("Rapport vide!");
+            } else {
+
+               if (resultOnServer == true) {
+                  RO_reporting.getClubRankingPdfAsFileName(selectedCompetition.id);
+               } else {
+                  Alert.show("Pdf en cours de generation ...");
+                  var url:URLRequest;
+                  url = new URLRequest(serverUrl +
+                                       "report?type=clubRanking&competitionId=" +
+                                       selectedCompetition.id);
+                  navigateToURL(url,"_blank");
+               }
+            clearFormHandler();
+            }
+         }
          private function resultIsNotEmptyCategoryRanking(event:ResultEvent):void {
            var isNotEmpty:Boolean = event.result as Boolean;
 
@@ -334,7 +389,7 @@
                   RO_reporting.getCategoryRankingPdfAsFileName(selectedCompetition.id);
                } else {
 
-                  Alert.show("Pdf generation is in progress ...");
+                  Alert.show("Pdf en cours de generation ...");
 
                   var url:URLRequest;
                   var idx:int;
@@ -366,6 +421,8 @@
 
             if (selectedScratch == true) {
                RO_reporting.isNotEmptyScratchRanking(selectedCompetition.id);
+            } else if (selectedClub == true) {
+               RO_reporting.isNotEmptyClubRanking(selectedCompetition.id);
             } else {
                RO_reporting.isNotEmptyCategoryRanking(selectedCompetition.id, selectedCategories);
             }
@@ -385,13 +442,15 @@
 
          private function resultGetRankingPdfAsFileName(event:ResultEvent):void {
            var fileName:String = event.result as String;
-           Alert.show("File <" + fileName + "> is available on the server.");
+           Alert.show("Le fichier <" + fileName + "> est disponible sur le serveur.");
 
          }
 
          private function getOnlineRanking(event:Event):void {
             if (selectedScratch == true) {
                RO_registering.getArrivalsFromCompetition(selectedCompetition.id);
+            } else if (selectedClub == true) {
+               RO_registering.getArrivalsFromCompetitionOrderByClub(selectedCompetition.id);
             } else {
                RO_registering.getArrivalsFromCompetitionOrderByCategory(selectedCompetition.id, selectedCategories);
             }
@@ -456,13 +515,16 @@
    <mx:RemoteObject id="RO_reporting" destination="reporting" fault="onFault(event)">
       <mx:method name="isNotEmptyScratchRanking" result="resultIsNotEmptyScratchRanking(event)"/>
       <mx:method name="isNotEmptyCategoryRanking" result="resultIsNotEmptyCategoryRanking(event)"/>
+      <mx:method name="isNotEmptyClubRanking" result="resultIsNotEmptyClubRanking(event)"/>
       <mx:method name="getCategoryRankingPdfAsFileName" result="resultGetRankingPdfAsFileName(event)"/>
+      <mx:method name="getClubRankingPdfAsFileName" result="resultGetRankingPdfAsFileName(event)"/>
       <mx:method name="getScratchRankingPdfAsFileName" result="resultGetRankingPdfAsFileName(event)"/>
    </mx:RemoteObject>
 
    <mx:RemoteObject id="RO_registering" destination="registering" fault="onFault(event)">
       <mx:method name="getArrivalsFromCompetition" result="resultGetArrivals(event)"/>
       <mx:method name="getArrivalsFromCompetitionOrderByCategory" result="resultGetArrivals(event)"/>
+      <mx:method name="getArrivalsFromCompetitionOrderByClub" result="resultGetArrivals(event)"/>
    </mx:RemoteObject>
 
 	<mx:VBox width="95%" height="60%">
@@ -474,7 +536,8 @@
              <mx:Label id="L_competition" text="Selectionner une competition: " textAlign="right"/>
 		 		 <mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setCompetition(event)" />
              <mx:CheckBox id="CB_scratch" label="Classement scratch" selected="false" click="modifyScratch(event)"/>
-            <mx:CheckBox id="CB_allCategories" label="Classement par categorie (toutes ou selection)" selected="false" click="modifyAllCategories(event)"/>
+             <mx:CheckBox id="CB_allCategories" label="Classement par categorie (toutes ou selection)" selected="false" click="modifyAllCategories(event)"/>
+             <mx:CheckBox id="CB_club" label="Classement par club" selected="false" click="modifyClub(event)"/>
            </mx:HBox>
            <mx:Tile direction="horizontal" width="100%" borderStyle="inset"
                      horizontalGap="5" verticalGap="5"
@@ -537,6 +600,7 @@
                   <mx:DataGridColumn headerText="Name" dataField="name" width="150"/>
                   <mx:DataGridColumn headerText="Competition" labelFunction="Util.displayCompetition" showDataTips="true" width="115"/>
                   <mx:DataGridColumn headerText="Categorie" labelFunction="Util.displayCategory" showDataTips="true" width="115"/>
+                  <mx:DataGridColumn headerText="Club" dataField="club" width="150"/>
                   <mx:DataGridColumn headerText="Dossard" labelFunction="Util.displayLabel" showDataTips="true" width="100"/>
                   <mx:DataGridColumn headerText="Temps" dataField="elapsedTime" showDataTips="true" width="150" labelFunction="Util.getElapsedTimeLabel"/>
                </mx:columns>

@@ -59,6 +59,8 @@ package net.o3s.webflex.bean
 
 	  private var _source:String;
 
+	  private var _club:String;
+
 
 		public function Registered()
 		{
@@ -210,6 +212,16 @@ package net.o3s.webflex.bean
 	  public function set source(value:String):void
 	  {
 		  _source = value;
+	  }
+
+	  public function get club():String
+	  {
+		  return _club;
+	  }
+
+	  public function set club(value:String):void
+	  {
+		  _club = value;
 	  }
 	}
 }

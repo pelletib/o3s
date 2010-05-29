@@ -682,7 +682,8 @@
 						<mx:DataGridColumn headerText="Equipe" labelFunction="Util.displayTeam" showDataTips="true" width="30"/>
 						<mx:DataGridColumn headerText="Paye" labelFunction="Util.displayPaid" showDataTips="true" width="30"/>
                   <mx:DataGridColumn headerText="CM" labelFunction="Util.displayProvidedHealthForm" showDataTips="true" width="30"/>
-                  <mx:DataGridColumn headerText="source" dataField="source" showDataTips="true" width="50"/>
+                  <mx:DataGridColumn headerText="Origine" dataField="source" showDataTips="true" width="50"/>
+                  <mx:DataGridColumn headerText="Club" dataField="club" showDataTips="true" width="100"/>
 						<mx:DataGridColumn headerText="Date inscription" dataField="registeringDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
 						<mx:DataGridColumn headerText="Date arrivee" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
 						<mx:DataGridColumn headerText="Temps" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="Util.getElapsedTimeLabel"/>
