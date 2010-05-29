@@ -168,6 +168,7 @@
             var firstLineData:Array = importFileLines[0].split(";");
             for (var j:int = 0; j < firstLineData.length; j++) {
 
+               // warning : is classe and club are present, only class is used and set into the club field
                if ( firstLineData[j].toLowerCase() == "nom" || firstLineData[j].toLowerCase() == "\"nom\"") {
                         indLastname = j ;
                } else if (firstLineData[j].toLowerCase() == "prenom" || firstLineData[j].toLowerCase() == "\"prenom\"" ||
@@ -175,6 +176,11 @@
                         indFirstname = j ;
                } else if (firstLineData[j].toLowerCase() == "club" || firstLineData[j].toLowerCase() == "\"club\"" ||
                           firstLineData[j].toLowerCase() == "clu" || firstLineData[j].toLowerCase() == "\"clu\"") {
+                        if (indClub == -1) {
+                           indClub = j ;
+                        }
+               } else if (firstLineData[j].toLowerCase() == "classe" || firstLineData[j].toLowerCase() == "\"classe\"" ||
+                          firstLineData[j].toLowerCase() == "cla" || firstLineData[j].toLowerCase() == "\"cla\"") {
                         indClub = j ;
                } else if (firstLineData[j].toLowerCase() == "date de naissance" || firstLineData[j].toLowerCase() == "\"date de naissance\"" ||
                           firstLineData[j].toLowerCase() == "dna" || firstLineData[j].toLowerCase() == "\"dna\"") {
