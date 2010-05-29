@@ -43,16 +43,17 @@
 
          <property name="eclipselink.target-database" value="HSQL"/>
 
+         <property name="eclipselink.ddl-generation" value="create-tables"/>
+         <property name="eclipselink.ddl-generation.output-mode" value="database"/>
+
+	      -->
+
+         <property name="eclipselink.target-database" value="PostgreSQL"/>
          <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
          <property name="eclipselink.ddl-generation.output-mode" value="sql-script"/>
          <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop.sql"/>
          <property name="eclipselink.create-ddl-jdbc-file-name" value="create.sql"/>
          <property name="eclipselink.application-location" value="."/>
-	      -->
-
-         <property name="eclipselink.ddl-generation" value="create-tables"/>
-         <property name="eclipselink.target-database" value="PostgreSQL"/>
-         <property name="eclipselink.ddl-generation.output-mode" value="database"/>
 
 	      <property name="toplink.target-database" value="HSQL"/>
 	      <property name="toplink.ddl-generation" value="drop-and-create-tables"/>
