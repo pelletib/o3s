@@ -573,6 +573,30 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     }
 
     /**
+     * Get registered on competition order by club and duration
+     */
+    @SuppressWarnings("unchecked")
+    public List<IEntityRegistered> findRegisteredFromCompetitionOrderByClubAndDuration(final int competitionId) throws RegisteringException {
+    	IEntityEvent event = admin.findDefaultEvent();
+
+    	Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_CLUB_ETIME");
+        query.setParameter("COMPETITION", competitionId);
+        query.setParameter("EVENTID", event.getId());
+
+        List<IEntityRegistered> registereds = null;
+        try {
+
+        	registereds = query.getResultList();
+        } catch (javax.persistence.NoResultException e) {
+        	registereds = new ArrayList<IEntityRegistered>();
+        } catch (Exception e){
+        	e.printStackTrace();
+        	throw new RegisteringException("Unable to find competitionId [" + competitionId + "]", e);
+        }
+        return registereds;
+    }
+
+    /**
      * Get registered on competition order by category and duration for a list of categories
      */
     @SuppressWarnings("unchecked")
@@ -812,6 +836,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
              	registered.setPersons(new HashSet(persons));
             	category = admin.findNoCategory();
             	registered.setCategory(category);
+            	registered.setClub("N/A");
 
          	} else {
         		List<IEntityPerson> onlyOnePerson = new ArrayList<IEntityPerson>();
@@ -829,6 +854,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
             	// check the competition regarding the category
             	checkCompetitionCategory(competition, category);
             	registered.setCategory(category);
+            	registered.setClub(persons.get(0).getClub());
 
         	}
 
@@ -914,6 +940,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
                  	registered.setPersons(new HashSet(persons));
                 	category = admin.findNoCategory();
                 	registered.setCategory(category);
+                	registered.setClub("N/A");
 
              	} else {
             		List<IEntityPerson> onlyOnePerson = new ArrayList<IEntityPerson>();
@@ -931,6 +958,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
                 	// check the competition regarding the category
                 	checkCompetitionCategory(competition, category);
                 	registered.setCategory(category);
+                	registered.setClub(persons.get(0).getClub());
 
             	}
 

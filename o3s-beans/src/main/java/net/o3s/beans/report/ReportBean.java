@@ -93,6 +93,11 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     private static String CATEGORIES_RANKING_REPORT="CategoriesRankingReport";
 
     /**
+     * Prefix for club ranking report
+     */
+    private static String CLUB_RANKING_REPORT="ClubRankingReport";
+
+    /**
      * Prefix for label report
      */
     private static String LABEL_REPORT="LabelReport";
@@ -449,6 +454,37 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     }
 
     /**
+     * Test if the club ranking is not empty
+     * @param competitionId competition id
+     * @return true is the ranking is not empty
+     */
+    public Boolean isNotEmptyClubRanking(final int competitionId) {
+    	IEntityCompetition competition = null;
+
+    	competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+    		logger.warning("competition is null!");
+    		return false;
+        }
+
+     	List<IEntityRegistered> registereds;
+		try {
+			registereds = this.registering.findRegisteredFromCompetitionOrderByClubAndDuration(competitionId);
+		} catch (RegisteringException re) {
+			re.printStackTrace();
+    		return false;
+		}
+
+    	if (registereds.isEmpty()) {
+    		logger.warning("No yet arrived!");
+    		return false;
+        }
+
+    	return true;
+    }
+
+    /**
      * Generate a byte array report for the category ranking
      * @param competitionId competition id
      * @param categoryId category id
@@ -459,6 +495,19 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 	public byte[] getCategoryRankingPdfAsByteArray(final int competitionId, List<Integer> categoriesId) throws ReportException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		getCategoryRankingPdfAsByteArray(competitionId, categoriesId, outputStream);
+	    return outputStream.toByteArray();
+    }
+
+    /**
+     * Generate a byte array report for the club ranking
+     * @param competitionId competition id
+	 * @return byte array
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
+    @SuppressWarnings("unchecked")
+	public byte[] getClubRankingPdfAsByteArray(final int competitionId) throws ReportException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		getClubRankingPdfAsByteArray(competitionId, outputStream);
 	    return outputStream.toByteArray();
     }
 
@@ -506,6 +555,48 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     }
 
     /**
+     * Generate a byte array report for the club ranking
+     * @param competitionId competition id
+	 * @param output stream
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
+    @SuppressWarnings("unchecked")
+	public void getClubRankingPdfAsByteArray(final int competitionId, final OutputStream outputStream) throws ReportException {
+
+    	IEntityCompetition competition = null;
+
+    	competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+    		throw new ReportException("Competition <" + competitionId + "> unknown");
+        }
+
+     	List<IEntityRegistered> registereds;
+		try {
+			registereds = this.registering.findRegisteredFromCompetitionOrderByClubAndDuration(competitionId);
+		} catch (RegisteringException re) {
+			re.printStackTrace();
+    		throw new ReportException("Unable to generate report for competition " + competitionId, re);
+		}
+
+    	if (registereds.isEmpty()) {
+    		throw new ReportException("No yet arrived!");
+        }
+
+    	// set parameters
+		Map parameters = new HashMap();
+		parameters.put(JRJpaQueryExecuterFactory.PARAMETER_JPA_ENTITY_MANAGER, entityManager);
+		parameters.put("competitionId",Integer.valueOf(competitionId));
+		parameters.put("competitionName", competition.getName());
+		parameters.put("eventName", competition.getEvent().getName());
+		logger.fine("eventName=" + competition.getEvent().getName());
+
+		String sourceFileName = CLUB_RANKING_REPORT + ".jrxml";
+		invokeJasperReportStream(sourceFileName, outputStream, parameters, registereds);
+
+    }
+
+    /**
      * Generate the file name for a category ranking report
      * @param competitionId competition
      */
@@ -518,6 +609,26 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     		throw new ReportException("Competition <" + competitionId + "> unknown");
         }
     	String pdfFileName = CATEGORIES_RANKING_REPORT + "-" + competition.getName() + ".pdf";
+
+		pdfFileName = pdfFileName.replace(' ', '_');
+
+		return pdfFileName;
+
+    }
+
+    /**
+     * Generate the file name for a club ranking report
+     * @param competitionId competition
+     */
+    public String buildClubFileName(final int competitionId)  throws ReportException{
+    	IEntityCompetition competition = null;
+
+    	competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+    		throw new ReportException("Competition <" + competitionId + "> unknown");
+        }
+    	String pdfFileName = CLUB_RANKING_REPORT + "-" + competition.getName() + ".pdf";
 
 		pdfFileName = pdfFileName.replace(' ', '_');
 
@@ -565,6 +676,52 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		String sourceFileName = CATEGORIES_RANKING_REPORT + ".jrxml";
 
         String pdfFileName = buildCategoryFileName(competitionId);
+
+		invokeJasperReportPdf(sourceFileName, pdfFileName, parameters, registereds);
+
+        return pdfFileName;
+    }
+
+    /**
+     * Generate a pdf report for the club ranking
+     * @param competitionId competition id
+	 * @return file name
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
+    @SuppressWarnings("unchecked")
+	public String getClubRankingPdfAsFileName(final int competitionId) throws ReportException {
+
+    	IEntityCompetition competition = null;
+
+    	competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+    		throw new ReportException("Competition <" + competitionId + "> unknown");
+        }
+
+     	List<IEntityRegistered> registereds;
+		try {
+			registereds = this.registering.findRegisteredFromCompetitionOrderByClubAndDuration(competitionId);
+		} catch (RegisteringException re) {
+			re.printStackTrace();
+    		throw new ReportException("Unable to generate report for competition " + competitionId, re);
+		}
+
+    	if (registereds.isEmpty()) {
+    		throw new ReportException("No yet arrived!");
+        }
+
+    	// set parameters
+		Map parameters = new HashMap();
+		parameters.put(JRJpaQueryExecuterFactory.PARAMETER_JPA_ENTITY_MANAGER, entityManager);
+		parameters.put("competitionId",Integer.valueOf(competitionId));
+		parameters.put("competitionName", competition.getName());
+		parameters.put("eventName", competition.getEvent().getName());
+		logger.fine("eventName=" + competition.getEvent().getName());
+
+		String sourceFileName = CLUB_RANKING_REPORT + ".jrxml";
+
+        String pdfFileName = buildClubFileName(competitionId);
 
 		invokeJasperReportPdf(sourceFileName, pdfFileName, parameters, registereds);
 

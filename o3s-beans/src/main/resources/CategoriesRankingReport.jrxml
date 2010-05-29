@@ -113,7 +113,7 @@
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{rcount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="50" y="0" width="100" height="20"/>
+				<reportElement x="50" y="0" width="150" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
