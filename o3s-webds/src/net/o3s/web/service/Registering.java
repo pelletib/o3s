@@ -370,7 +370,8 @@ public class Registering {
 					registeredVO.isTeamed(),
 					registeredVO.getName(),
 					registeredVO.isPaid(),
-					registeredVO.isProvidedHealthForm());
+					registeredVO.isProvidedHealthForm(),
+					registeredVO.getSource());
 		} catch (RegisteringException e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
@@ -411,7 +412,8 @@ public class Registering {
 					registeredVO.isTeamed(),
 					registeredVO.getName(),
 					registeredVO.isPaid(),
-					registeredVO.isProvidedHealthForm());
+					registeredVO.isProvidedHealthForm(),
+					registeredVO.getSource());
 		} catch (RegisteringException e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
@@ -582,7 +584,8 @@ public class Registering {
     					registeredVO.isTeamed(),
     					registeredVO.getName(),
     					registeredVO.isPaid(),
-    					registeredVO.isProvidedHealthForm());
+    					registeredVO.isProvidedHealthForm(),
+    					registeredVO.getSource());
     			logger.log(Level.FINE, "import Registered <" + registereds + ">");
 
     		} catch (Exception e) {

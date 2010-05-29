@@ -141,19 +141,18 @@ public class Init {
 		vregistered.removeAllElements();
 
 		try {
-			vregistered.addAll(registering.createRegistered(team0, competition1.getId(), false, "", true, true));
-			registering.createRegistered(team1, competition2.getId(), false, "", true, true);
-			registering.createRegistered(team2, competition3.getId(), true,
-					"EQUIPE1", false, false);
-			vregistered.addAll(registering.createRegistered(team3, competition1.getId(), false, "", true, true));
-			vregistered.addAll(registering.createRegistered(team4, competition1.getId(), false, "", true, true));
-			vregistered.addAll(registering.createRegistered(team5, competition1.getId(), false, "", true, true));
-			vregistered.addAll(registering.createRegistered(team6, competition1.getId(), false, "", true, true));
-			vregistered.addAll(registering.createRegistered(team7, competition1.getId(), false, "", true, true));
-			vregistered.addAll(registering.createRegistered(team8, competition1.getId(), false, "", true, true));
-			vregistered.addAll(registering.createRegistered(team9, competition1.getId(), false, "", true, true));
-			vregistered.addAll(registering.createRegistered(team10, competition1.getId(), false, "", true, true));
-			vregistered.addAll(registering.createRegistered(team11, competition1.getId(), false, "", true, true));
+			vregistered.addAll(registering.createRegistered(team0, competition1.getId(), false, "", true, true, "web"));
+			registering.createRegistered(team1, competition2.getId(), false, "", true, true, "internal");
+			registering.createRegistered(team2, competition3.getId(), true,"EQUIPE1", false, false, "internal");
+			vregistered.addAll(registering.createRegistered(team3, competition1.getId(), false, "", true, true, "web"));
+			vregistered.addAll(registering.createRegistered(team4, competition1.getId(), false, "", true, true, "web"));
+			vregistered.addAll(registering.createRegistered(team5, competition1.getId(), false, "", true, true, "web"));
+			vregistered.addAll(registering.createRegistered(team6, competition1.getId(), false, "", true, true, "web"));
+			vregistered.addAll(registering.createRegistered(team7, competition1.getId(), false, "", true, true, "web"));
+			vregistered.addAll(registering.createRegistered(team8, competition1.getId(), false, "", true, true, "web"));
+			vregistered.addAll(registering.createRegistered(team9, competition1.getId(), false, "", true, true, "web"));
+			vregistered.addAll(registering.createRegistered(team10, competition1.getId(), false, "", true, true, "web"));
+			vregistered.addAll(registering.createRegistered(team11, competition1.getId(), false, "", true, true, "web"));
 		} catch (RegisteringException e) {
 			e.printStackTrace();
 		} catch (AlreadyExistException e) {

@@ -42,6 +42,8 @@ public class RegisteredVO {
 	private List<PersonVO> persons;
 	private int rank;
 	private boolean providedHealthForm=false;
+	private String source;
+
 
 	public RegisteredVO() {
 		super();
@@ -79,6 +81,7 @@ public class RegisteredVO {
 				this.getCategory() + ", " +
 				this.getRank() + ", " +
 				this.isProvidedHealthForm() + "," +
+				this.getSource() + "," +
 				"]";
 	}
 
@@ -178,4 +181,11 @@ public class RegisteredVO {
 		this.rank = rank;
 	}
 
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
 }
