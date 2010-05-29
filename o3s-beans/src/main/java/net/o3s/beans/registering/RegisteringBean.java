@@ -775,7 +775,8 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 			boolean isTeamed,
 			final String name,
 			final boolean isPaid,
-			final boolean providedHealthForm) throws AlreadyExistException, RegisteringException {
+			final boolean providedHealthForm,
+			final String source) throws AlreadyExistException, RegisteringException {
     	IEntityRegistered registered = null;
 		List<IEntityRegistered> registeredsReturn = new ArrayList<IEntityRegistered>();
 		String registeredName = null;
@@ -838,6 +839,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     		registered.setIsTeamed(isTeamed);
         	registered.setIsPaid(isPaid);
         	registered.setProvidedHealthForm(providedHealthForm);
+        	registered.setSource(source);
 
            	// set event related to the competition
         	registered.setEvent(competition.getEvent());
@@ -875,7 +877,8 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 			boolean isTeamed,
 			final String name,
 			final boolean isPaid,
-			final boolean providedHealthForm) throws RegisteringException {
+			final boolean providedHealthForm,
+			final String source) throws RegisteringException {
     	IEntityRegistered registered = null;
 		String registeredName = null;
 
@@ -934,6 +937,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         		registered.setIsTeamed(isTeamed);
             	registered.setIsPaid(isPaid);
             	registered.setProvidedHealthForm(providedHealthForm);
+            	registered.setSource(source);
 
             	// set the competition
             	registered.setCompetition(competition);
