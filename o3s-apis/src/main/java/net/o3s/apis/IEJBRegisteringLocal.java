@@ -44,12 +44,12 @@ public interface IEJBRegisteringLocal {
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByDuration(final int competitionId) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId,  List<Integer> categoriesId) throws RegisteringException;
-	List<IEntityRegistered> createRegistered(final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid, final boolean providedHealthForm)  throws AlreadyExistException,RegisteringException;
+	List<IEntityRegistered> createRegistered(final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid, final boolean providedHealthForm, final String source)  throws AlreadyExistException,RegisteringException;
 	IEntityRegistered findRegisteredFromId(final int id);
 	IEntityRegistered findRegisteredFromPersonForDefaultEvent(final int personId);
 	List<IEntityRegistered> findRegisteredFromPersonForAllEvent(final int personId);
 	void removeRegistered(final int id) throws RegisteringException;
-	IEntityRegistered updateRegistered(final int id, final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid, final boolean providedHealthForm) throws RegisteringException;
+	IEntityRegistered updateRegistered(final int id, final List<IEntityPerson> persons, final int competitionId, boolean isTeamed, final String name, final boolean isPaid, final boolean providedHealthForm, final String source) throws RegisteringException;
 	List<IEntityLabel> findAllLabels();
 
 	int countRegisteredFromCompetition(final int competitionId) throws RegisteringException;

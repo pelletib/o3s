@@ -67,5 +67,8 @@ public interface IEntityRegistered {
 	IEntityCategory getCategory();
 	void setCategory(IEntityCategory category);
 
+	String getSource();
+	void setSource(String source) ;
+
 	String toString();
 }
