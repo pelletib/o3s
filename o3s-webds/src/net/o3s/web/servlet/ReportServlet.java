@@ -60,6 +60,7 @@ public class ReportServlet extends HttpServlet {
 
 	private static final String TYPE_SCRATCH_RANKING = "scratchRanking";
 	private static final String TYPE_CATEGORIES_RANKING = "categoriesRanking";
+	private static final String TYPE_CLUB_RANKING = "clubRanking";
 	private static final String TYPE_LABEL = "label";
 
 	@EJB
@@ -162,6 +163,29 @@ public class ReportServlet extends HttpServlet {
 				os.flush();
 				os.close();
 			}
+		} else if (type.equals(TYPE_CLUB_RANKING) == true) {
+			try  {
+				if (request.getParameter(PRM_COMPETITION_ID) == null) {
+					throw new IOException("parameter '" + PRM_COMPETITION_ID + "' is missing");
+				}
+
+				int competitionId = Integer.valueOf(request.getParameter(PRM_COMPETITION_ID)).intValue();
+
+				response.setContentType( "application/pdf" );
+			    response.setHeader("Content-Disposition","attachment;filename=" + report.buildClubFileName(competitionId));
+
+			    report.getClubRankingPdfAsByteArray(competitionId, os);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new IOException(e.getMessage());
+
+
+			} finally {
+				os.flush();
+				os.close();
+			}
+
 		} else {
 			throw new IOException("unkown type for report servlet");
 		}

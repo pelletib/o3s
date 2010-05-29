@@ -43,6 +43,7 @@ public class RegisteredVO {
 	private int rank;
 	private boolean providedHealthForm=false;
 	private String source;
+	private String club;
 
 
 	public RegisteredVO() {
@@ -82,6 +83,7 @@ public class RegisteredVO {
 				this.getRank() + ", " +
 				this.isProvidedHealthForm() + "," +
 				this.getSource() + "," +
+				this.getClub() + "," +
 				"]";
 	}
 
@@ -188,4 +190,13 @@ public class RegisteredVO {
 	public void setSource(String source) {
 		this.source = source;
 	}
+
+	public String getClub() {
+		return club;
+	}
+
+	public void setClub(String club) {
+		this.club = club;
+	}
+
 }

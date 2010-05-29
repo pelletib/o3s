@@ -223,6 +223,7 @@ public class Util {
 			registeredVO.setRank(-1);
 			registeredVO.setProvidedHealthForm(registered.isProvidedHealthForm());
 			registeredVO.setSource(registered.getSource());
+			registeredVO.setClub(registered.getClub());
 		}
 		return registeredVO;
 

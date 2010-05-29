@@ -179,6 +179,43 @@ public class Registering {
     	return registeredsVO;
 	}
 
+	// get arrivals order by category and duration
+	public List<RegisteredVO> getArrivalsFromCompetitionOrderByClub(final int competitionId) throws RegisteringException {
+
+		setRegisteringEJB();
+
+		List<IEntityRegistered> registereds = null;
+		try {
+			registereds = this.registering.findRegisteredFromCompetitionOrderByClubAndDuration(competitionId);
+		} catch (RegisteringException re) {
+			re.printStackTrace();
+    		throw new RegisteringException("Unable to find registereds for competition " + competitionId, re);
+		} catch (Exception e) {
+			e.printStackTrace();
+    		throw new RegisteringException("Unable to find registereds for competition " + competitionId, e);
+		}
+
+
+		logger.fine("registereds=" + registereds);
+
+		List<RegisteredVO> registeredsVO = Util.createRegisteredListVO(registereds, this);
+
+		// set the rank
+		int rank = 1;
+		String club = "";
+		for (RegisteredVO registeredVO:registeredsVO) {
+			if (registeredVO.getPersons().get(0).getClub().equals(club) == false){
+				rank = 1;
+				club = registeredVO.getPersons().get(0).getClub();
+			}
+			registeredVO.setRank(rank);
+			rank++;
+		}
+
+
+    	return registeredsVO;
+	}
+
 
 	// get all registered
 	public List<RegisteredVO> getAllRegistereds() {

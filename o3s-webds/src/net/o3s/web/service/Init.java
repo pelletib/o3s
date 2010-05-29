@@ -109,22 +109,22 @@ public class Init {
 		List<IEntityPerson> team11 = new ArrayList<IEntityPerson>();
 
 		try {
-			team0.add( registering.createPerson("TNOM1", "Tprenom1", "Crossey", "L0", "Tprenom1.Tnom1@gmail.com", 'M', df.parse("09/12/1971")));
-			team1.add( registering.createPerson("TNOM2", "Tprenom2", "Crossey", "L1", "Tprenom2.Tnom2@gmail.com", 'F', df.parse("06/02/2000")));
+			team0.add( registering.createPerson("TNOM1", "Tprenom1", "CLUB1", "L0", "Tprenom1.Tnom1@gmail.com", 'M', df.parse("09/12/1971")));
+			team1.add( registering.createPerson("TNOM2", "Tprenom2", "CLUB1", "L1", "Tprenom2.Tnom2@gmail.com", 'F', df.parse("06/02/2000")));
 
-			team2.add( registering.createPerson("TNOM3", "Tprenom3", "Crossey", "L2-1", "Tprenom3.Tnom3@gmail.com", 'F', df.parse("18/04/2002")));
-			team2.add( registering.createPerson("TNOM4", "Tprenom4", "Crossey", "L2-2", "Tprenom4.Tnom4@gmail.com", 'F', df.parse("19/07/2006")));
-			team2.add( registering.createPerson("TNOM5", "Tprenom5", "Crossey", "L2-3", "Tprenom5.Tnom5@gmail.com", 'F', df.parse("06/01/1971")));
+			team2.add( registering.createPerson("TNOM3", "Tprenom3", "CLUB1", "L2-1", "Tprenom3.Tnom3@gmail.com", 'F', df.parse("18/04/2002")));
+			team2.add( registering.createPerson("TNOM4", "Tprenom4", "CLUB1", "L2-2", "Tprenom4.Tnom4@gmail.com", 'F', df.parse("19/07/2006")));
+			team2.add( registering.createPerson("TNOM5", "Tprenom5", "CLUB1", "L2-3", "Tprenom5.Tnom5@gmail.com", 'F', df.parse("06/01/1971")));
 
-			team3.add( registering.createPerson("TNOM6", "Tprenom6", "Paris", "L3", "Tprenom6.Tnom6@paris.fr", 'M', df.parse("18/11/1972")));
-			team4.add( registering.createPerson("TNOM7", "Tprenom7", "Crossey", "L4", "Tprenom7.Tnom7@free.fr", 'M', df.parse("06/11/1978")));
-			team5.add( registering.createPerson("TNOM8", "Tprenom8", "Grenoble", "L5", "Tprenom8.Tnom8@free.fr", 'M', df.parse("20/05/1967")));
-			team6.add( registering.createPerson("TNOM9", "Tprenom9",  "Crossey", "L6", "Tprenom9.Tnom9@free.fr", 'M', df.parse("04/02/1970")));
-			team7.add( registering.createPerson("TNOM10", "Tprenom10", "Crossey", "L7", "Tprenom10.Tnom10@neuf.fr", 'M', df.parse("25/07/1971")));
-			team8.add( registering.createPerson("TNOM11", "Tprenom11", "GrandeVille", "L8", "Tprenom11.Tnom11@free.fr", 'M', df.parse("01/11/1971")));
-			team9.add( registering.createPerson("TNOM12", "Tprenom12", "Paris", "L9", "Tprenom12.Tnom12@paris.fr", 'M', df.parse("25/12/1971")));
-			team10.add( registering.createPerson("TNOM13", "Tprenom13", "machin", "L10", "Tprenom13.Tnom13@free.fr", 'M', df.parse("25/09/1955")));
-			team11.add( registering.createPerson("TNOM14", "Tprenom14", "Mexico", "L11", "Tprenom14.Tnom14@free.fr", 'M', df.parse("25/09/1982")));
+			team3.add( registering.createPerson("TNOM6", "Tprenom6", "CLUB1", "L3", "Tprenom6.Tnom6@paris.fr", 'M', df.parse("18/11/1972")));
+			team4.add( registering.createPerson("TNOM7", "Tprenom7", "CLUB1", "L4", "Tprenom7.Tnom7@free.fr", 'M', df.parse("06/11/1978")));
+			team5.add( registering.createPerson("TNOM8", "Tprenom8", "CLUB1", "L5", "Tprenom8.Tnom8@free.fr", 'M', df.parse("20/05/1967")));
+			team6.add( registering.createPerson("TNOM9", "Tprenom9",  "CLUB2", "L6", "Tprenom9.Tnom9@free.fr", 'M', df.parse("04/02/1970")));
+			team7.add( registering.createPerson("TNOM10", "Tprenom10", "CLUB2", "L7", "Tprenom10.Tnom10@neuf.fr", 'M', df.parse("25/07/1971")));
+			team8.add( registering.createPerson("TNOM11", "Tprenom11", "CLUB2", "L8", "Tprenom11.Tnom11@free.fr", 'M', df.parse("01/11/1971")));
+			team9.add( registering.createPerson("TNOM12", "Tprenom12", "CLUB2", "L9", "Tprenom12.Tnom12@paris.fr", 'M', df.parse("25/12/1971")));
+			team10.add( registering.createPerson("TNOM13", "Tprenom13", "CLUB2", "L10", "Tprenom13.Tnom13@free.fr", 'M', df.parse("25/09/1955")));
+			team11.add( registering.createPerson("TNOM14", "Tprenom14", "CLUB2", "L11", "Tprenom14.Tnom14@free.fr", 'M', df.parse("25/09/1982")));
 
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block

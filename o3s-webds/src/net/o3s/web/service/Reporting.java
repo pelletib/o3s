@@ -81,6 +81,18 @@ public class Reporting {
 		return fileName;
 	}
 
+	public String getClubRankingPdfAsFileName(final int competitionId) {
+		setReportEJB();
+		String fileName = null;
+		try  {
+			fileName = report.getClubRankingPdfAsFileName(competitionId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+		return fileName;
+	}
+
 	public String getScratchRankingPdfAsFileName(final int competitionId) {
 		setReportEJB();
 		String fileName = null;
@@ -111,6 +123,16 @@ public class Reporting {
 		}
 		try  {
 			return report.isNotEmptyCategoryRanking(competitionId, categoriesId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+	}
+
+	public Boolean isNotEmptyClubRanking(final int competitionId) {
+		setReportEJB();
+		try  {
+			return report.isNotEmptyClubRanking(competitionId);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
