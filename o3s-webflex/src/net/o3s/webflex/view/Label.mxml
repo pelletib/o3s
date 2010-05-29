@@ -230,6 +230,8 @@
                   registered.paid = false;
                   registered.event = null;
                   registered.name = "";
+                  registered.source = "import";
+
                   registered.persons = new ArrayCollection([]);
 
                   for (var j:int = 0; j < lineData.length; j++) {
@@ -674,9 +676,10 @@
 						<mx:DataGridColumn headerText="Equipe" labelFunction="Util.displayTeam" showDataTips="true" width="30"/>
 						<mx:DataGridColumn headerText="Paye" labelFunction="Util.displayPaid" showDataTips="true" width="30"/>
                   <mx:DataGridColumn headerText="CM" labelFunction="Util.displayProvidedHealthForm" showDataTips="true" width="30"/>
-						<mx:DataGridColumn headerText="Date d'enregistrement" dataField="registeringDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
-						<mx:DataGridColumn headerText="Date d'arrivee" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
-						<mx:DataGridColumn headerText="Temps ecoule" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="Util.getElapsedTimeLabel"/>
+                  <mx:DataGridColumn headerText="source" dataField="source" showDataTips="true" width="50"/>
+						<mx:DataGridColumn headerText="Date inscription" dataField="registeringDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
+						<mx:DataGridColumn headerText="Date arrivee" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
+						<mx:DataGridColumn headerText="Temps" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="Util.getElapsedTimeLabel"/>
 						<mx:DataGridColumn width="100" headerText="Actions"
 										   itemRenderer="net.o3s.webflex.components.ActionLabelDataGridColumnItemRenderer" />
 					</mx:columns>

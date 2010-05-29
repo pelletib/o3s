@@ -57,6 +57,8 @@ package net.o3s.webflex.bean
 
 	  private var _rank:int;
 
+	  private var _source:String;
+
 
 		public function Registered()
 		{
@@ -198,6 +200,16 @@ package net.o3s.webflex.bean
 	  public function set rank(value:int):void
 	  {
 		  _rank = value;
+	  }
+
+	  public function get source():String
+	  {
+		  return _source;
+	  }
+
+	  public function set source(value:String):void
+	  {
+		  _source = value;
 	  }
 	}
 }

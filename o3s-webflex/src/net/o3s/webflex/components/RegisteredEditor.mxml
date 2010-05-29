@@ -278,6 +278,12 @@
 				registered.paid = paid;
             registered.providedHealthForm = providedHealthForm;
 
+            if (StaticVars.isLogged == false) {
+               registered.source = "web";
+            } else {
+               registered.source = "internal";
+            }
+
   			   RO_registering.createRegistered(registered);
 
 			} else if (mode == "update") {
@@ -291,6 +297,11 @@
 				updateRegistered.teamed = selectedCompetition.teamed;
 				updateRegistered.paid = paid;
             updateRegistered.providedHealthForm = providedHealthForm;
+            if (StaticVars.isLogged == false) {
+               updateRegistered.source = "web";
+            } else {
+               updateRegistered.source = "internal";
+            }
 
 				RO_registering.updateRegistered(updateRegistered);
 			}
