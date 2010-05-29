@@ -541,6 +541,13 @@ public class Registering {
    					persons.add(person);
    					logger.log(Level.FINE, "import Person <" + person + ">");
 
+   				} catch (AlreadyExistException e) {
+   					logger.log(Level.SEVERE, "La personne <" + personVO + "> existe deja!");
+   					IEntityPerson person = registering.findPersonFromLastnameFirstNameBirthDay(personVO.getLastname(),personVO.getFirstname(), personVO.getBirthday());
+   					persons.add(person);
+   					logger.log(Level.FINE, "import Person <" + person + ">");
+
+   					//throw new FlexException(e.getMessage());
    				} catch (Exception e) {
    					e.printStackTrace();
    					logger.log(Level.SEVERE, "Unable to import person <" + personVO + ">", e);
@@ -588,6 +595,9 @@ public class Registering {
     					registeredVO.getSource());
     			logger.log(Level.FINE, "import Registered <" + registereds + ">");
 
+    		} catch (AlreadyExistException e) {
+    			logger.log(Level.SEVERE, "Personne deja inscrite <" + registeredVO + "> !");
+    			//throw new FlexException(e.getMessage());
     		} catch (Exception e) {
     			e.printStackTrace();
     			logger.log(Level.SEVERE, "Unable to import registered <" + registeredVO + ">", e);
