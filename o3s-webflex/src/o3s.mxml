@@ -179,7 +179,7 @@
 
 				<mx:Panel
 					title="Login" id="loginPanel" horizontalAlign="center"
-					horizontalScrollPolicy="off" verticalScrollPolicy="off">
+					horizontalScrollPolicy="off" verticalScrollPolicy="off" defaultButton="{loginButton}">
 
 					<mx:Form id="loginForm">
 						<mx:FormItem label="Username:">
