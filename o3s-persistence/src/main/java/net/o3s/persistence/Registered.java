@@ -89,10 +89,10 @@ public class Registered implements IEntityRegistered, Serializable {
     boolean teamed=false;
     boolean paid=false;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
     Date registeringDate;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
     Date arrivalDate;
 
     long elapsedTime;
