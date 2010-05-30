@@ -586,18 +586,18 @@
 		]]>
 	</mx:Script>
 
-	<mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
+	<mx:RemoteObject id="RO_admin" destination="admin" showBusyCursor="true" fault="onFault(event)">
 		<mx:method name="getCompetitions" result="resultGetCompetitions(event)"/>
 		<mx:method name="getCategories" result="resultGetCategories(event)"/>
 	</mx:RemoteObject>
 
-	<mx:RemoteObject id="RO_registering" destination="registering" fault="onFault(event)">
+	<mx:RemoteObject id="RO_registering" destination="registering" showBusyCursor="true" fault="onFault(event)">
 		<mx:method name="getRegistereds" result="resultGetRegistered(event)"/>
 		<mx:method name="removeRegistered" result="resultRemoveRegistered(event)"/>
       <mx:method name="importRegistered" result="resultImportRegistered(event)"/>
 	</mx:RemoteObject>
 
-	<mx:RemoteObject id="RO_reporting" destination="reporting" fault="onFault(event)">
+	<mx:RemoteObject id="RO_reporting" destination="reporting" showBusyCursor="true" fault="onFault(event)">
 		<mx:method name="printLabel" result="resultPrintLabel(event)"/>
 	</mx:RemoteObject>
 

@@ -60,7 +60,7 @@
 </mx:Script>
    <mx:DateFormatter formatString="DD/MM/YYYY" id="formatDateDDMMYYY"/>
 
-   <mx:RemoteObject id="RO_admin" destination="admin" fault="Util.onFault(event)">
+   <mx:RemoteObject id="RO_admin" destination="admin" showBusyCursor="true" fault="Util.onFault(event)">
       <mx:method name="getDefaultEvent" result="resultGetDefaultEvent(event)"/>
    </mx:RemoteObject>
 

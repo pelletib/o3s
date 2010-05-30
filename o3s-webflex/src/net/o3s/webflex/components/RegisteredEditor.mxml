@@ -399,16 +399,16 @@
 	]]>
 </mx:Script>
 
-	<mx:RemoteObject id="RO_admin" destination="admin" fault="onFaultGetCompetition(event)">
+	<mx:RemoteObject id="RO_admin" destination="admin" showBusyCursor="true" fault="onFaultGetCompetition(event)">
 		<mx:method name="getCompetitions" result="resultGetCompetition(event)"/>
 	</mx:RemoteObject>
 
-	<mx:RemoteObject id="RO_registering" destination="registering" fault="Util.onFault(event)">
+	<mx:RemoteObject id="RO_registering" destination="registering" showBusyCursor="true" fault="Util.onFault(event)">
 		<mx:method name="createRegistered" result="resultCreateRegistered(event)" fault="Util.handleException(event)"/>
 		<mx:method name="updateRegistered" result="resultUpdateRegistered(event)" fault="Util.handleException(event)"/>
 	</mx:RemoteObject>
 
-   <mx:RemoteObject id="RO_reporting" destination="reporting" fault="Util.onFault(event)">
+   <mx:RemoteObject id="RO_reporting" destination="reporting" showBusyCursor="true" fault="Util.onFault(event)">
       <mx:method name="printLabel" result="resultPrintLabel(event)" fault="Util.handleException(event)"/>
    </mx:RemoteObject>
 

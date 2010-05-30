@@ -148,7 +148,7 @@
 		]]>
 	</mx:Script>
 
-	<mx:RemoteObject id="RO_admin" destination="admin" fault="onFault(event)">
+	<mx:RemoteObject id="RO_admin" destination="admin" showBusyCursor="true" fault="onFault(event)">
 	</mx:RemoteObject>
 
 	<mx:VBox width="95%" height="60%">

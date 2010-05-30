@@ -185,7 +185,7 @@
    <mx:DateFormatter formatString="DD/MM/YY HH:NN:SS" id="formatDate"/>
    <mx:DateFormatter formatString="HH:NN:SS" id="formatTime"/>
 
-   <mx:RemoteObject id="RO_tracking" destination="tracking" fault="onFault(event)">
+   <mx:RemoteObject id="RO_tracking" destination="tracking" showBusyCursor="true" fault="onFault(event)">
      <mx:method name="createArrivalEvent" result="resultCreateArrivalEvent(event)"/>
    </mx:RemoteObject>
 

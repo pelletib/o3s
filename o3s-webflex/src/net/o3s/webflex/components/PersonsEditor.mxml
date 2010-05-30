@@ -313,7 +313,7 @@
 	]]>
 </mx:Script>
 
-	<mx:RemoteObject id="RO_registering" destination="registering" fault="Util.onFault(event)">
+	<mx:RemoteObject id="RO_registering" destination="registering" showBusyCursor="true" fault="Util.onFault(event)">
 		<mx:method name="createPerson" result="resultCreatePerson(event)" fault="Util.handleException(event)"/>
 		<mx:method name="updatePerson" result="resultUpdatePerson(event)" fault="Util.handleException(event)"/>
 		<mx:method name="removePerson" result="resultRemovePerson(event)" fault="Util.handleException(event)"/>

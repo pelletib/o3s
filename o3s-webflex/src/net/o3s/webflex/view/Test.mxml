@@ -66,7 +66,7 @@
 		]]>
 	</mx:Script>
 
-	<mx:RemoteObject id="RO_init" destination="init" result="populateOk(event)"/>
+	<mx:RemoteObject id="RO_init" destination="init" showBusyCursor="true" result="populateOk(event)"/>
 
 	<mx:VBox width="95%" height="60%">
 

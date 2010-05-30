@@ -253,7 +253,7 @@
 		]]>
 	</mx:Script>
 
-	<mx:RemoteObject id="RO_registering" destination="registering" fault="onFault(event)">
+	<mx:RemoteObject id="RO_registering" destination="registering" showBusyCursor="true" fault="onFault(event)">
 		<mx:method name="getPersons" result="resultGetPerson(event)"/>
       <mx:method name="removePerson" result="resultRemovePerson(event)" fault="Util.handleException(event)"/>
 	</mx:RemoteObject>

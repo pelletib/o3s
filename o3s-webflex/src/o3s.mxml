@@ -146,11 +146,11 @@
    </mx:Style>
 
 
-   <mx:RemoteObject id="RO_init" destination="init">
+   <mx:RemoteObject id="RO_init" showBusyCursor="true" destination="init">
       <mx:method name="populateAdminData" result="resultInit(event)" fault="Util.handleException(event)"/>
    </mx:RemoteObject>
 
-	<mx:RemoteObject id="RO_login" destination="login" fault="Util.onFault(event)">
+	<mx:RemoteObject id="RO_login" destination="login" showBusyCursor="true" fault="Util.onFault(event)">
 		<mx:method name="login" result="resultLogin(event)" fault="Util.handleException(event)"/>
 		<mx:method name="logOut" result="resultLogout(event)" fault="Util.handleException(event)"/>
 	</mx:RemoteObject>
