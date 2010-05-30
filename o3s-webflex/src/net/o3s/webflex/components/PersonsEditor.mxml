@@ -322,7 +322,7 @@
 
 	<mx:DateFormatter formatString="DD/MM/YYYY" id="formatDateDDMMYYY"/>
 
-	<mx:Panel title="Personne(s)" width="100%" height="100%">
+	<mx:Panel title="Personne(s)" width="100%" height="100%" defaultButton="{B_addPerson}">
 		<mx:HBox width="100%" height="90%">
 			<mx:VBox width="30%" height="100%">
 				<components:PersonForm id="MyPersonForm"/>
