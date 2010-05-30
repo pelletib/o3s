@@ -36,14 +36,12 @@
          import mx.events.ItemClickEvent;
          import mx.rpc.events.ResultEvent;
          import mx.utils.ObjectUtil;
+    	 import mx.events.CollectionEvent;
 
          [Bindable]
          private var terminalList:ArrayCollection= new ArrayCollection(
                         [  {name:"Arrival1", data:1},
                            {name:"Arrival2", data:2}]);
-
-         [Bindable]
-         private var labelList:ArrayCollection = new ArrayCollection([]);
 
          [Bindable]
          public var terminalIsEmpty:Boolean = true;
@@ -169,6 +167,18 @@
 			}
 		 }
 
+		  private function arrColl_collectionChange(evt:CollectionEvent):void {
+			  callLater(autoScrollDataGrid);
+		  }
+
+		  private function autoScrollDataGrid():void {
+			  if (DG_labels) {
+				  DG_labels.validateNow();
+				  DG_labels.verticalScrollPosition = DG_labels.maxVerticalScrollPosition;
+			  }
+		  }
+
+
       ]]>
    </mx:Script>
 
@@ -178,6 +188,9 @@
    <mx:RemoteObject id="RO_tracking" destination="tracking" fault="onFault(event)">
      <mx:method name="createArrivalEvent" result="resultCreateArrivalEvent(event)"/>
    </mx:RemoteObject>
+
+	<mx:ArrayCollection id="labelList"
+						collectionChange="arrColl_collectionChange(event);" />
 
    <mx:VBox width="95%" height="60%">
 
