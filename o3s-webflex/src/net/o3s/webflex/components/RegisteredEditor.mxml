@@ -177,14 +177,21 @@
 
  				if (count == 0) {
 					msg = msg + "Vous etes inscrit a la competition" +
-						"'" + r.competition.name + "'" + "\n";
+						"'" + r.competition.name + "'." + "\n";
 				}
 
-				msg = msg + "'" + r.name + "'";
-				msg = msg + " est dans la categorie " +
-					"'" + r.category.name + "'" +
-					" avec le dossard " +
-					"'" + r.label.value + "'." ;
+
+            if (r.teamed == true) {
+               msg = msg + "Votre equipe '" + r.name + "'";
+               msg = msg + " a le dossard " +
+                  "'" + r.label.value + "'." ;
+            } else {
+               msg = msg + "'" + r.name + "'";
+               msg = msg + " est dans la categorie " +
+                  "'" + r.category.name + "'" +
+                  " avec le dossard " +
+                  "'" + r.label.value + "'." ;
+            }
 
             if (ask4print == true) {
                msg = msg + " Impression du dossard en cours.\n";

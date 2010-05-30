@@ -91,6 +91,9 @@
 		[Bindable]
 		public var _person:Person = new Person();
 
+      private var healthFormMsg:String;
+      private var licenseMsg:String;
+
 		public function get person():Person	{
 			_person.firstname = StringUtil.trim(TI_personFirstname.text);
 			_person.lastname = StringUtil.trim(TI_personLastname.text);
@@ -179,6 +182,16 @@
 
          removeDisplayList();
 			refreshPredictList();
+
+         if (StaticVars.isLogged == false) {
+            healthFormMsg = "Important : un certificat medical doit etre presente le jour de la course."
+            licenseMsg = "Important : la licence doit etre presentee le jour de la course."
+         } else {
+            healthFormMsg = "Demander un certificat medical"
+            licenseMsg = "Demander la licence"
+         }
+
+         setMsg();
 		}
 
 		// Clear the form and reset validation.
@@ -435,6 +448,14 @@
 			}
 		}
 
+      private function setMsg():void {
+         if (TI_personLicense.text != null && StringUtil.trim(TI_personLicense.text) != "") {
+            L_msg.text=licenseMsg;
+        } else {
+            L_msg.text=healthFormMsg;
+         }
+      }
+
 
 	]]>
 </mx:Script>
@@ -476,11 +497,12 @@
 		<mx:FormItem label="Club" direction="horizontal" >
 			<mx:TextInput id="TI_personClub" width="150" change="removeDisplayList();validateForm(event);"/>
 		</mx:FormItem>
-      <mx:FormItem label="License" direction="horizontal" >
-         <mx:TextInput id="TI_personLicense" width="150" change="removeDisplayList();validateForm(event);"/>
+      <mx:FormItem label="Licence" direction="horizontal" >
+         <mx:TextInput id="TI_personLicense" width="150" change="removeDisplayList();setMsg();validateForm(event);"/>
       </mx:FormItem>
 		<mx:FormItem label="Email" direction="horizontal" >
 			<mx:TextInput id="TI_personEmail" width="150" restrict="A-Za-z0-9\-_@." change="removeDisplayList();validateForm(event);"/>
 		</mx:FormItem>
+      <mx:Label id="L_msg" color="red" textAlign="right"/>
 	</mx:Form>
 </mx:Canvas>
