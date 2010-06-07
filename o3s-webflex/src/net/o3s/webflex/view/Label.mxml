@@ -522,6 +522,7 @@
 					selectedItems.removeAll();
 					actionSelectionEnabled = false;
 					selectAll=false;
+               CB_selectAll.selected=false;
 
 				}
 			}
