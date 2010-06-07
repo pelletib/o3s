@@ -47,8 +47,8 @@ import net.o3s.apis.IEntityEvent;
  */
 @Entity
 @NamedQueries( {
-	@NamedQuery(name = "COMPETITION_FROM_NAME", query = "SELECT c FROM Competition c WHERE c.name = :NAME"),
-	@NamedQuery(name = "ALL_COMPETITIONS_FROM_EVENT", query = "SELECT c FROM Competition c WHERE c.event.id = :EVENT_ID"),
+	@NamedQuery(name = "COMPETITION_FROM_NAME_AND_EVENT", query = "SELECT c FROM Competition c WHERE c.name = :NAME AND c.event.id = :EVENTID"),
+	@NamedQuery(name = "ALL_COMPETITIONS_FROM_EVENT", query = "SELECT c FROM Competition c WHERE c.event.id = :EVENTID"),
 	@NamedQuery(name = "ALL_COMPETITIONS", query = "SELECT c FROM Competition c") })
 public class Competition implements IEntityCompetition, Serializable {
 

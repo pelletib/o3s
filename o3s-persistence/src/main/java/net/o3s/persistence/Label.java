@@ -25,13 +25,17 @@ package net.o3s.persistence;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 
+import net.o3s.apis.IEntityEvent;
 import net.o3s.apis.IEntityLabel;
 
 /**
@@ -40,8 +44,8 @@ import net.o3s.apis.IEntityLabel;
  */
 @Entity
 @NamedQueries( {
-	@NamedQuery(name = "LABEL_FROM_NUMBER", query = "SELECT l FROM Label l WHERE l.number = :NUMBER"),
-	@NamedQuery(name = "LABEL_FROM_VALUE", query = "SELECT l FROM Label l WHERE l.value LIKE :VALUE"),
+	@NamedQuery(name = "LABEL_FROM_NUMBER_AND_EVENT", query = "SELECT l FROM Label l WHERE l.number = :NUMBER AND l.event.id = :EVENTID"),
+	@NamedQuery(name = "LABEL_FROM_VALUE_AND_EVENT", query = "SELECT l FROM Label l WHERE l.event.id = :EVENTID AND l.value LIKE :VALUE"),
 	@NamedQuery(name = "ALL_LABELS", query = "SELECT l FROM Label l") })
 public class Label implements IEntityLabel, Serializable {
 
@@ -50,6 +54,10 @@ public class Label implements IEntityLabel, Serializable {
 	private int id;
 	private int number;
 	private String value;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH, targetEntity=Event.class)
+    private IEntityEvent event;
+
 	private static final long serialVersionUID = 1L;
 
 	public Label() {
@@ -77,11 +85,20 @@ public class Label implements IEntityLabel, Serializable {
 		this.number = number;
 	}
 
+	public IEntityEvent getEvent() {
+		return this.event;
+	}
+
+	public void setEvent(IEntityEvent event) {
+		this.event = event;
+	}
+
 	public String toString() {
 		return "Label [" +
 		        this.getId() + ", " +
 		        this.getNumber() + ", " +
 		        this.getValue() + ", " +
+		        this.getEvent() + ", " +
 		        "]";
 	}
 }

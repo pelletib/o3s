@@ -52,11 +52,11 @@ import net.o3s.apis.IEntityEvent;
  */
 @Entity
 @NamedQueries( {
-	@NamedQuery(name = "CATEGORY_FROM_NAME", query = "SELECT c FROM Category c WHERE c.name = :NAME"),
-	@NamedQuery(name = "CATEGORY_FROM_NAME_AND_SEX", query = "SELECT c FROM Category c WHERE c.name = :NAME and c.sex = :SEX"),
-	@NamedQuery(name = "CATEGORY_FROM_DATES_AND_SEX", query = "SELECT c FROM Category c WHERE c.sex = :SEX and :DATE between c.minDate and c.maxDate"),
+	@NamedQuery(name = "CATEGORY_FROM_NAME_AND_EVENT", query = "SELECT c FROM Category c WHERE c.name = :NAME AND c.event.id = :EVENTID"),
+	@NamedQuery(name = "CATEGORY_FROM_NAME_AND_SEX_AND_EVENT", query = "SELECT c FROM Category c WHERE c.name = :NAME and c.sex = :SEX AND c.event.id = :EVENTID"),
+	@NamedQuery(name = "CATEGORY_FROM_DATES_AND_SEX_AND_EVENT", query = "SELECT c FROM Category c WHERE c.sex = :SEX and :DATE between c.minDate and c.maxDate AND c.event.id = :EVENTID"),
 	@NamedQuery(name = "NOCATEGORY", query = "SELECT c FROM Category c WHERE c.name LIKE 'Unknown%'"),
-	@NamedQuery(name = "ALL_CATEGORIES_FROM_EVENT", query = "SELECT c FROM Category c WHERE c.event.id = :EVENT_ID"),
+	@NamedQuery(name = "ALL_CATEGORIES_FROM_EVENT", query = "SELECT c FROM Category c WHERE c.event.id = :EVENTID"),
 	@NamedQuery(name = "ALL_CATEGORIES", query = "SELECT c FROM Category c") })
 public class Category implements IEntityCategory, Serializable {
 

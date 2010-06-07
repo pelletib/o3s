@@ -73,7 +73,7 @@ import net.o3s.apis.IEntityRegistered;
 			    query = "SELECT r FROM Registered r WHERE r.event.id = :EVENTID AND r.competition.id = :COMPETITION AND r.arrivalDate IS NOT NULL ORDER BY r.category.id,r.elapsedTime"),
 	@NamedQuery(name = "REGISTERED_FROM_COMPETITION_ORDERBY_CLUB_ETIME",
 			    query = "SELECT r FROM Registered r WHERE r.event.id = :EVENTID AND r.competition.id = :COMPETITION AND r.arrivalDate IS NOT NULL AND r.teamed = FALSE AND r.club IS NOT NULL AND r.club <> '' AND r.club <> 'N/A' ORDER BY r.club,r.elapsedTime"),
-	@NamedQuery(name = "ALL_REGISTERED_FROM_EVENT", query = "SELECT r FROM Registered r WHERE r.event.id = :EVENT_ID"),
+	@NamedQuery(name = "ALL_REGISTERED_FROM_EVENT", query = "SELECT r FROM Registered r WHERE r.event.id = :EVENTID"),
     @NamedQuery(name = "ALL_REGISTERED", query = "SELECT r FROM Registered r") })
 public class Registered implements IEntityRegistered, Serializable {
 
