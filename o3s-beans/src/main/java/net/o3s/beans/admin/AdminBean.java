@@ -229,8 +229,10 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     }
 
     public IEntityCompetition findCompetitionFromName(final String name) {
-        Query query = this.entityManager.createNamedQuery("COMPETITION_FROM_NAME");
+    	IEntityEvent event = findDefaultEvent();
+    	Query query = this.entityManager.createNamedQuery("COMPETITION_FROM_NAME_AND_EVENT");
         query.setParameter("NAME", name);
+        query.setParameter("EVENTID", event.getId());
         IEntityCompetition competition = null;
         try {
         	competition = (IEntityCompetition) query.getSingleResult();
@@ -259,7 +261,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
         List<IEntityCompetition> competitions = null;
         try {
-            query.setParameter("EVENT_ID", event.getId());
+            query.setParameter("EVENTID", event.getId());
             competitions = query.getResultList();
         } catch (javax.persistence.NoResultException e) {
         	competitions = new ArrayList<IEntityCompetition>();
@@ -331,9 +333,11 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
     @SuppressWarnings("unchecked")
     public List<IEntityCategory> findCategoryFromDatesAndSex(final Date date, final char sex) {
-    	Query query = this.entityManager.createNamedQuery("CATEGORY_FROM_DATES_AND_SEX");
+    	IEntityEvent event = findDefaultEvent();
+    	Query query = this.entityManager.createNamedQuery("CATEGORY_FROM_DATES_AND_SEX_AND_EVENT");
     	query.setParameter("DATE", date);
     	query.setParameter("SEX", sex);
+        query.setParameter("EVENTID", event.getId());
 
     	 List<IEntityCategory> categories = null;
     	 try {
@@ -360,15 +364,18 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
     public IEntityCategory findCategoryFromNameAndSex(final String name, final char sex) {
     	IEntityCategory category = null;
+    	IEntityEvent event = findDefaultEvent();
 
         try {
-    		Query query = this.entityManager.createNamedQuery("CATEGORY_FROM_NAME");
+    		Query query = this.entityManager.createNamedQuery("CATEGORY_FROM_NAME_AND_EVENT");
     		query.setParameter("NAME", name + " (" + sex + ")");
-    		category = (IEntityCategory) query.getSingleResult();
+            query.setParameter("EVENTID", event.getId());
+            category = (IEntityCategory) query.getSingleResult();
         } catch (javax.persistence.NoResultException e) {
-        	Query query = this.entityManager.createNamedQuery("CATEGORY_FROM_NAME_AND_SEX");
+        	Query query = this.entityManager.createNamedQuery("CATEGORY_FROM_NAME_AND_SEX_AND_EVENT");
     		query.setParameter("NAME", name);
     		query.setParameter("SEX", sex);
+            query.setParameter("EVENTID", event.getId());
     		try {
     		category =  (IEntityCategory) query.getSingleResult();
     		} catch (javax.persistence.NoResultException re) {
@@ -398,7 +405,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     public  List<IEntityCategory> findAllCategoriesFromDefaultEvent() {
         Query query = this.entityManager.createNamedQuery("ALL_CATEGORIES_FROM_EVENT");
         IEntityEvent event = findDefaultEvent();
-        query.setParameter("EVENT_ID", event.getId());
+        query.setParameter("EVENTID", event.getId());
 
         List<IEntityCategory> categories = null;
         try {

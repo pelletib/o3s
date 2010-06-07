@@ -109,8 +109,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      * @return
      */
     private IEntityLabel findLabelFromValue(final String value) {
-        Query query = this.entityManager.createNamedQuery("LABEL_FROM_VALUE");
+    	IEntityEvent event = admin.findDefaultEvent();
+    	Query query = this.entityManager.createNamedQuery("LABEL_FROM_VALUE_AND_EVENT");
         query.setParameter("VALUE", value);
+        query.setParameter("EVENTID", event.getId());
 
         IEntityLabel label = null;
         try {
@@ -129,8 +131,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      * @return
      */
     private IEntityLabel findLabelFromNumber(final int number) {
-        Query query = this.entityManager.createNamedQuery("LABEL_FROM_NUMBER");
+    	IEntityEvent event = admin.findDefaultEvent();
+        Query query = this.entityManager.createNamedQuery("LABEL_FROM_NUMBER_AND_EVENT");
         query.setParameter("NUMBER", number);
+        query.setParameter("EVENTID", event.getId());
 
         IEntityLabel label = null;
         try {
@@ -761,7 +765,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     public  List<IEntityRegistered> findAllRegisteredFromDefaultEvent() {
         Query query = this.entityManager.createNamedQuery("ALL_REGISTERED_FROM_EVENT");
         IEntityEvent event = admin.findDefaultEvent();
-        query.setParameter("EVENT_ID", event.getId());
+        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
