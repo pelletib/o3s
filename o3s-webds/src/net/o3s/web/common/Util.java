@@ -164,7 +164,8 @@ public class Util {
 				personVO.setComputedCategory(category.getName());
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new FlexException(e.getMessage());
+				//throw new FlexException(e.getMessage());
+				personVO.setComputedCategory("Error");
 			}
 
 			// check if the person is already registered (in all events)
