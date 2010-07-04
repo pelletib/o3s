@@ -283,6 +283,12 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	person.setLicense(license);
         	person.setEmail(email);
         	person.setSex(sex);
+
+        	// check if birthday if before today (at least :)
+        	Date today = new Date();
+        	if (birthday.after(today)) {
+            	throw new RegisteringException("Date d'anniversaire invalide");
+        	}
         	person.setBirthday(birthday);
 
             this.entityManager.persist(person);
