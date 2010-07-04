@@ -32,6 +32,8 @@
 
 		import mx.collections.ArrayCollection;
 		import mx.validators.StringValidator;
+      import net.o3s.webflex.components.AdvancedStringValidator;
+
 		import mx.validators.EmailValidator;
 		import mx.validators.DateValidator;
 
@@ -60,8 +62,8 @@
 		// Holds a reference to the currently focussed
 		// control on the form.
 		private var focussedFormControl:DisplayObject;
-		private var personFirstnameValidator:StringValidator;
-		private var personLastnameValidator:StringValidator;
+		private var personFirstnameValidator:AdvancedStringValidator;
+		private var personLastnameValidator:AdvancedStringValidator;
 		private var personSexValidator:StringValidator;
 		private var personClubValidator:StringValidator;
       private var personLicenseValidator:StringValidator;
@@ -137,17 +139,27 @@
 
 		private function init():void {
 
-        personFirstnameValidator = new StringValidator();
+        personFirstnameValidator = new AdvancedStringValidator();
          personFirstnameValidator.source = TI_personFirstname;
          personFirstnameValidator.property = "text";
          personFirstnameValidator.minLength = 2;
          personFirstnameValidator.required=true;
+         personFirstnameValidator.specialCharacterNotAllowedError="Caracteres speciaux interdits";
+         personFirstnameValidator.allowSpaces=true;
+         personFirstnameValidator.numeralNotAllowedError="Chiffres interdits";
+         personFirstnameValidator.tooShortError="Au moins 2 caracteres sont requis";
+         personFirstnameValidator.tooLongError="Champ trop long";
 
-         personLastnameValidator = new StringValidator();
+         personLastnameValidator = new AdvancedStringValidator();
          personLastnameValidator.source = TI_personLastname;
          personLastnameValidator.property = "text";
          personLastnameValidator.minLength = 2;
          personLastnameValidator.required=true;
+         personLastnameValidator.specialCharacterNotAllowedError="Caracteres speciaux interdits";
+         personLastnameValidator.allowSpaces=true;
+         personLastnameValidator.numeralNotAllowedError="Chiffres interdits";
+         personLastnameValidator.tooShortError="Au moins 2 caracteres sont requis";
+         personLastnameValidator.tooLongError="Champ trop long";
 
          personSexValidator = new StringValidator();
          personSexValidator.source = CB_personSex;
