@@ -190,7 +190,7 @@
                         indSex = j ;
                } else if (firstLineData[j].toLowerCase() == "email" || firstLineData[j].toLowerCase() == "\"email\"" ||
                           firstLineData[j].toLowerCase() == "ema" || firstLineData[j].toLowerCase() == "\"ema\"") {
-                        indEmail = j ;lineData
+                        indEmail = j ;
                } else if (firstLineData[j].toLowerCase() == "license" || firstLineData[j].toLowerCase() == "\"license\"" ||
                           firstLineData[j].toLowerCase() == "lic" || firstLineData[j].toLowerCase() == "\"lic\"") {
                         indLicense = j ;

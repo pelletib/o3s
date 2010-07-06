@@ -46,6 +46,8 @@
 		import net.o3s.webflex.bean.FlexException;
 		import mx.events.FlexEvent;
 		import net.o3s.webflex.components.Util;
+      import mx.collections.Sort;
+      import mx.collections.SortField;
 
 		[Bindable]
 		public var competitionList:ArrayCollection= new ArrayCollection([]);
@@ -84,6 +86,9 @@
 			competitionIsEmpty = true;
 			submitRegisteredButtonEnabled = false;
 			competitionList.filterFunction = Util.competitionFilter;
+         var sort:Sort = new Sort();
+         sort.fields = [new SortField("id",true,false,true)];
+         competitionList.sort = sort;
 			competitionList.refresh();
 			CB_competition.selectedIndex = -1;
 
@@ -131,6 +136,9 @@
 		private function resultGetCompetition(event:ResultEvent):void {
 			competitionList = event.result as ArrayCollection;
 			competitionList.filterFunction = Util.competitionFilter;
+         var sort:Sort = new Sort();
+         sort.fields = [new SortField("id",true,false,true)];
+         competitionList.sort = sort;
 			competitionList.refresh();
 
 			if (mode == "update" &&  selectedCompetition == null) {
@@ -202,15 +210,25 @@
 
 
 			}
-			msg = msg + "\n\n";
 
-			msg = msg + "Nous sommes impatients de vous retrouver au '" +
-				parentDocument.MyEventPanel.event.name + "' le " +
-				formatDateDDMMYYY.format(parentDocument.MyEventPanel.event.date) + ".";
+        if (StaticVars.isLogged == false) {
+
+            msg = msg + "\n\n";
+
+            msg = msg + "Nous sommes impatients de vous retrouver au '" +
+               parentDocument.MyEventPanel.event.name + "' le " +
+               formatDateDDMMYYY.format(parentDocument.MyEventPanel.event.date) + ".";
+
+            msg = msg + "\n\n";
+
+            msg = msg + "Vous pourrez retirer votre dossard au stand 'Pre-inscription' le jour de la course apres paiement et presentation de votre certificat medical ou licence.";
+            msg = msg + "\n\n";
+            msg = msg + "Vous pouvez consulter les conditions de participation sur notre site www.fouleesdecrossey.com rubrique reglement.";
+         }
 
 			myAlert = Alert.show(msg, "Inscription ok");
-			myAlert.height=300;
-			myAlert.width=300;
+			myAlert.height=400;
+			myAlert.width=400;
 
 			clearAll();
 		}

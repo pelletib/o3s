@@ -38,7 +38,8 @@
 			import mx.utils.ObjectUtil;
          import net.o3s.webflex.components.Util;
          import net.o3s.webflex.components.StaticVars;
-
+         import mx.collections.Sort;
+         import mx.collections.SortField;
 
          [Bindable]
          private var competitionList:ArrayCollection;
@@ -66,6 +67,9 @@
          private function resultGetCompetition(event:ResultEvent):void {
             competitionList = event.result as ArrayCollection;
             competitionList.filterFunction = Util.competitionFilter;
+            var sort:Sort = new Sort();
+            sort.fields = [new SortField("id",true,false,true)];
+            competitionList.sort = sort;
             competitionList.refresh();
          }
 

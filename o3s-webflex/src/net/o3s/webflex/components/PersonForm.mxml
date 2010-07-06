@@ -139,7 +139,7 @@
 
 		private function init():void {
 
-        personFirstnameValidator = new AdvancedStringValidator();
+         personFirstnameValidator = new AdvancedStringValidator();
          personFirstnameValidator.source = TI_personFirstname;
          personFirstnameValidator.property = "text";
          personFirstnameValidator.minLength = 2;
@@ -197,7 +197,7 @@
 
          if (StaticVars.isLogged == false) {
             healthFormMsg = "Important : un certificat medical doit etre presente le jour de la course."
-            licenseMsg = "Important : la licence doit etre presentee le jour de la course."
+            licenseMsg = "Important : la licence doit etre presentee le jour de la course. "
          } else {
             healthFormMsg = "Demander un certificat medical"
             licenseMsg = "Demander la licence"
@@ -480,17 +480,17 @@
 	</mx:RemoteObject>
 
 	<mx:Form>
-		<mx:FormItem label="Prenom" >
-			<mx:TextInput id="TI_personFirstname" width="150" change="removeDisplayList();validateForm(event);predictFirstName(event);" enter="removeDisplayList()" focusOut="removeDisplayList();checkIfPersonExist()"/>
+		<mx:FormItem label="Prenom (*)" >
+			<mx:TextInput id="TI_personFirstname" width="150" restrict="A-Za-z\- " change="removeDisplayList();validateForm(event);predictFirstName(event);" enter="removeDisplayList()" focusOut="removeDisplayList();checkIfPersonExist()"/>
 		</mx:FormItem>
-		<mx:FormItem label="Nom" >
-			<mx:TextInput id="TI_personLastname" width="150" change="removeDisplayList();validateForm(event);predictLastName(event);" enter="removeDisplayList()" focusOut="removeDisplayList();checkIfPersonExist()"/>
+		<mx:FormItem label="Nom (*)" >
+			<mx:TextInput id="TI_personLastname" width="150" restrict="A-Za-z\- " change="removeDisplayList();validateForm(event);predictLastName(event);" enter="removeDisplayList()" focusOut="removeDisplayList();checkIfPersonExist()"/>
 		</mx:FormItem>
-		<mx:FormItem label="Sexe" >
+		<mx:FormItem label="Sexe (*)" >
 			<mx:ComboBox id="CB_personSex" dataProvider="{sexList}" width="50" change="removeDisplayList();validateForm(event);"/>
 		</mx:FormItem>
 
-		<mx:FormItem label="Date de naissance" >
+		<mx:FormItem label="Date de naissance (*)" >
          <mx:HBox>
 			<mx:DateField id="DF_personBirthday"
 						  yearNavigationEnabled="true"
@@ -515,6 +515,8 @@
 		<mx:FormItem label="Email" direction="horizontal" >
 			<mx:TextInput id="TI_personEmail" width="150" restrict="A-Za-z0-9\-_@." change="removeDisplayList();validateForm(event);"/>
 		</mx:FormItem>
-      <mx:Label id="L_msg" color="red" textAlign="right"/>
+      <mx:Label id="L_mandatoryFields" textAlign="right" text="(*) champs obligatoires."/>
+      <mx:Label id="L_msg" color="blue" textAlign="right"/>
+      <mx:Label id="L_rules" color="blue" textAlign="right" text="Voir conditions de participation sur le site http://www.fouleesdecrossey.com (reglement)."/>
 	</mx:Form>
 </mx:Canvas>

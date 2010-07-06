@@ -170,7 +170,7 @@
 		<mx:HBox width="100%" height="90%">
 			<mx:Form>
 				<mx:FormItem id="FI_teamName" label="Nom d'equipe" direction="horizontal" >
-					<mx:TextInput id="TI_teamName" width="150" change="validateForm(event);"/>
+					<mx:TextInput id="TI_teamName" width="150" restrict="A-Za-z0-9\- " change="validateForm(event);"/>
 				</mx:FormItem>
 			</mx:Form>
 		</mx:HBox>

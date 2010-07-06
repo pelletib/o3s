@@ -166,7 +166,7 @@
          <mx:AddChild relativeTo="{HB_linkLogin}"  position="before" creationPolicy="all" >
 
             <mx:ViewStack id="minStack" width="100%" height="100%" >
-               <view:Registering id="VBox_registering" label="Registering" />
+               <view:Registering id="VBox_registering" label="Inscription" />
                <view:Ranking id="VBox_ranking" label="Classement" />
             </mx:ViewStack>
          </mx:AddChild>
