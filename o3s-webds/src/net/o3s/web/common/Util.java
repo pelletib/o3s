@@ -34,7 +34,6 @@ import net.o3s.apis.IEntityEvent;
 import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
-import net.o3s.beans.registering.RegisteringBean;
 import net.o3s.web.service.Registering;
 import net.o3s.web.vo.CategoryVO;
 import net.o3s.web.vo.CompetitionVO;

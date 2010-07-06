@@ -548,7 +548,7 @@ public class Registering {
    		setRegisteringEJB();
    		setAdminEJB();
 
-		logger.log(Level.FINE, "input <" + registeredsVO + ">");
+		logger.log(Level.INFO, "input <" + registeredsVO + ">");
 
    		for (RegisteredVO registeredVO : registeredsVO) {
 
@@ -576,18 +576,18 @@ public class Registering {
    							personVO.getSex(),
    							personVO.getBirthday());
    					persons.add(person);
-   					logger.log(Level.FINE, "import Person <" + person + ">");
+   					logger.log(Level.INFO, "import Personne <" + person + ">");
 
    				} catch (AlreadyExistException e) {
-   					logger.log(Level.SEVERE, "La personne <" + personVO + "> existe deja!");
+   					logger.log(Level.WARNING, "La personne <" + personVO + "> existe deja!");
    					IEntityPerson person = registering.findPersonFromLastnameFirstNameBirthDay(personVO.getLastname(),personVO.getFirstname(), personVO.getBirthday());
    					persons.add(person);
-   					logger.log(Level.FINE, "import Person <" + person + ">");
+   					logger.log(Level.INFO, "import Personne <" + person + ">");
 
    					//throw new FlexException(e.getMessage());
    				} catch (Exception e) {
    					e.printStackTrace();
-   					logger.log(Level.SEVERE, "Unable to import person <" + personVO + ">", e);
+   					logger.log(Level.WARNING, "Impossible d'importer la personne <" + personVO + ">", e);
    					continue;
    					//throw new FlexException(e.getMessage());
    				}
@@ -606,8 +606,10 @@ public class Registering {
 
    					// get the first one (almost equiv to random)
    					IEntityCategory category = categories.get(0);
+   					logger.log(Level.INFO, "Categorie <" + category + ">");
+
    					for(IEntityCompetition competition:category.getCompetitions()) {
-   	   					logger.log(Level.FINE, "Selected competition (1st) <" + competition + ">");
+   	   					logger.log(Level.INFO, "Selection de la premiere competition <" + competition + ">");
    	   					registeredVO.setCompetition(Util.createCompetitionVO(competition));
    	   					break;
    					}
@@ -615,7 +617,7 @@ public class Registering {
    				}
    			} catch (Exception e) {
 	    			e.printStackTrace();
-	    			logger.log(Level.SEVERE, "Unable to get competition for registered <" + registeredVO + ">", e);
+	    			logger.log(Level.WARNING, "Impossible de recuperer la competition pour l'inscription <" + registeredVO + ">", e);
 	    			continue;
 	    			//throw new FlexException(e.getMessage());
 			}
@@ -630,14 +632,14 @@ public class Registering {
     					registeredVO.isPaid(),
     					registeredVO.isProvidedHealthForm(),
     					registeredVO.getSource());
-    			logger.log(Level.FINE, "import Registered <" + registereds + ">");
+    			logger.log(Level.FINE, "Import de l'inscription OK <" + registereds + ">");
 
     		} catch (AlreadyExistException e) {
-    			logger.log(Level.SEVERE, "Personne deja inscrite <" + registeredVO + "> !");
+    			logger.log(Level.WARNING, "Personne deja inscrite <" + registeredVO + "> !");
     			//throw new FlexException(e.getMessage());
     		} catch (Exception e) {
     			e.printStackTrace();
-    			logger.log(Level.SEVERE, "Unable to import registered <" + registeredVO + ">", e);
+    			logger.log(Level.WARNING, "Impossible d'importer l'inscription <" + registeredVO + ">", e);
 
     			//throw new FlexException(e.getMessage());
     		}

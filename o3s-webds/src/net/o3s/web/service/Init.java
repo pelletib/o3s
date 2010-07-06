@@ -134,9 +134,9 @@ public class Init {
 		} catch (AlreadyExistException e) {
 			e.printStackTrace();
 		}
-		IEntityCompetition competition1 = admin.findCompetitionFromId(10);
-		IEntityCompetition competition2 = admin.findCompetitionFromId(5);
-		IEntityCompetition competition3 = admin.findCompetitionFromId(11);
+		IEntityCompetition competition1 = admin.findCompetitionFromId(16);
+		IEntityCompetition competition2 = admin.findCompetitionFromId(11);
+		IEntityCompetition competition3 = admin.findCompetitionFromId(17);
 
 		vregistered.removeAllElements();
 
@@ -167,7 +167,7 @@ public class Init {
 
 		logger.fine("Starting date set to:" + startingDate);
 
-		IEntityCompetition competition1 = admin.findCompetitionFromId(10);
+		IEntityCompetition competition1 = admin.findCompetitionFromId(16);
 
 		try {
 			admin.setStartDateInCompetition(competition1.getId());
