@@ -137,9 +137,9 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		IEntityCompetition competition1 = admin.findCompetitionFromId(10);
-		IEntityCompetition competition2 = admin.findCompetitionFromId(5);
-		IEntityCompetition competition3 = admin.findCompetitionFromId(11);
+		IEntityCompetition competition1 = admin.findCompetitionFromId(16);
+		IEntityCompetition competition2 = admin.findCompetitionFromId(11);
+		IEntityCompetition competition3 = admin.findCompetitionFromId(17);
 
 		Vector<IEntityRegistered> vregistered = new Vector<IEntityRegistered>();
 
