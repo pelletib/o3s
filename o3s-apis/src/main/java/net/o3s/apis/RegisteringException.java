@@ -23,6 +23,9 @@
  */
 package net.o3s.apis;
 
+import javax.ejb.ApplicationException;
+
+@ApplicationException(rollback=true)
 public class RegisteringException extends Exception {
 
 	public RegisteringException(String string) {

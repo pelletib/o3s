@@ -23,6 +23,9 @@
  */
 package net.o3s.apis;
 
+import javax.ejb.ApplicationException;
+
+@ApplicationException(rollback=true)
 public class AlreadyExistException extends Exception {
 
 	public AlreadyExistException(String string) {

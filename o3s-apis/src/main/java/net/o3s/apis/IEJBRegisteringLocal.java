@@ -33,6 +33,7 @@ public interface IEJBRegisteringLocal {
 	IEntityPerson updatePerson(IEntityPerson person) throws RegisteringException;
 	IEntityPerson findPersonFromId(final int id);
 	IEntityPerson findPersonFromLastnameFirstNameBirthDay(final String lastname, final String firstname, final Date birthday);
+	List<IEntityPerson> findPersonsFromLastnameFirstname(final String lastname, final String firstname);
 	void removePerson(final int id) throws RegisteringException;
 	List<String> findAllLastName(final String prefix);
 	List<String> findAllFirstName(final String prefix);

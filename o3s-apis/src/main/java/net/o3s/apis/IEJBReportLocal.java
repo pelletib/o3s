@@ -30,21 +30,27 @@ import java.util.List;
 public interface IEJBReportLocal {
 
 	String getScratchRankingPdfAsFileName(final int competitionId) throws ReportException ;
+	String getScratchRankingCsvAsFileName(final int competitionId) throws ReportException ;
 	byte[] getScratchRankingPdfAsByteArray(final int competitionId) throws ReportException;
 	void getScratchRankingPdfAsByteArray(final int competitionId, final OutputStream outputStream) throws ReportException;
-	String buildScratchFileName(final int competitionId)  throws ReportException;
+	String buildScratchPdfFileName(final int competitionId)  throws ReportException;
+	String buildScratchCsvFileName(final int competitionId)  throws ReportException;
 	Boolean isNotEmptyScratchRanking(final int competitionId);
 
 	String getCategoryRankingPdfAsFileName(final int competitionId) throws ReportException;
+	String getCategoryRankingCsvAsFileName(final int competitionId) throws ReportException;
 	void getCategoryRankingPdfAsByteArray(final int competitionId,  List<Integer> categoriesId, final OutputStream outputStream)  throws ReportException;
 	byte[] getCategoryRankingPdfAsByteArray(final int competitionId, List<Integer> categoriesId) throws ReportException;
-	String buildCategoryFileName(final int competitionId)  throws ReportException;
+	String buildCategoryPdfFileName(final int competitionId)  throws ReportException;
+	String buildCategoryCsvFileName(final int competitionId)  throws ReportException;
 	Boolean isNotEmptyCategoryRanking(final int competitionId, List<Integer> categoriesId);
 
 	String getClubRankingPdfAsFileName(final int competitionId) throws ReportException;
+	String getClubRankingCsvAsFileName(final int competitionId) throws ReportException;
 	void getClubRankingPdfAsByteArray(final int competitionId, final OutputStream outputStream)  throws ReportException;
 	byte[] getClubRankingPdfAsByteArray(final int competitionId) throws ReportException;
-	String buildClubFileName(final int competitionId)  throws ReportException;
+	String buildClubPdfFileName(final int competitionId)  throws ReportException;
+	String buildClubCsvFileName(final int competitionId)  throws ReportException;
 	Boolean isNotEmptyClubRanking(final int competitionId);
 
 	String getLabelPdfAsFileName(final int registeredId) throws ReportException;
