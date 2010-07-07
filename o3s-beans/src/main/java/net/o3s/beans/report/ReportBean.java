@@ -64,6 +64,8 @@ import net.sf.jasperreports.engine.JasperPrintManager;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.export.JRCsvExporter;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.engine.query.JRJpaQueryExecuterFactory;
@@ -197,6 +199,37 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 	}
 
     /**
+     * Generate a csv file from the Jasper report description
+     * @param sourceFileName JRXML source file
+     * @param csvFileName target file name
+     * @param parameters parameters for the JRXML file
+     * @param collection datas for the JRXML file
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
+    @SuppressWarnings("unchecked")
+	private void invokeJasperReportCsv(String sourceFileName, String csvFileName,
+			Map parameters, Collection collection) throws ReportException {
+
+    	JasperPrint jasperPrint = getJasperPrint(sourceFileName, parameters, collection);
+
+    	JRCsvExporter exporterCSV = new JRCsvExporter();
+    	exporterCSV.setParameter(JRCsvExporterParameter.JASPER_PRINT, jasperPrint);
+    	exporterCSV.setParameter(JRCsvExporterParameter.OUTPUT_FILE_NAME, csvFileName);
+    	exporterCSV.setParameter(JRCsvExporterParameter.IGNORE_PAGE_MARGINS, true);
+
+		try {
+	    	exporterCSV.exportReport();
+		} catch (JRException e) {
+			e.printStackTrace();
+			throw new ReportException(
+					"Unable to export in pdf the ranking report", e);
+
+		}
+
+		logger.fine("Export ok");
+	}
+
+    /**
      * Generate a pdf stream from the Jasper report description
      * @param sourceFileName JRXML source file
      * @param outputStream target output stream
@@ -270,11 +303,11 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 	}
 
     /**
-     * Build the file name for the scratch ranking
+     * Build the file name for the scratch ranking pdf report
      * @param competitionId competition id
      * @return file name
      */
-    public String buildScratchFileName(final int competitionId)  throws ReportException{
+    public String buildScratchPdfFileName(final int competitionId)  throws ReportException{
     	IEntityCompetition competition = null;
 
     	competition = admin.findCompetitionFromId(competitionId);
@@ -287,6 +320,26 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		pdfFileName = pdfFileName.replace(' ', '_');
 
 		return pdfFileName;
+    }
+
+    /**
+     * Build the file name for the scratch ranking csv report
+     * @param competitionId competition id
+     * @return file name
+     */
+    public String buildScratchCsvFileName(final int competitionId)  throws ReportException{
+    	IEntityCompetition competition = null;
+
+    	competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+    		throw new ReportException("Competition <" + competitionId + "> unknown");
+        }
+
+        String csvFileName = SCRATCH_RANKING_REPORT + "-" + competition.getName() + ".csv";
+        csvFileName = csvFileName.replace(' ', '_');
+
+		return csvFileName;
     }
 
     /**
@@ -359,11 +412,56 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		logger.fine("eventName=" + competition.getEvent().getName());
 		String sourceFileName = SCRATCH_RANKING_REPORT + ".jrxml";
 
-        String pdfFileName = buildScratchFileName(competitionId);
+        String pdfFileName = buildScratchPdfFileName(competitionId);
 
 		invokeJasperReportPdf(sourceFileName, pdfFileName, parameters, registereds);
 
         return pdfFileName;
+    }
+
+    /**
+     * Generate a csv report for the scratch ranking
+     * @param competitionId competition id
+	 * @return file name
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
+    @SuppressWarnings("unchecked")
+	public String getScratchRankingCsvAsFileName(final int competitionId) throws ReportException {
+
+    	IEntityCompetition competition = null;
+
+    	competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+    		throw new ReportException("Competition <" + competitionId + "> unknown");
+        }
+
+     	List<IEntityRegistered> registereds;
+		try {
+			registereds = this.registering.findRegisteredFromCompetitionOrderByDuration(competitionId);
+		} catch (RegisteringException re) {
+			re.printStackTrace();
+    		throw new ReportException("Unable to generate report for competition " + competitionId, re);
+		}
+
+    	if (registereds.isEmpty()) {
+    		throw new ReportException("No yet arrived!");
+        }
+
+    	// set parameters
+		Map parameters = new HashMap();
+		parameters.put(JRJpaQueryExecuterFactory.PARAMETER_JPA_ENTITY_MANAGER, entityManager);
+		parameters.put("competitionId",Integer.valueOf(competitionId));
+		parameters.put("competitionName", competition.getName());
+		parameters.put("eventName", competition.getEvent().getName());
+
+		logger.fine("eventName=" + competition.getEvent().getName());
+		String sourceFileName = SCRATCH_RANKING_REPORT + ".jrxml";
+        String csvFileName = buildScratchCsvFileName(competitionId);
+
+		invokeJasperReportCsv(sourceFileName, csvFileName, parameters, registereds);
+
+        return csvFileName;
     }
 
     /**
@@ -597,10 +695,10 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     }
 
     /**
-     * Generate the file name for a category ranking report
+     * Generate the file name for a category ranking pdf report
      * @param competitionId competition
      */
-    public String buildCategoryFileName(final int competitionId)  throws ReportException{
+    public String buildCategoryPdfFileName(final int competitionId)  throws ReportException{
     	IEntityCompetition competition = null;
 
     	competition = admin.findCompetitionFromId(competitionId);
@@ -617,10 +715,30 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     }
 
     /**
-     * Generate the file name for a club ranking report
+     * Generate the file name for a category ranking csv report
      * @param competitionId competition
      */
-    public String buildClubFileName(final int competitionId)  throws ReportException{
+    public String buildCategoryCsvFileName(final int competitionId)  throws ReportException{
+    	IEntityCompetition competition = null;
+
+    	competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+    		throw new ReportException("Competition <" + competitionId + "> unknown");
+        }
+    	String csvFileName = CATEGORIES_RANKING_REPORT + "-" + competition.getName() + ".csv";
+
+    	csvFileName = csvFileName.replace(' ', '_');
+
+		return csvFileName;
+
+    }
+
+    /**
+     * Generate the file name for a club ranking pdf report
+     * @param competitionId competition
+     */
+    public String buildClubPdfFileName(final int competitionId)  throws ReportException{
     	IEntityCompetition competition = null;
 
     	competition = admin.findCompetitionFromId(competitionId);
@@ -633,6 +751,26 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		pdfFileName = pdfFileName.replace(' ', '_');
 
 		return pdfFileName;
+
+    }
+
+    /**
+     * Generate the file name for a club ranking csv report
+     * @param competitionId competition
+     */
+    public String buildClubCsvFileName(final int competitionId)  throws ReportException{
+    	IEntityCompetition competition = null;
+
+    	competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+    		throw new ReportException("Competition <" + competitionId + "> unknown");
+        }
+    	String csvFileName = CLUB_RANKING_REPORT + "-" + competition.getName() + ".csv";
+
+    	csvFileName = csvFileName.replace(' ', '_');
+
+		return csvFileName;
 
     }
 
@@ -675,11 +813,57 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
 		String sourceFileName = CATEGORIES_RANKING_REPORT + ".jrxml";
 
-        String pdfFileName = buildCategoryFileName(competitionId);
+        String pdfFileName = buildCategoryPdfFileName(competitionId);
 
 		invokeJasperReportPdf(sourceFileName, pdfFileName, parameters, registereds);
 
         return pdfFileName;
+    }
+
+    /**
+     * Generate a csv report for the category ranking
+     * @param competitionId competition id
+	 * @return file name
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
+    @SuppressWarnings("unchecked")
+	public String getCategoryRankingCsvAsFileName(final int competitionId) throws ReportException {
+
+    	IEntityCompetition competition = null;
+
+    	competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+    		throw new ReportException("Competition <" + competitionId + "> unknown");
+        }
+
+     	List<IEntityRegistered> registereds;
+		try {
+			registereds = this.registering.findRegisteredFromCompetitionOrderByCategoryAndDuration(competitionId);
+		} catch (RegisteringException re) {
+			re.printStackTrace();
+    		throw new ReportException("Unable to generate report for competition " + competitionId, re);
+		}
+
+    	if (registereds.isEmpty()) {
+    		throw new ReportException("No yet arrived!");
+        }
+
+    	// set parameters
+		Map parameters = new HashMap();
+		parameters.put(JRJpaQueryExecuterFactory.PARAMETER_JPA_ENTITY_MANAGER, entityManager);
+		parameters.put("competitionId",Integer.valueOf(competitionId));
+		parameters.put("competitionName", competition.getName());
+		parameters.put("eventName", competition.getEvent().getName());
+		logger.fine("eventName=" + competition.getEvent().getName());
+
+		String sourceFileName = CATEGORIES_RANKING_REPORT + ".jrxml";
+
+        String csvFileName = buildCategoryCsvFileName(competitionId);
+
+		invokeJasperReportCsv(sourceFileName, csvFileName, parameters, registereds);
+
+        return csvFileName;
     }
 
     /**
@@ -721,11 +905,57 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
 		String sourceFileName = CLUB_RANKING_REPORT + ".jrxml";
 
-        String pdfFileName = buildClubFileName(competitionId);
+        String pdfFileName = buildClubPdfFileName(competitionId);
 
 		invokeJasperReportPdf(sourceFileName, pdfFileName, parameters, registereds);
 
         return pdfFileName;
+    }
+
+    /**
+     * Generate a csv report for the club ranking
+     * @param competitionId competition id
+	 * @return file name
+     * @throws ReportException whenever an error occurs (compile, ...)
+     */
+    @SuppressWarnings("unchecked")
+	public String getClubRankingCsvAsFileName(final int competitionId) throws ReportException {
+
+    	IEntityCompetition competition = null;
+
+    	competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+    		throw new ReportException("Competition <" + competitionId + "> unknown");
+        }
+
+     	List<IEntityRegistered> registereds;
+		try {
+			registereds = this.registering.findRegisteredFromCompetitionOrderByClubAndDuration(competitionId);
+		} catch (RegisteringException re) {
+			re.printStackTrace();
+    		throw new ReportException("Unable to generate report for competition " + competitionId, re);
+		}
+
+    	if (registereds.isEmpty()) {
+    		throw new ReportException("No yet arrived!");
+        }
+
+    	// set parameters
+		Map parameters = new HashMap();
+		parameters.put(JRJpaQueryExecuterFactory.PARAMETER_JPA_ENTITY_MANAGER, entityManager);
+		parameters.put("competitionId",Integer.valueOf(competitionId));
+		parameters.put("competitionName", competition.getName());
+		parameters.put("eventName", competition.getEvent().getName());
+		logger.fine("eventName=" + competition.getEvent().getName());
+
+		String sourceFileName = CLUB_RANKING_REPORT + ".jrxml";
+
+        String csvFileName = buildClubCsvFileName(competitionId);
+
+		invokeJasperReportCsv(sourceFileName, csvFileName, parameters, registereds);
+
+        return csvFileName;
     }
 
     /**

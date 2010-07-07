@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.ejb.ApplicationException;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -227,6 +228,24 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
         return person;
 
+    }
+
+    /**
+     * Find persons from Lastname and Firstname
+     */
+    @SuppressWarnings("unchecked")
+    public  List<IEntityPerson> findPersonsFromLastnameFirstname(final String lastname, final String firstname) {
+        Query query = this.entityManager.createNamedQuery("PERSON_FROM_LASTNAME_FIRSTNAME");
+        query.setParameter("LASTNAME", normalizeLastname(lastname));
+        query.setParameter("FIRSTNAME", normalizeFirstname(firstname));
+
+        List<IEntityPerson> persons = null;
+        try {
+        	persons = query.getResultList();
+        } catch (javax.persistence.NoResultException e) {
+        	persons = new ArrayList<IEntityPerson>();
+        }
+        return persons;
     }
 
     /**
@@ -798,6 +817,8 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         return persons;
     }
 
+
+
     /**
      * Create a new registered
      */
@@ -828,9 +849,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
            		registeredName = name;
            	}
 
-    		if (findRegisteredFromName(registeredName) != null) {
-            	throw new AlreadyExistException("L'inscrit <" + registeredName + "> existe deja !");
-    		}
+    		//if (findRegisteredFromName(registeredName) != null) {
+            //	throw new AlreadyExistException("L'inscrit <" + registeredName + "> existe deja !");
+    		//}
 
     		IEntityRegistered clone = findRegisteredFromPersonForDefaultEvent(person.getId());
     		if ( clone != null) {
@@ -854,7 +875,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
             	registered.setPersons(new HashSet(onlyOnePerson));
 
             	// retrieve the category
-            	List<IEntityCategory> categories = admin.findCategoryFromDatesAndSex(persons.get(0).getBirthday(), persons.get(0).getSex());
+            	List<IEntityCategory> categories = admin.findCategoryFromDatesAndSex(onlyOnePerson.get(0).getBirthday(), onlyOnePerson.get(0).getSex());
             	if (categories == null || categories.isEmpty()){
             		throw new RegisteringException("Categorie non trouvee pour le couple (date naissance/sexe):" + persons.get(0).getBirthday() + "," + persons.get(0).getSex());
             	}
@@ -864,7 +885,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
             	// check the competition regarding the category
             	checkCompetitionCategory(competition, category);
             	registered.setCategory(category);
-            	registered.setClub(persons.get(0).getClub());
+            	registered.setClub(onlyOnePerson.get(0).getClub());
 
         	}
 
