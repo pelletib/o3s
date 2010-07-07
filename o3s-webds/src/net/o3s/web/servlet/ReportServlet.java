@@ -102,7 +102,7 @@ public class ReportServlet extends HttpServlet {
 				int competitionId = Integer.valueOf(request.getParameter(PRM_COMPETITION_ID)).intValue();
 
 				response.setContentType( "application/pdf" );
-			    response.setHeader("Content-Disposition","attachment;filename=" + report.buildScratchFileName(competitionId));
+			    response.setHeader("Content-Disposition","attachment;filename=" + report.buildScratchPdfFileName(competitionId));
 
 			    report.getScratchRankingPdfAsByteArray(competitionId, os);
 
@@ -136,7 +136,7 @@ public class ReportServlet extends HttpServlet {
 
 			try  {
 				response.setContentType( "application/pdf" );
-				response.setHeader("Content-Disposition","attachment;filename=" + report.buildCategoryFileName(competitionId));
+				response.setHeader("Content-Disposition","attachment;filename=" + report.buildCategoryPdfFileName(competitionId));
 				report.getCategoryRankingPdfAsByteArray(competitionId, catList, os);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -172,7 +172,7 @@ public class ReportServlet extends HttpServlet {
 				int competitionId = Integer.valueOf(request.getParameter(PRM_COMPETITION_ID)).intValue();
 
 				response.setContentType( "application/pdf" );
-			    response.setHeader("Content-Disposition","attachment;filename=" + report.buildClubFileName(competitionId));
+			    response.setHeader("Content-Disposition","attachment;filename=" + report.buildClubPdfFileName(competitionId));
 
 			    report.getClubRankingPdfAsByteArray(competitionId, os);
 

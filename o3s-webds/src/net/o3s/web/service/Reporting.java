@@ -81,6 +81,18 @@ public class Reporting {
 		return fileName;
 	}
 
+	public String getCategoryRankingCsvAsFileName(final int competitionId) {
+		setReportEJB();
+		String fileName = null;
+		try  {
+			fileName = report.getCategoryRankingCsvAsFileName(competitionId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+		return fileName;
+	}
+
 	public String getClubRankingPdfAsFileName(final int competitionId) {
 		setReportEJB();
 		String fileName = null;
@@ -93,11 +105,35 @@ public class Reporting {
 		return fileName;
 	}
 
+	public String getClubRankingCsvAsFileName(final int competitionId) {
+		setReportEJB();
+		String fileName = null;
+		try  {
+			fileName = report.getClubRankingCsvAsFileName(competitionId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+		return fileName;
+	}
+
 	public String getScratchRankingPdfAsFileName(final int competitionId) {
 		setReportEJB();
 		String fileName = null;
 		try  {
 			fileName = report.getScratchRankingPdfAsFileName(competitionId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+		return fileName;
+	}
+
+	public String getScratchRankingCsvAsFileName(final int competitionId) {
+		setReportEJB();
+		String fileName = null;
+		try  {
+			fileName = report.getScratchRankingCsvAsFileName(competitionId);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());

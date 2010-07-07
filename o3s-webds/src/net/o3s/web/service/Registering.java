@@ -354,6 +354,29 @@ public class Registering {
 
 	}
 
+	// get person if exist (first one)
+	public PersonVO getPersonFromLastnameFirstName(String lastname, String firstname) {
+		setRegisteringEJB();
+		List<IEntityPerson> persons = null;
+		logger.fine("getPerson <" + firstname + ", " + lastname + ">");
+
+		persons = registering.findPersonsFromLastnameFirstname(lastname, firstname);
+
+		PersonVO pVO = null;
+
+		if (persons != null && ! persons.isEmpty()) {
+			// retrieve the first one
+			IEntityPerson person = persons.get(0);
+			if (person != null) {
+				pVO = Util.createPersonVO(person, this);
+			}
+		}
+
+		logger.fine("person=" + pVO);
+		return pVO;
+
+	}
+
 	// check if person if already registered
 	public Boolean isAlreadyRegisteredForDefaultEvent(int personId) {
 		setRegisteringEJB();
