@@ -54,7 +54,7 @@
 			private var password:String;
 
          public function preInit():void {
-            initTest();
+            //initTest();
             Application.application.setStyle("styleName", "o3s");
          }
 
@@ -64,6 +64,7 @@
          }
 
 			public function init():void {
+            currentState = "init";
 			}
 
 			public function clearFormHandler():void

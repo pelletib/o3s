@@ -74,13 +74,19 @@ package net.o3s.webflex.components
 
 		public static function onFault(ev:Event):void {
 			Alert.show( ObjectUtil.toString(ev) );
-		}
 
+		}
 
 		// remove unknow and blank entries
 		public static function competitionFilter(item:Object):Boolean {
 			var c:Competition = item as Competition;
 			return (c.name != "Unknown");
+		}
+
+		// remove unknow and blank entries
+		public static function categoryFilter(item:Object):Boolean {
+			var c:Category = item as Category;
+			return (c.name != "Unknown (M)" && c.name != "Unknown (F)");
 		}
 
 		public static function displayCompetition(item:Object, col:DataGridColumn):String {
@@ -183,6 +189,15 @@ package net.o3s.webflex.components
 
 			var df:DateFormatter = new DateFormatter;
 			df.formatString="DD/MM/YY HH:NN:SS";
+
+			return df.format(item[column.dataField]);
+		}
+
+		public static function getDateDDMMYYLabel(item:Object,column:DataGridColumn):String
+		{
+
+			var df:DateFormatter = new DateFormatter;
+			df.formatString="DD/MM/YYYY";
 
 			return df.format(item[column.dataField]);
 		}

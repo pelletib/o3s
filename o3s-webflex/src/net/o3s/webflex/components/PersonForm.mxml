@@ -146,9 +146,11 @@
          personFirstnameValidator.required=true;
          personFirstnameValidator.specialCharacterNotAllowedError="Caracteres speciaux interdits";
          personFirstnameValidator.allowSpaces=true;
+         personFirstnameValidator.allowNumbers=true;
          personFirstnameValidator.numeralNotAllowedError="Chiffres interdits";
          personFirstnameValidator.tooShortError="Au moins 2 caracteres sont requis";
          personFirstnameValidator.tooLongError="Champ trop long";
+         personFirstnameValidator.requiredFieldError="Champ obligatoire";
 
          personLastnameValidator = new AdvancedStringValidator();
          personLastnameValidator.source = TI_personLastname;
@@ -157,9 +159,11 @@
          personLastnameValidator.required=true;
          personLastnameValidator.specialCharacterNotAllowedError="Caracteres speciaux interdits";
          personLastnameValidator.allowSpaces=true;
+         personLastnameValidator.allowNumbers=true;
          personLastnameValidator.numeralNotAllowedError="Chiffres interdits";
          personLastnameValidator.tooShortError="Au moins 2 caracteres sont requis";
          personLastnameValidator.tooLongError="Champ trop long";
+         personLastnameValidator.requiredFieldError="Champ obligatoire";
 
          personSexValidator = new StringValidator();
          personSexValidator.source = CB_personSex;
@@ -434,10 +438,23 @@
 			removeDisplayFirstNameList();
 		}
 
+      // if the person (lastname, firstname) are filled and the person exists, move to the edit mode
+      private function try2GetPerson():void {
+
+      }
+
 		// if the person (lastname, firstname, birthday) are filled and the person exists, move to the edit mode
 		private function checkIfPersonExist():void {
 
-			if (StringUtil.trim(TI_personFirstname.text) != "" &&
+         if (StringUtil.trim(TI_personFirstname.text) != "" &&
+            StringUtil.trim(TI_personLastname.text) != "" &&
+            StringUtil.trim(DF_personBirthday.text) == "" ) {
+
+            RO_registering.getPersonFromLastnameFirstName(
+               StringUtil.trim(TI_personLastname.text),
+               StringUtil.trim(TI_personFirstname.text));
+
+         } else if (StringUtil.trim(TI_personFirstname.text) != "" &&
 				StringUtil.trim(TI_personLastname.text) != ""  &&
 				StringUtil.trim(DF_personBirthday.text) != "") {
 
@@ -476,15 +493,16 @@
 		<mx:method name="getFirstNameWithPrefix" result="resultGetFirstNameWithPrefix(event)" fault="Util.handleException(event)"/>
 		<mx:method name="getLastNameWithPrefix" result="resultGetLastNameWithPrefix(event)" fault="Util.handleException(event)"/>
 		<mx:method name="getPerson" result="resultGetPerson(event)" fault="Util.handleException(event)"/>
+      <mx:method name="getPersonFromLastnameFirstName" result="resultGetPerson(event)" fault="Util.handleException(event)"/>
 
 	</mx:RemoteObject>
 
 	<mx:Form>
 		<mx:FormItem label="Prenom (*)" >
-			<mx:TextInput id="TI_personFirstname" width="150" restrict="A-Za-z\- " change="removeDisplayList();validateForm(event);predictFirstName(event);" enter="removeDisplayList()" focusOut="removeDisplayList();checkIfPersonExist()"/>
+			<mx:TextInput id="TI_personFirstname" width="150" restrict="A-Za-z0-9\- " change="removeDisplayList();validateForm(event);predictFirstName(event);" enter="removeDisplayList()" focusOut="removeDisplayList();checkIfPersonExist()"/>
 		</mx:FormItem>
 		<mx:FormItem label="Nom (*)" >
-			<mx:TextInput id="TI_personLastname" width="150" restrict="A-Za-z\- " change="removeDisplayList();validateForm(event);predictLastName(event);" enter="removeDisplayList()" focusOut="removeDisplayList();checkIfPersonExist()"/>
+			<mx:TextInput id="TI_personLastname" width="150" restrict="A-Za-z0-9\- " change="removeDisplayList();validateForm(event);predictLastName(event);" enter="removeDisplayList()" focusOut="removeDisplayList();checkIfPersonExist()"/>
 		</mx:FormItem>
 		<mx:FormItem label="Sexe (*)" >
 			<mx:ComboBox id="CB_personSex" dataProvider="{sexList}" width="50" change="removeDisplayList();validateForm(event);"/>

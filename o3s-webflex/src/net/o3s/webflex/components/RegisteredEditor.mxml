@@ -35,6 +35,7 @@
 
 		import mx.validators.Validator;
 		import mx.events.ValidationResultEvent;
+      import mx.events.CloseEvent;
 		import mx.controls.Alert;
 		import mx.events.ListEvent;
 		import mx.rpc.events.ResultEvent;
@@ -45,7 +46,8 @@
 		import net.o3s.webflex.bean.Registered;
 		import net.o3s.webflex.bean.FlexException;
 		import mx.events.FlexEvent;
-		import net.o3s.webflex.components.Util;
+      import net.o3s.webflex.components.Util;
+      import net.o3s.webflex.bean.Person;
       import mx.collections.Sort;
       import mx.collections.SortField;
 
@@ -257,8 +259,8 @@
 			msg = msg + "\n\n";
 
 			myAlert = Alert.show(msg, "Inscription mise a jour");
-			myAlert.height=300;
-			myAlert.width=300;
+			myAlert.height=400;
+			myAlert.width=400;
 
 			clearAll();
 		}
@@ -287,54 +289,110 @@
 
 		}
 
+      public function confirmSubmitRegisteredForm(event:Event):void {
+
+         var msg:String = "";
+
+         msg = msg + "Etes-vous sur de vouloir soumettre ces inscriptions sur la course" ;
+         msg = msg + " <" + selectedCompetition.name + "> ?"
+         msg = msg + "\n\n" ;
+
+         for(var count:int = 0; count < MyPersonsEditor.personList.length; count++) {
+               var p:Person = MyPersonsEditor.personList.list.getItemAt(count, 0) as Person;
+               msg = msg + " <" + p.lastname + " " + p.firstname + "> -> <"  + p.computedCategory + ">";
+               msg = msg + "\n" ;
+         }
+         var myAlert:Alert;
+         myAlert = Alert.show(msg,
+                              "Soumission des inscriptions",
+                              Alert.OK | Alert.CANCEL,
+                              this,
+                              submitRegisteredForm,
+                              null,
+                              Alert.OK);
+         myAlert.height=400;
+         myAlert.width=500;
+         myAlert.horizontalCenter="yes";
+      }
+
+      public function confirmSubmitRegisteredFormAndPrint(event:Event):void {
+
+         var msg:String = "";
+
+         msg = msg + "Etes-vous sur de vouloir soumettre ces inscriptions sur la course" ;
+         msg = msg + " <" + selectedCompetition.name + "> ?"
+         msg = msg + "\n\n" ;
+
+         for(var count:int = 0; count < MyPersonsEditor.personList.length; count++) {
+               var p:Person = MyPersonsEditor.personList.list.getItemAt(count, 0) as Person;
+               msg = msg + " <" + p.lastname + " " + p.firstname + "> -> <"  + p.computedCategory + ">";
+               msg = msg + "\n" ;
+         }
+         var myAlert:Alert;
+         myAlert = Alert.show(msg,
+                              "Soumission des inscriptions",
+                              Alert.OK | Alert.CANCEL,
+                              this,
+                              submitRegisteredFormAndPrint,
+                              null,
+                              Alert.OK);
+         myAlert.height=400;
+         myAlert.width=500;
+         myAlert.horizontalCenter="yes";
+
+      }
+
 		// Submit form if everything is valid.
-		public function submitRegisteredForm(event:Event):void	{
+		public function submitRegisteredForm(event:CloseEvent):void	{
+
+         if(event.detail == Alert.OK) {
+
 			if (mode == "create") {
-				var registered:Registered = new Registered();
-				registered.persons = MyPersonsEditor.personList;
-				registered.event = parentDocument.MyEventPanel.event;
-				registered.competition = selectedCompetition;
-				if (currentState == "team") {
-					registered.name = MyTeamEditor.teamName;
-				} else {
-					registered.name = "";
-				}
-				registered.teamed = selectedCompetition.teamed;
-				registered.paid = paid;
-            registered.providedHealthForm = providedHealthForm;
+   				var registered:Registered = new Registered();
+   				registered.persons = MyPersonsEditor.personList;
+   				registered.event = parentDocument.MyEventPanel.event;
+   				registered.competition = selectedCompetition;
+   				if (currentState == "team") {
+   					registered.name = MyTeamEditor.teamName;
+   				} else {
+   					registered.name = "";
+   				}
+   				registered.teamed = selectedCompetition.teamed;
+   				registered.paid = paid;
+               registered.providedHealthForm = providedHealthForm;
 
-            if (StaticVars.isLogged == false) {
-               registered.source = "web";
-            } else {
-               registered.source = "internal";
-            }
+               if (StaticVars.isLogged == false) {
+                registered.source = "web";
+               } else {
+                registered.source = "internal";
+               }
 
-  			   RO_registering.createRegistered(registered);
+     			   RO_registering.createRegistered(registered);
 
-			} else if (mode == "update") {
-				updateRegistered.persons = MyPersonsEditor.personList;
-				updateRegistered.competition = selectedCompetition;
-				if (currentState == "team") {
-					updateRegistered.name = MyTeamEditor.teamName;
-				} else {
-					updateRegistered.name = "";
-				}
-				updateRegistered.teamed = selectedCompetition.teamed;
-				updateRegistered.paid = paid;
-            updateRegistered.providedHealthForm = providedHealthForm;
-            if (StaticVars.isLogged == false) {
-               updateRegistered.source = "web";
-            } else {
-               updateRegistered.source = "internal";
-            }
+   			} else if (mode == "update") {
+	  	     		 updateRegistered.persons = MyPersonsEditor.personList;
+		 		    updateRegistered.competition = selectedCompetition;
+				    if (currentState == "team") {
+					    updateRegistered.name = MyTeamEditor.teamName;
+				    } else {
+					    updateRegistered.name = "";
+				  }
+				  updateRegistered.teamed = selectedCompetition.teamed;
+				  updateRegistered.paid = paid;
+              updateRegistered.providedHealthForm = providedHealthForm;
+              if (StaticVars.isLogged == false) {
+                  updateRegistered.source = "web";
+              } else {
+                  updateRegistered.source = "internal";
+              }
 
-				RO_registering.updateRegistered(updateRegistered);
-			}
-
+				  RO_registering.updateRegistered(updateRegistered);
+			   }
+         }
 		}
 
       // Submit form if everything is valid.
-      public function submitRegisteredFormAndPrint(event:Event):void  {
+      public function submitRegisteredFormAndPrint(event:CloseEvent):void  {
          ask4print=true;
          submitRegisteredForm(event);
       }

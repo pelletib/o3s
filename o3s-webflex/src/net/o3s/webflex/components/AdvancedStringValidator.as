@@ -159,6 +159,7 @@ package net.o3s.webflex.components
 				for(var k : int = 0; k < strString.length; k++)
 				{
 					if(!((strString.charCodeAt(k) == 45) || (strString.charCodeAt(k) == 32) ||
+						(strString.charCodeAt(k) >= 48 && strString.charCodeAt(k) <= 57) ||
 						(strString.charCodeAt(k) >= 65 && strString.charCodeAt(k) <= 90) ||
 						(strString.charCodeAt(k) >= 97 && strString.charCodeAt(k) <= 122)))
 						{

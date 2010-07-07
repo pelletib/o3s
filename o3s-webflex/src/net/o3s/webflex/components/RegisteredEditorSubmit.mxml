@@ -81,7 +81,7 @@
             <mx:Button
                id="B_submitRegisteredAndPrintButton"
                label="Soumettre inscription et imprimer le dossard"
-               click="this.parentDocument.submitRegisteredFormAndPrint(event);"
+               click="this.parentDocument.confirmSubmitRegisteredFormAndPrint(event);"
                enabled="{this.parentDocument.submitRegisteredButtonEnabled} "
                />
          </mx:AddChild>
@@ -100,7 +100,7 @@
 				<mx:Button
 					id="B_submitRegisteredButton"
 					label="Soumettre inscription"
-					click="this.parentDocument.submitRegisteredForm(event);"
+					click="this.parentDocument.confirmSubmitRegisteredForm(event);"
 					enabled="{this.parentDocument.submitRegisteredButtonEnabled} "
 					/>
 				<mx:Button

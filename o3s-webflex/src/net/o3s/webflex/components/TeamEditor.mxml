@@ -34,6 +34,7 @@
 
 		import mx.collections.ArrayCollection;
 		import mx.validators.StringValidator;
+      import net.o3s.webflex.components.AdvancedStringValidator;
 
 		import mx.validators.Validator;
 		import mx.events.ValidationResultEvent;
@@ -49,7 +50,7 @@
 		import mx.rpc.Fault;
 		import mx.rpc.events.FaultEvent;
 
-		private var teamNameValidator:StringValidator;
+		private var teamNameValidator:AdvancedStringValidator;
 
 		[Bindable]
 		public var formIsValid:Boolean = false;
@@ -74,11 +75,20 @@
         //
          // Create validators
          //
-         teamNameValidator = new StringValidator();
+
+         teamNameValidator = new AdvancedStringValidator();
          teamNameValidator.source = TI_teamName;
          teamNameValidator.property = "text";
          teamNameValidator.minLength = 2;
          teamNameValidator.required=false;
+         teamNameValidator.specialCharacterNotAllowedError="Caracteres speciaux interdits";
+         teamNameValidator.allowSpaces=true;
+         teamNameValidator.allowNumbers=true;
+         teamNameValidator.numeralNotAllowedError="Chiffres interdits";
+         teamNameValidator.tooShortError="Au moins 2 caracteres sont requis";
+         teamNameValidator.tooLongError="Champ trop long";
+         teamNameValidator.requiredFieldError="Champ obligatoire";
+
 		}
 
 		// Clear the form and reset validation.

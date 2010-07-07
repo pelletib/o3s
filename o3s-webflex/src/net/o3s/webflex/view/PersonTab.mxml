@@ -295,7 +295,7 @@
 						<mx:DataGridColumn headerText="Id" dataField="id" showDataTips="false" width="30"/>
                   <mx:DataGridColumn headerText="Nom" dataField="lastname" showDataTips="false" width="150"/>
 						<mx:DataGridColumn headerText="Prenom" dataField="firstname" showDataTips="false" width="150"/>
-                  <mx:DataGridColumn headerText="Date de naissance" dataField="birthday" showDataTips="false" width="120" labelFunction="Util.getDateLabel"/>
+                  <mx:DataGridColumn headerText="Date de naissance" dataField="birthday" showDataTips="false" width="120" labelFunction="Util.getDateDDMMYYLabel"/>
 						<mx:DataGridColumn headerText="Sexe" dataField="sex" showDataTips="false" width="50"/>
                   <mx:DataGridColumn headerText="Club" dataField="club" showDataTips="false" width="150"/>
                   <mx:DataGridColumn headerText="Licence" dataField="license" showDataTips="false" width="150"/>

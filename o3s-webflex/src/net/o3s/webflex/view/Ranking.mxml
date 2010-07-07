@@ -50,7 +50,10 @@
          import mx.utils.StringUtil;
          import flash.net.FileReference;
          import mx.utils.URLUtil;
-         import mx.core.Application
+         import mx.core.Application;
+         import mx.collections.Sort;
+         import mx.collections.SortField;
+
          import net.o3s.webflex.bean.Person;
          import net.o3s.webflex.bean.MyEvent;
          import net.o3s.webflex.bean.Competition;
@@ -74,7 +77,7 @@
          public var selectedClub:Boolean = false;
 
 			[Bindable]
-			public var competitionList:ArrayCollection;
+			public var competitionList:ArrayCollection= new ArrayCollection([]);
 
          [Bindable]
          public var selectedCompetition:Competition;
@@ -83,7 +86,7 @@
          public var competitionIsEmpty:Boolean = true;
 
          [Bindable]
-         public var categoryList:ArrayCollection;
+         public var categoryList:ArrayCollection= new ArrayCollection([]);
 
          [Bindable]
          private var arrivalsList:ArrayCollection= new ArrayCollection([]);
@@ -95,10 +98,16 @@
          public var selectedLabelFilter:String="";
 
          [Bindable]
+         public var submitButtonGetRankingOnlineEnabled:Boolean = false;
+
+         [Bindable]
          public var submitButtonGetRankingPDFEnabled:Boolean = false;
 
          [Bindable]
          public var submitButtonGenerateRankingPDFEnabled:Boolean = false;
+
+         [Bindable]
+         public var submitButtonGenerateRankingCsvEnabled:Boolean = false;
 
          [Bindable]
          var fileData:ByteArray = new ByteArray();
@@ -107,6 +116,7 @@
          var fileReference:FileReference = new FileReference();
 
          var resultOnServer:Boolean;
+         var rankingType:String = "PDF";
 
          var serverUrl:String;
 
@@ -150,8 +160,23 @@
 
             CB_competition.selectedItem = -1;
             competitionIsEmpty = true;
+            competitionList.filterFunction = Util.competitionFilter;
+            var sort1:Sort = new Sort();
+            sort1.fields = [new SortField("id",true,false,true)];
+            competitionList.sort = sort1;
+            competitionList.refresh();
+
+            categoryList.filterFunction = Util.categoryFilter;
+            var sort2:Sort = new Sort();
+            sort2.fields = [new SortField("id",true,false,true)];
+            categoryList.sort = sort2;
+            categoryList.refresh();
+
             submitButtonGetRankingPDFEnabled = false;
+            submitButtonGetRankingOnlineEnabled = false;
             submitButtonGenerateRankingPDFEnabled = false;
+            submitButtonGenerateRankingCsvEnabled = false;
+
             // needed in flex, class must be instancied once
             var fe:FlexException = new FlexException();
 
@@ -173,10 +198,20 @@
 
          private function resultGetCompetitions(event:ResultEvent):void {
             competitionList = event.result as ArrayCollection;
+            competitionList.filterFunction = Util.competitionFilter;
+            var sort:Sort = new Sort();
+            sort.fields = [new SortField("id",true,false,true)];
+            competitionList.sort = sort;
+            competitionList.refresh();
          }
 
          private function resultGetCategories(event:ResultEvent):void {
             categoryList = event.result as ArrayCollection;
+            categoryList.filterFunction = Util.categoryFilter;
+            var sort:Sort = new Sort();
+            sort.fields = [new SortField("id",true,false,true)];
+            categoryList.sort = sort;
+            categoryList.refresh();
          }
 
 			// Clear the form and reset validation.
@@ -266,10 +301,13 @@
 
          private function refreshSubmitButtonEnabled():void {
 
-            submitButtonGetRankingPDFEnabled = true;
-            submitButtonGetRankingPDFEnabled = submitButtonGetRankingPDFEnabled && !competitionIsEmpty;
-            submitButtonGetRankingPDFEnabled = submitButtonGetRankingPDFEnabled && (selectedCategories.length > 0 || selectedScratch || selectedClub);
-            submitButtonGenerateRankingPDFEnabled = submitButtonGetRankingPDFEnabled && StaticVars.isLogged;
+            submitButtonGetRankingOnlineEnabled = true;
+            submitButtonGetRankingOnlineEnabled = submitButtonGetRankingOnlineEnabled && !competitionIsEmpty;
+            submitButtonGetRankingOnlineEnabled = submitButtonGetRankingOnlineEnabled && (selectedCategories.length > 0 || selectedScratch || selectedClub);
+
+            submitButtonGetRankingPDFEnabled = submitButtonGetRankingOnlineEnabled && StaticVars.isLogged
+            submitButtonGenerateRankingPDFEnabled = submitButtonGetRankingOnlineEnabled && StaticVars.isLogged;
+            submitButtonGenerateRankingCsvEnabled = submitButtonGetRankingOnlineEnabled && StaticVars.isLogged;
 
          }
 
@@ -346,14 +384,24 @@
             } else {
 
                if (resultOnServer == true) {
-                  RO_reporting.getScratchRankingPdfAsFileName(selectedCompetition.id);
+                  if (rankingType == "PDF") {
+                     RO_reporting.getScratchRankingPdfAsFileName(selectedCompetition.id);
+                  } else if (rankingType == "CSV") { // CSV
+                     RO_reporting.getScratchRankingCsvAsFileName(selectedCompetition.id);
+                  }
                } else {
-                  Alert.show("Pdf en cours de generation ...");
-                  var url:URLRequest;
-                  url = new URLRequest(serverUrl +
-                                       "report?type=scratchRanking&competitionId=" +
-                                       selectedCompetition.id);
-                  navigateToURL(url,"_blank");
+
+                  if (rankingType == "PDF") {
+
+                     Alert.show("Pdf en cours de generation ...");
+                     var url:URLRequest;
+                     url = new URLRequest(serverUrl +
+                                         "report?type=scratchRanking&competitionId=" +
+                                          selectedCompetition.id);
+                     navigateToURL(url,"_blank");
+                  } else if (rankingType == "CSV") { // CSV
+                     // do nothing
+                  }
                }
             clearFormHandler();
             }
@@ -367,18 +415,27 @@
             } else {
 
                if (resultOnServer == true) {
-                  RO_reporting.getClubRankingPdfAsFileName(selectedCompetition.id);
-               } else {
-                  Alert.show("Pdf en cours de generation ...");
-                  var url:URLRequest;
-                  url = new URLRequest(serverUrl +
-                                       "report?type=clubRanking&competitionId=" +
-                                       selectedCompetition.id);
-                  navigateToURL(url,"_blank");
-               }
+                  if (rankingType == "PDF") {
+                     RO_reporting.getClubRankingPdfAsFileName(selectedCompetition.id);
+                  } else if (rankingType == "CSV") { // CSV
+                     RO_reporting.getClubRankingCsvAsFileName(selectedCompetition.id);
+                  }
+              } else {
+                  if (rankingType == "PDF") {
+
+                     Alert.show("Pdf en cours de generation ...");
+                     var url:URLRequest;
+                     url = new URLRequest(serverUrl +
+                                         "report?type=clubRanking&competitionId=" +
+                                          selectedCompetition.id);
+                     navigateToURL(url,"_blank");
+                  } else if (rankingType == "CSV") { // CSV
+                     // do nothing
+                  }               }
             clearFormHandler();
             }
          }
+
          private function resultIsNotEmptyCategoryRanking(event:ResultEvent):void {
            var isNotEmpty:Boolean = event.result as Boolean;
 
@@ -386,35 +443,44 @@
                Alert.show("Rapport vide !");
             } else {
                if (resultOnServer == true) {
-                  RO_reporting.getCategoryRankingPdfAsFileName(selectedCompetition.id);
+                  if (rankingType == "PDF") {
+                     RO_reporting.getCategoryRankingPdfAsFileName(selectedCompetition.id);
+                  } else if (rankingType == "CSV") { // CSV
+                     RO_reporting.getCategoryRankingCsvAsFileName(selectedCompetition.id);
+                  }
                } else {
 
-                  Alert.show("Pdf en cours de generation ...");
+                  if (rankingType == "PDF") {
 
-                  var url:URLRequest;
-                  var idx:int;
-                  var catPrms:String ="";
-                  for (idx=0;idx<selectedCategories.length;idx++) {
-                     var cat:Category = selectedCategories.getItemAt(idx) as Category;
-                     if (idx == 0) {
-                        catPrms = "" + cat.id;
-                     } else {
-                        catPrms = catPrms + "," + cat.id;
+                     Alert.show("Pdf en cours de generation ...");
+
+                     var url:URLRequest;
+                     var idx:int;
+                     var catPrms:String ="";
+                     for (idx=0;idx<selectedCategories.length;idx++) {
+                        var cat:Category = selectedCategories.getItemAt(idx) as Category;
+                        if (idx == 0) {
+                           catPrms = "" + cat.id;
+                        } else {
+                           catPrms = catPrms + "," + cat.id;
+                        }
                      }
-                  }
-                  url = new URLRequest(serverUrl +
-                                       "report?type=categoriesRanking&competitionId=" +
-                                       selectedCompetition.id +
-                                       "&categoriesId=" +
-                                       catPrms);
+                     url = new URLRequest(serverUrl +
+                                          "report?type=categoriesRanking&competitionId=" +
+                                          selectedCompetition.id +
+                                          "&categoriesId=" +
+                                          catPrms);
 
-                  navigateToURL(url,"_blank");
+                     navigateToURL(url,"_blank");
+                  } else if (rankingType == "CSV") { // CSV
+                     // do nothing
+                  }
                }
                clearFormHandler();
             }
          }
 
-         private function doGetRankingPdf():void {
+         private function doGetRanking():void {
 
             // at first check that the report is not empty
             // the reporting servlet is invoked when processing the result
@@ -431,19 +497,30 @@
 
          private function getRankingPdf(event:Event):void {
             this.resultOnServer = false;
-            doGetRankingPdf();
+            this.rankingType = "PDF";
+
+            doGetRanking();
          }
 
          private function generateRankingPdf(event:Event):void {
            this.resultOnServer = true;
-           doGetRankingPdf();
+            this.rankingType = "PDF";
+
+           doGetRanking();
 
          }
 
-         private function resultGetRankingPdfAsFileName(event:ResultEvent):void {
+         private function generateRankingCsv(event:Event):void {
+           this.resultOnServer = true;
+           this.rankingType = "CSV";
+
+           doGetRanking();
+
+         }
+
+         private function resultGetRankingAsFileName(event:ResultEvent):void {
            var fileName:String = event.result as String;
            Alert.show("Le fichier <" + fileName + "> est disponible sur le serveur.");
-
          }
 
          private function getOnlineRanking(event:Event):void {
@@ -516,9 +593,12 @@
       <mx:method name="isNotEmptyScratchRanking" result="resultIsNotEmptyScratchRanking(event)"/>
       <mx:method name="isNotEmptyCategoryRanking" result="resultIsNotEmptyCategoryRanking(event)"/>
       <mx:method name="isNotEmptyClubRanking" result="resultIsNotEmptyClubRanking(event)"/>
-      <mx:method name="getCategoryRankingPdfAsFileName" result="resultGetRankingPdfAsFileName(event)"/>
-      <mx:method name="getClubRankingPdfAsFileName" result="resultGetRankingPdfAsFileName(event)"/>
-      <mx:method name="getScratchRankingPdfAsFileName" result="resultGetRankingPdfAsFileName(event)"/>
+      <mx:method name="getCategoryRankingPdfAsFileName" result="resultGetRankingAsFileName(event)"/>
+      <mx:method name="getCategoryRankingCsvAsFileName" result="resultGetRankingAsFileName(event)"/>
+      <mx:method name="getClubRankingPdfAsFileName" result="resultGetRankingAsFileName(event)"/>
+      <mx:method name="getClubRankingCsvAsFileName" result="resultGetRankingAsFileName(event)"/>
+      <mx:method name="getScratchRankingPdfAsFileName" result="resultGetRankingAsFileName(event)"/>
+      <mx:method name="getScratchRankingCsvAsFileName" result="resultGetRankingAsFileName(event)"/>
    </mx:RemoteObject>
 
    <mx:RemoteObject id="RO_registering" destination="registering" showBusyCursor="true" fault="onFault(event)">
@@ -570,6 +650,13 @@
                      label="Generer le pdf sur le serveur"
                      click="generateRankingPdf(event);"
                      enabled="{submitButtonGenerateRankingPDFEnabled}"
+                     />
+
+                  <mx:Button
+                     id="B_generateRankingCSV"
+                     label="Generer le csv sur le serveur"
+                     click="generateRankingCsv(event);"
+                     enabled="{submitButtonGenerateRankingCsvEnabled}"
                      />
 
                   <mx:Button
