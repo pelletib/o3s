@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <parent>
+    <artifactId>o3s-modules</artifactId>
+    <groupId>net.o3s</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>o3s-webds</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <name>o3s :: o3s-webds</name>
+  <description></description>
+
+  <properties>
+    <output.dir>${basedir}/src/main/webapp</output.dir>
+    <webxml.file>${basedir}/src/main/webapp/WEB-INF/web.xml</webxml.file>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.o3s</groupId>
+      <artifactId>o3s-apis</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.ow2.spec.ee</groupId>
+        <artifactId>ow2-jpa-1.0-spec</artifactId>
+        <version>${ow2.spec.version}</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.ow2.spec.ee</groupId>
+        <artifactId>ow2-ejb-3.0-spec</artifactId>
+        <version>${ow2.spec.version}</version>
+        <scope>provided</scope>
+   </dependency>
+   <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jms_1.1_spec</artifactId>
+        <version>1.1.1</version>
+        <scope>provided</scope>
+   </dependency>
+      <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>${tomcat.version}</version>
+        <scope>provided</scope>
+   </dependency>
+    <dependency>
+        <groupId>org.ow2.jonas</groupId>
+        <artifactId>jonas-security</artifactId>
+        <version>${jonas.version}</version>
+        <scope>provided</scope>
+    </dependency>
+   <dependency>
+      <groupId>net.o3s</groupId>
+      <artifactId>o3s-webflex</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <type>swf</type>
+    </dependency>
+
+    <dependency>
+       <groupId>com.adobe.blazeds</groupId>
+       <artifactId>blazeds-core</artifactId>
+       <version>3.0</version>
+    </dependency>
+
+  </dependencies>
+  <build>
+     <finalName>o3s-webds</finalName>
+     <defaultGoal>package</defaultGoal>
+       <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy flex swf files</id>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <phase>compile</phase>
+            <configuration>
+              <artifactItems>
+
+                <artifactItem>
+                  <groupId>net.o3s</groupId>
+                  <artifactId>o3s-webflex</artifactId>
+                  <type>swf</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${output.dir}</outputDirectory>
+                  <destFileName>o3s.swf</destFileName>
+
+                </artifactItem>
+               </artifactItems>
+
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webXml>${webxml.file}</webXml>
+        </configuration>
+      </plugin>
+
+        </plugins>
+  </build>
+
+</project>

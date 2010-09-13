@@ -1,0 +1,114 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>o3s-modules</artifactId>
+    <groupId>net.o3s</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>o3s-application</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>ear</packaging>
+  <name>o3s :: o3s-application</name>
+  <description></description>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.o3s</groupId>
+      <artifactId>o3s-beans</artifactId>
+      <type>ejb</type>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.o3s</groupId>
+      <artifactId>o3s-webds</artifactId>
+      <type>war</type>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.o3s</groupId>
+      <artifactId>o3s-apis</artifactId>
+      <type>jar</type>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.o3s</groupId>
+      <artifactId>o3s-persistence</artifactId>
+      <type>jar</type>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.o3s</groupId>
+      <artifactId>o3s-appclient-init</artifactId>
+      <type>jar</type>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+   <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-ear-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+
+          <version>5</version>
+
+          <displayName>o3s</displayName>
+                  <description>
+                        Open Source Sport Software
+                  </description>
+                  <defaultLibBundleDir>lib</defaultLibBundleDir>
+          <earSourceDirectory>EarContent</earSourceDirectory>
+          <applicationXml>${basedir}/EarContent/META-INF/application.xml</applicationXml>
+          <modules>
+            <ejbModule>
+              <groupId>net.o3s</groupId>
+              <artifactId>o3s-beans</artifactId>
+            </ejbModule>
+
+            <webModule>
+              <groupId>net.o3s</groupId>
+              <artifactId>o3s-webds</artifactId>
+              <contextRoot>/o3s-webds</contextRoot>
+            </webModule>
+            <jarModule>
+              <groupId>net.o3s</groupId>
+              <artifactId>o3s-appclient-init</artifactId>
+              <bundleDir>/</bundleDir>
+              <!--
+              <uri>client.jar</uri>
+              -->
+            </jarModule>
+          </modules>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+            </manifest>
+          </archive>
+          <generateApplicationXml>true</generateApplicationXml>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>deploy</id>
+            <phase>install</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <echo>${project.build.directory}/${project.build.finalName}</echo>
+                <copy file="${project.build.directory}/${project.build.finalName}.ear"
+                      todir="${env.JONAS_BASE}/deploy" />
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+ </plugins>
+ </build>
+</project>

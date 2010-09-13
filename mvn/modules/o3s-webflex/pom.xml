@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>o3s-modules</artifactId>
+    <groupId>net.o3s</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>o3s-webflex</artifactId>
+  <name>o3s :: o3s-webflex</name>
+
+  <packaging>swf</packaging>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>flexlib</groupId>
+      <artifactId>flexlib-bin</artifactId>
+      <type>swc</type>
+      <version>${flexlib.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.code</groupId>
+      <artifactId>flex-iframe</artifactId>
+      <version>${flexiframe.version}</version>
+      <type>swc</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-enforcer-plugin</artifactId>
+      <version>1.0-alpha-3</version>
+    </dependency>
+
+    <!-- Flex -->
+    <dependency>
+      <groupId>com.adobe.flex.framework</groupId>
+      <artifactId>flex-framework</artifactId>
+      <version>${flex.version}</version>
+      <type>pom</type>
+    </dependency>
+
+
+  </dependencies>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <plugins>
+      <plugin>
+        <dependencies>
+          <dependency>
+            <groupId>com.adobe.flex</groupId>
+            <artifactId>license</artifactId>
+            <version>${flex.version}</version>
+          </dependency>
+
+	<dependency>
+		<groupId>com.adobe.flex</groupId>
+		<artifactId>compiler</artifactId>
+		<version>4.0.0.10193</version>
+		<type>pom</type>
+	</dependency>
+
+
+        </dependencies>
+
+        <groupId>org.sonatype.flexmojos</groupId>
+        <artifactId>flexmojos-maven-plugin</artifactId>
+        <version>${flexmojos.version}</version>
+        <extensions>true</extensions>
+
+        <configuration>
+          <compiledLocales>
+            <locale>en_US</locale>
+          </compiledLocales>
+
+          <mergeResourceBundle>true</mergeResourceBundle>
+
+<!--
+          <licenses>
+            <flexbuilder3>${licence.flexbuilder3}</flexbuilder3>
+          </licenses>
+-->
+          <services>${basedir}/../o3s-webds/src/main/webapp/WEB-INF/flex/services-config.xml</services>
+
+          <contextRoot>/o3s-webds</contextRoot>
+
+          <sourceFile>o3s.mxml</sourceFile>
+
+          <optimize>true</optimize>
+
+        </configuration>
+
+      </plugin>
+    </plugins>
+    <finalName>o3s</finalName>
+  </build>
+</project>

@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:components="net.o3s.webflex.components.*"
+		   creationComplete="init()"
+		   width="100%" height="100%" >
+<mx:Script>
+	<![CDATA[
+
+		import mx.collections.ArrayCollection;
+
+		import mx.validators.Validator;
+		import mx.events.ValidationResultEvent;
+      import mx.events.CloseEvent;
+		import mx.controls.Alert;
+		import mx.events.ListEvent;
+		import mx.rpc.events.ResultEvent;
+		import mx.utils.ObjectUtil;
+		import mx.core.IUIComponent;
+		import net.o3s.webflex.bean.MyEvent;
+		import net.o3s.webflex.bean.Competition;
+		import net.o3s.webflex.bean.Registered;
+		import net.o3s.webflex.bean.FlexException;
+		import mx.events.FlexEvent;
+      import net.o3s.webflex.components.Util;
+      import net.o3s.webflex.bean.Person;
+      import mx.collections.Sort;
+      import mx.collections.SortField;
+
+		[Bindable]
+		public var competitionList:ArrayCollection= new ArrayCollection([]);
+
+		[Bindable]
+		public var competitionIsEmpty:Boolean = true;
+
+		[Bindable]
+		public var selectedCompetition:Competition=null;
+
+		[Bindable]
+		public var submitRegisteredButtonEnabled:Boolean = false;
+
+		[Bindable]
+		public var mode:String="create";
+
+		[Bindable]
+		public var updateRegistered:Registered=null;
+
+		private var exitCallback:Function = null;
+
+      private var ask4print:Boolean=false;
+
+      public var paid:Boolean=false;
+      public var providedHealthForm:Boolean=false;
+
+		public function refreshAdminData():void {
+
+			RO_admin.getCompetitions();
+		}
+
+		private function init():void {
+
+			selectedCompetition = null;
+			refreshAdminData();
+			competitionIsEmpty = true;
+			submitRegisteredButtonEnabled = false;
+			competitionList.filterFunction = Util.competitionFilter;
+         var sort:Sort = new Sort();
+         sort.fields = [new SortField("id",true,false,true)];
+         competitionList.sort = sort;
+			competitionList.refresh();
+			CB_competition.selectedIndex = -1;
+
+			// needed in flex, class must be instancied once
+			var fe:FlexException = new FlexException();
+			currentState = "";
+
+			// Set the focus on the first field so
+			// user does not have to mouse over to it.
+			// Note that the user still has to click on the
+			// Flex application to give it focus. This is
+			// a currently limitation in Flex.
+			resetFocus();
+
+			exitCallback = null;
+
+         ask4print = false;
+         paid = false;
+         providedHealthForm = false;
+
+		}
+
+		public function clearAll():void {
+			if (currentState == "team") {
+				MyTeamEditor.clearAll();
+			}
+			if (currentState == "team" || currentState == "individual") {
+				MyPersonsEditor.clearAll();
+			}
+			currentState = "";
+			CB_competition.selectedItem = -1;
+			competitionIsEmpty = true;
+			refreshSubmitRegisteredButtonEnabled();
+			resetFocus();
+			if (exitCallback != null) {
+				exitCallback();
+			}
+         ask4print = false;
+         paid = false;
+         providedHealthForm = false;
+         MyRegisteredEditorSubmit.clearAll();
+
+		}
+
+		private function resultGetCompetition(event:ResultEvent):void {
+			competitionList = event.result as ArrayCollection;
+			competitionList.filterFunction = Util.competitionFilter;
+         var sort:Sort = new Sort();
+         sort.fields = [new SortField("id",true,false,true)];
+         competitionList.sort = sort;
+			competitionList.refresh();
+
+			if (mode == "update" &&  selectedCompetition == null) {
+				//set selectedCompetition
+				selectedCompetition=updateRegistered.competition;
+				var idx:int = getIdxCompetition(selectedCompetition.id);
+				CB_competition.selectedIndex = getIdxCompetition(selectedCompetition.id);
+				competitionIsEmpty = false;
+			} else if (mode == "create") {
+				CB_competition.selectedIndex = -1;
+			}
+		}
+
+      private function onFaultGetCompetition(ev:Event):void {
+         // recovery
+         RO_admin.getCompetitions();
+      }
+
+		private function setCompetition(event:Event):void {
+			selectedCompetition=event.currentTarget.selectedItem as Competition;
+			if (selectedCompetition != null && selectedCompetition.name != "Unknown") {
+				competitionIsEmpty = false;
+				if (selectedCompetition.teamed == true) {
+					currentState = "team";
+				} else {
+					currentState = "individual";
+				}
+
+			} else {
+				competitionIsEmpty = true;
+				currentState = "";
+			}
+			refreshSubmitRegisteredButtonEnabled();
+		}
+
+		private function resultCreateRegistered(event:ResultEvent):void {
+			var registereds:ArrayCollection = event.result as ArrayCollection;
+			var myAlert:Alert;
+
+			var msg:String = "";
+
+			for(var count:int = 0; count < registereds.length; count++) {
+				var r:Registered = registereds.getItemAt(count, 0) as Registered;
+
+ 				if (count == 0) {
+					msg = msg + "Vous etes inscrit a la competition" +
+						"'" + r.competition.name + "'." + "\n";
+				}
+
+
+            if (r.teamed == true) {
+               msg = msg + "Votre equipe '" + r.name + "'";
+               msg = msg + " a le dossard " +
+                  "'" + r.label.value + "'." ;
+            } else {
+               msg = msg + "'" + r.name + "'";
+               msg = msg + " est dans la categorie " +
+                  "'" + r.category.name + "'" +
+                  " avec le dossard " +
+                  "'" + r.label.value + "'." ;
+            }
+
+            if (ask4print == true) {
+               msg = msg + " Impression du dossard en cours.\n";
+               RO_reporting.printLabel(r.id, false);
+            } else {
+               msg = msg + "\n";
+            }
+
+
+			}
+
+        if (StaticVars.isLogged == false) {
+
+            msg = msg + "\n\n";
+
+            msg = msg + "Nous sommes impatients de vous retrouver au '" +
+               parentDocument.MyEventPanel.event.name + "' le " +
+               formatDateDDMMYYY.format(parentDocument.MyEventPanel.event.date) + ".";
+
+            msg = msg + "\n\n";
+
+            msg = msg + "Vous pourrez retirer votre dossard au stand 'Pre-inscription' le jour de la course apres paiement et presentation de votre certificat medical ou licence.";
+            msg = msg + "\n\n";
+            msg = msg + "Vous pouvez consulter les conditions de participation sur notre site www.fouleesdecrossey.com rubrique reglement.";
+         }
+
+			myAlert = Alert.show(msg, "Inscription ok");
+			myAlert.height=400;
+			myAlert.width=400;
+
+			clearAll();
+		}
+
+		private function resultUpdateRegistered(event:ResultEvent):void {
+			var registered:Registered = event.result as Registered;
+			var myAlert:Alert;
+
+			var msg:String = "";
+
+			msg = msg + "Competition " +
+						"'" + registered.competition.name + "'" + "\n";
+			msg = msg + "'" + registered.name + "'";
+			msg = msg + " est dans la categorie " +
+					"'" + registered.category.name + "'" +
+					" avec le dossard " +
+					"'" + registered.label.value + "'.";
+
+         if (ask4print == true) {
+           msg = msg + "Impression du dossard en cours.\n";
+           RO_reporting.printLabel(registered.id, false);
+         } else {
+           msg = msg + "\n";
+         }
+
+			msg = msg + "\n\n";
+
+			myAlert = Alert.show(msg, "Inscription mise a jour");
+			myAlert.height=400;
+			myAlert.width=400;
+
+			clearAll();
+		}
+
+		// Helper method. Sets the focus on the first field so
+		// user does not have to mouse over to it.
+		private function resetFocus():void {
+         if (focusManager != null) {
+			   focusManager.setFocus(CB_competition);
+         }
+		}
+
+		private function refreshSubmitRegisteredButtonEnabled():void {
+
+			submitRegisteredButtonEnabled = true;
+
+			if (currentState == "team") {
+				submitRegisteredButtonEnabled = submitRegisteredButtonEnabled && MyTeamEditor.formIsValid;
+			}
+
+			submitRegisteredButtonEnabled = submitRegisteredButtonEnabled && !competitionIsEmpty;
+
+			if (currentState == "individual" || currentState == "team") {
+				submitRegisteredButtonEnabled = submitRegisteredButtonEnabled && MyPersonsEditor.personList.length>0;
+			}
+
+		}
+
+      public function confirmSubmitRegisteredForm(event:Event):void {
+
+         var msg:String = "";
+
+         msg = msg + "Etes-vous sur de vouloir soumettre ces inscriptions sur la course" ;
+         msg = msg + " <" + selectedCompetition.name + "> ?"
+         msg = msg + "\n\n" ;
+
+         for(var count:int = 0; count < MyPersonsEditor.personList.length; count++) {
+               var p:Person = MyPersonsEditor.personList.list.getItemAt(count, 0) as Person;
+               msg = msg + " <" + p.lastname + " " + p.firstname + "> -> <"  + p.computedCategory + ">";
+               msg = msg + "\n" ;
+         }
+         var myAlert:Alert;
+         myAlert = Alert.show(msg,
+                              "Soumission des inscriptions",
+                              Alert.OK | Alert.CANCEL,
+                              this,
+                              submitRegisteredForm,
+                              null,
+                              Alert.OK);
+         myAlert.height=400;
+         myAlert.width=500;
+         myAlert.horizontalCenter="yes";
+      }
+
+      public function confirmSubmitRegisteredFormAndPrint(event:Event):void {
+
+         var msg:String = "";
+
+         msg = msg + "Etes-vous sur de vouloir soumettre ces inscriptions sur la course" ;
+         msg = msg + " <" + selectedCompetition.name + "> ?"
+         msg = msg + "\n\n" ;
+
+         for(var count:int = 0; count < MyPersonsEditor.personList.length; count++) {
+               var p:Person = MyPersonsEditor.personList.list.getItemAt(count, 0) as Person;
+               msg = msg + " <" + p.lastname + " " + p.firstname + "> -> <"  + p.computedCategory + ">";
+               msg = msg + "\n" ;
+         }
+         var myAlert:Alert;
+         myAlert = Alert.show(msg,
+                              "Soumission des inscriptions",
+                              Alert.OK | Alert.CANCEL,
+                              this,
+                              submitRegisteredFormAndPrint,
+                              null,
+                              Alert.OK);
+         myAlert.height=400;
+         myAlert.width=500;
+         myAlert.horizontalCenter="yes";
+
+      }
+
+		// Submit form if everything is valid.
+		public function submitRegisteredForm(event:CloseEvent):void	{
+
+         if(event.detail == Alert.OK) {
+
+			if (mode == "create") {
+   				var registered:Registered = new Registered();
+   				registered.persons = MyPersonsEditor.personList;
+   				registered.event = parentDocument.MyEventPanel.event;
+   				registered.competition = selectedCompetition;
+   				if (currentState == "team") {
+   					registered.name = MyTeamEditor.teamName;
+   				} else {
+   					registered.name = "";
+   				}
+   				registered.teamed = selectedCompetition.teamed;
+   				registered.paid = paid;
+               registered.providedHealthForm = providedHealthForm;
+
+               if (StaticVars.isLogged == false) {
+                registered.source = "web";
+               } else {
+                registered.source = "internal";
+               }
+
+     			   RO_registering.createRegistered(registered);
+
+   			} else if (mode == "update") {
+	  	     		 updateRegistered.persons = MyPersonsEditor.personList;
+		 		    updateRegistered.competition = selectedCompetition;
+				    if (currentState == "team") {
+					    updateRegistered.name = MyTeamEditor.teamName;
+				    } else {
+					    updateRegistered.name = "";
+				  }
+				  updateRegistered.teamed = selectedCompetition.teamed;
+				  updateRegistered.paid = paid;
+              updateRegistered.providedHealthForm = providedHealthForm;
+              if (StaticVars.isLogged == false) {
+                  updateRegistered.source = "web";
+              } else {
+                  updateRegistered.source = "internal";
+              }
+
+				  RO_registering.updateRegistered(updateRegistered);
+			   }
+         }
+		}
+
+      // Submit form if everything is valid.
+      public function submitRegisteredFormAndPrint(event:CloseEvent):void  {
+         ask4print=true;
+         submitRegisteredForm(event);
+      }
+
+		// when child component have changed
+		public function notifyChangeFromChildComponent():void {
+			refreshSubmitRegisteredButtonEnabled();
+		}
+
+		// return -1 if not found
+		private function getIdxCompetition(id:int):int {
+
+			for(var count:int = 0; count < competitionList.length; count++) {
+				var c:Competition = competitionList.getItemAt(count, 0) as Competition;
+
+				if (c.id == id) {
+					return count;
+				}
+			}
+			return -1;
+		}
+
+		private function completeState(e:Event):void {
+
+			if (mode == "update") {
+				//set competition
+				if(selectedCompetition == null && competitionList.length != 0) {
+					selectedCompetition=updateRegistered.competition;
+					var idx:int = getIdxCompetition(selectedCompetition.id);
+					CB_competition.selectedIndex = getIdxCompetition(selectedCompetition.id);
+					competitionIsEmpty = false;
+
+				}
+
+				//set personsList
+				MyPersonsEditor.set4Update(updateRegistered.persons);
+
+				//set team
+				if (updateRegistered.teamed == true) {
+               if (MyTeamEditor != null) {
+					 MyTeamEditor.set4Update(updateRegistered.name);
+               }
+				}
+
+			}
+
+		}
+
+
+		public function set4Update(registered:Registered):void {
+
+			mode="update";
+			selectedCompetition=null;
+			updateRegistered = registered;
+
+			//set currentState
+			if (registered.teamed == true) {
+				this.currentState="team";
+			} else {
+				this.currentState="individual";
+			}
+			MyRegisteredEditorSubmit.B_submitRegisteredButton.label="Mettre a jour inscription";
+         if (MyRegisteredEditorSubmit.CB_paid != null) {
+            MyRegisteredEditorSubmit.CB_paid.selected=registered.paid;
+         }
+         if (MyRegisteredEditorSubmit.CB_providedHealthForm != null) {
+            MyRegisteredEditorSubmit.CB_providedHealthForm.selected=registered.providedHealthForm;
+         }
+		}
+
+		// callback set by the caller if wanted
+		public function setExitCallback(mycallback:Function):void {
+			exitCallback = mycallback;
+		}
+
+      private function resultPrintLabel(event:ResultEvent):void {
+      }
+
+
+	]]>
+</mx:Script>
+
+	<mx:RemoteObject id="RO_admin" destination="admin" showBusyCursor="true" fault="onFaultGetCompetition(event)">
+		<mx:method name="getCompetitions" result="resultGetCompetition(event)"/>
+	</mx:RemoteObject>
+
+	<mx:RemoteObject id="RO_registering" destination="registering" showBusyCursor="true" fault="Util.onFault(event)">
+		<mx:method name="createRegistered" result="resultCreateRegistered(event)" fault="Util.handleException(event)"/>
+		<mx:method name="updateRegistered" result="resultUpdateRegistered(event)" fault="Util.handleException(event)"/>
+	</mx:RemoteObject>
+
+   <mx:RemoteObject id="RO_reporting" destination="reporting" showBusyCursor="true" fault="Util.onFault(event)">
+      <mx:method name="printLabel" result="resultPrintLabel(event)" fault="Util.handleException(event)"/>
+   </mx:RemoteObject>
+
+	<mx:DateFormatter formatString="DD/MM/YYYY" id="formatDateDDMMYYY"/>
+
+	<mx:states>
+		<mx:State name="individual" enterState="completeState(event)">
+			<mx:AddChild relativeTo="{HB_Competition}" position="after">
+				<mx:HBox id="HB_Persons" width="100%" height="50%">
+					<components:PersonsEditor id="MyPersonsEditor"/>
+				</mx:HBox>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="team" basedOn="individual" enterState="completeState(event)">
+			<mx:AddChild relativeTo="{HB_Competition}" position="after">
+				<mx:HBox id="HB_Team" width="100%" height="20%">
+					<components:TeamEditor id="MyTeamEditor"/>
+				</mx:HBox>
+			</mx:AddChild>
+		</mx:State>
+
+	</mx:states>
+
+	<mx:transitions>
+		<mx:Transition id="fromAnyToTeam" fromState="*" toState="team">
+			<mx:Sequence target="{this}">
+				<mx:WipeDown duration="500"/>
+			</mx:Sequence>
+		</mx:Transition>
+		<mx:Transition id="fromIndividualToInit" fromState="individual" toState="">
+			<mx:Sequence target="{this}">
+				<mx:Blur duration="200" blurYFrom="20.0" blurYTo="1.0" blurXFrom="20.0" blurXTo="1.0" />
+				<mx:RemoveChildAction/>
+			</mx:Sequence>
+		</mx:Transition>
+		<mx:Transition id="fromTeamToAny" fromState="team" toState="*">
+			<mx:Sequence target="{this}">
+				<mx:Blur duration="200" blurYFrom="20.0" blurYTo="1.0" blurXFrom="20.0" blurXTo="1.0" />
+				<mx:RemoveChildAction/>
+			</mx:Sequence>
+		</mx:Transition>
+
+	</mx:transitions>
+
+	<mx:VBox id="HB_RegisteredEditor" width="100%" height="100%">
+
+		<mx:HBox id="HB_Competition" width="100%" height="10%">
+			<mx:Panel title="Competition" width="100%" height="100%" horizontalAlign="center">
+				<mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setCompetition(event)"  />
+			</mx:Panel>
+		</mx:HBox>
+
+		<mx:HBox id="HB_Submit" width="100%" height="10%">
+         <components:RegisteredEditorSubmit id="MyRegisteredEditorSubmit"/>
+		</mx:HBox>
+	</mx:VBox>
+</mx:Canvas>

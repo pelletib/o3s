@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.o3s</groupId>
+  <artifactId>o3s</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <name>o3s</name>
+  <packaging>pom</packaging>
+
+  <url>
+    http://code.google.com/p/o3s/
+  </url>
+
+  <properties>
+    <flex.home>${env.FLEX_HOME}</flex.home>
+    <flexlib.version>r169</flexlib.version>
+    <flexiframe.version>1.4.2</flexiframe.version>
+    <flex.version>4.0.0.10193</flex.version>
+    <graniteds.version>2.0.0.SP1</graniteds.version>
+    <flexmojos.version>3.6.1</flexmojos.version>
+    <licence.flexbuilder3>${env.FLEX_LICENSE}</licence.flexbuilder3>
+    <ow2.spec.version>1.0.3</ow2.spec.version>
+    <ow2-bundles.version>1.0.21</ow2-bundles.version>
+    <easybeans.version>1.2.0-M2</easybeans.version>
+    <carol.version>3.0.8</carol.version>
+    <tomcat.version>6.0.29</tomcat.version>
+    <jonas.version>5.2.0-M2</jonas.version>
+  </properties>
+
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/jasmine/kerneos/trunk</connection>
+    <developerConnection>scm:svn:svn+ssh://${maven.username}@svn.forge.objectweb.org/svnroot/jasmine/kerneos/trunk</developerConnection>
+    <url>http://fisheye.jasmine.objectweb.org/browse/JASMINe/kerneos/trunk</url>
+  </scm>
+
+  <repositories>
+    <repository>
+      <id>flexmojos-repository</id>
+      <url>http://repository.sonatype.org/content/groups/flexgroup/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>maven2-repository.dev.java.net</id>
+      <name>Java.net Repository for Maven2</name>
+      <url>http://download.java.net/maven/2</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>maven1-repository.dev.java.net</id>
+      <name>Java.net Repository for Maven1</name>
+      <url>http://download.java.net/maven/1</url>
+      <layout>legacy</layout>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>flex-iframe</id>
+      <url>http://flex-iframe.googlecode.com/svn/maven2</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>flexmojos-repository</id>
+      <name>FlexMojos repository on Sonatype.org</name>
+      <url>http://repository.sonatype.org/content/groups/public/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <profiles>
+    <profile>
+      <id>install</id>
+      <activation>
+          <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <defaultGoal>install</defaultGoal>
+      </build>
+      <modules>
+        <module>modules</module>
+      </modules>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

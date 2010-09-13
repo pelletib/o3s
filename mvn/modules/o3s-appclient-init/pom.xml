@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>o3s-modules</artifactId>
+    <groupId>net.o3s</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>o3s-appclient-init</artifactId>
+  <name>o3s :: appclient-init</name>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <dependencies>
+     <dependency>
+  	<groupId>net.o3s</groupId>
+  	<artifactId>o3s-apis</artifactId>
+  	<version>1.0.0-SNAPSHOT</version>
+     </dependency>
+     <dependency>
+        <groupId>org.ow2.spec.ee</groupId>
+        <artifactId>ow2-ejb-3.0-spec</artifactId>
+        <version>${ow2.spec.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.bundles</groupId>
+        <artifactId>ow2-util-archive-impl</artifactId>
+        <version>${ow2-bundles.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.easybeans</groupId>
+        <artifactId>easybeans-injection-api</artifactId>
+        <version>${easybeans.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.easybeans</groupId>
+        <artifactId>easybeans-injection-impl</artifactId>
+        <version>${easybeans.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.carol</groupId>
+        <artifactId>carol</artifactId>
+        <version>${carol.version}</version>
+        <scope>provided</scope>
+        <exclusions>
+          <!-- exclude commons logging -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+  </dependencies>
+</project>

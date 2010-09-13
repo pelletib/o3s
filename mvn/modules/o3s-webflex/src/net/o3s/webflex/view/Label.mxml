@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:components="net.o3s.webflex.components.*"
+		   width="100%" height="100%" creationComplete="init()">
+
+	<mx:Script>
+		<![CDATA[
+			import net.o3s.webflex.bean.Competition;
+			import net.o3s.webflex.bean.Category;
+			import net.o3s.webflex.bean.Registered;
+			import net.o3s.webflex.bean.Person;
+         import net.o3s.webflex.components.Util;
+
+			import mx.rpc.events.ResultEvent;
+			import mx.controls.Alert;
+			import mx.utils.ObjectUtil;
+			import mx.collections.ArrayCollection;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.utils.URLUtil;
+			import mx.core.Application;
+			import mx.utils.StringUtil;
+			import mx.events.CloseEvent;
+         import mx.controls.DateField;
+
+			[Bindable]
+			private var registeredList:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			private var competitionList:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			public var categoryList:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			public var selectedCompetitionFilter:Competition=null;
+
+			[Bindable]
+			public var selectedNameFilter:String="";
+
+			[Bindable]
+			public var selectedLabelFilter:String="";
+
+			public var serverUrl:String = "";
+
+			// list of registered that are selected in the datagrid
+			[Bindable]
+			public var selectedItems:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			private var editedRegistered:Registered= null;
+
+			[Bindable]
+			public var actionSelectionEnabled:Boolean = false;
+
+			[Bindable]
+			public var selectAll:Boolean = false;
+
+			[Bindable]
+			public var printDialog:Boolean = false;
+
+         public var importFileRef:FileReference = new FileReference;
+         private var importFileFilter:FileFilter = new FileFilter("CSV File (*.csv)", "*.csv");
+
+         private var importedRegisteredList:ArrayCollection= new ArrayCollection([]);
+
+			public function onClickRefresh(ev:Event):void {
+            resetRegisteredData();
+         }
+
+			public function refreshAdminData():void {
+				RO_admin.getCompetitions();
+				RO_admin.getCategories();
+				serverUrl="http://" + URLUtil.getServerNameWithPort(Application.application.loaderInfo.url) + "/o3s-webds/";
+			}
+
+         public function resetRegisteredData():void {
+            selectAll=false;
+            CB_selectAll.selected = false;
+            selectedItems.removeAll();
+            registeredList.filterFunction = null;
+            selectedCompetitionFilter=null;
+            selectedNameFilter="";
+            selectedLabelFilter = "";
+
+            CB_competition.selectedItem = -1;
+            TI_selectedNameFilter.text="";
+            TI_selectedLabelFilter.text="";
+            refreshRegisteredData();
+         }
+
+			public function refreshRegisteredData():void {
+				RO_registering.getRegistereds();
+			}
+
+			public function init():void {
+				refreshAdminData();
+            resetRegisteredData();
+				printDialog=false;
+				selectAll=false;
+				currentState="";
+
+            // Register event listeners for file select and load complete
+            importFileRef.addEventListener(Event.SELECT, handleImportFileSelect);
+            importFileRef.addEventListener(Event.COMPLETE, handleImportFileLoadComplete);
+            importFileRef.addEventListener(ProgressEvent.PROGRESS, fileRef_progress);
+
+			}
+
+          private function handleImportFileSelect(event:Event):void {
+
+            // Change import button label
+            importFileButton.label = "Chargement...";
+
+            importFileRef.load();
+         }
+
+         private function handleImportFileLoadComplete(event:Event):void {
+
+            // Parse the CSV file
+            // Read in contents of the file as a string
+            var importFileContents:String = importFileRef.data.toString();
+
+            // Parse the data out
+            // Format is in CSV, comma delimited with carriage return for new line
+            var importFileLines:Array = importFileContents.split("\n");
+
+            // Set/Reset the importedRegistered array
+            importedRegisteredList.removeAll();
+
+            //Alert.show("file length = "+importFileLines.length);
+
+            // determine the column index
+            var indLastname:int=-1;
+            var indFirstname:int=-1;
+            var indClub:int=-1;
+            var indBirthday:int=-1;
+            var indSex:int=-1;
+            var indEmail:int=-1;
+            var indLicense:int=-1;
+            var indCompetition:int=-1;
+            var indCategory:int=-1;
+
+            var firstLineData:Array = importFileLines[0].split(";");
+            for (var j:int = 0; j < firstLineData.length; j++) {
+
+               // warning : is classe and club are present, only class is used and set into the club field
+               if ( firstLineData[j].toLowerCase() == "nom" || firstLineData[j].toLowerCase() == "\"nom\"") {
+                        indLastname = j ;
+               } else if (firstLineData[j].toLowerCase() == "prenom" || firstLineData[j].toLowerCase() == "\"prenom\"" ||
+                          firstLineData[j].toLowerCase() == "pre" || firstLineData[j].toLowerCase() == "\"pre\"") {
+                        indFirstname = j ;
+               } else if (firstLineData[j].toLowerCase() == "club" || firstLineData[j].toLowerCase() == "\"club\"" ||
+                          firstLineData[j].toLowerCase() == "clu" || firstLineData[j].toLowerCase() == "\"clu\"") {
+                        if (indClub == -1) {
+                           indClub = j ;
+                        }
+               } else if (firstLineData[j].toLowerCase() == "classe" || firstLineData[j].toLowerCase() == "\"classe\"" ||
+                          firstLineData[j].toLowerCase() == "cla" || firstLineData[j].toLowerCase() == "\"cla\"") {
+                        indClub = j ;
+               } else if (firstLineData[j].toLowerCase() == "date de naissance" || firstLineData[j].toLowerCase() == "\"date de naissance\"" ||
+                          firstLineData[j].toLowerCase() == "dna" || firstLineData[j].toLowerCase() == "\"dna\"") {
+                        indBirthday = j ;
+               } else if (firstLineData[j].toLowerCase() == "sexe" || firstLineData[j].toLowerCase() == "\"sexe\"" ||
+                          firstLineData[j].toLowerCase() == "sex" || firstLineData[j].toLowerCase() == "\"sex\"") {
+                        indSex = j ;
+               } else if (firstLineData[j].toLowerCase() == "email" || firstLineData[j].toLowerCase() == "\"email\"" ||
+                          firstLineData[j].toLowerCase() == "ema" || firstLineData[j].toLowerCase() == "\"ema\"") {
+                        indEmail = j ;
+               } else if (firstLineData[j].toLowerCase() == "license" || firstLineData[j].toLowerCase() == "\"license\"" ||
+                          firstLineData[j].toLowerCase() == "lic" || firstLineData[j].toLowerCase() == "\"lic\"") {
+                        indLicense = j ;
+               } else if (firstLineData[j].toLowerCase() == "course" || firstLineData[j].toLowerCase() == "\"course\"" ||
+                          firstLineData[j].toLowerCase() == "cou" || firstLineData[j].toLowerCase() == "\"cou\"") {
+                        indCompetition = j ;
+               } else if (firstLineData[j].toLowerCase() == "categorie" || firstLineData[j].toLowerCase() == "\"categorie\"" ||
+                          firstLineData[j].toLowerCase() == "cat" || firstLineData[j].toLowerCase() == "\"cat\"") {
+                        indCategory = j ;
+               }
+            }
+
+            if (indLastname == -1 || indFirstname == -1 || indBirthday == -1 ||  indSex == -1) {
+               Alert.show("Erreur - les champs suivants sont obligatoires : nom, pre, sex, dna");
+               return;
+            }
+
+            //Alert.show("indLastname=" + indLastname + ", " +
+            //           "indFirstname=" + indFirstname + ", " +
+            //           "indClub=" + indClub + ", " +
+            //           "indBirthday=" + indBirthday + ", " +
+            //           "indSex=" + indSex + ", " +
+            //           "indEmail=" + indEmail + ", " +
+            //           "indLicense=" + indLicense + ", " +
+            //           "indCompetition=" + indCompetition + ", " +
+            //           "indCategory=" + indCategory + ", "
+            //           );
+
+
+            // Skip first line which contains the column headers
+            for (var i:int = 1; i < importFileLines.length; i++) {
+
+               // Split the line up into individual values
+               var lineData:Array = importFileLines[i].split(";");
+
+               // Don't include blank lines
+               if (lineData[0] != "") {
+                  var registered:Registered = new Registered();
+                  var person:Person = new Person();
+                  registered.competition = null;
+                  registered.category = null;
+                  registered.teamed = false;
+                  registered.paid = false;
+                  registered.event = null;
+                  registered.name = "";
+                  registered.source = "import";
+
+                  registered.persons = new ArrayCollection([]);
+
+                  for (var j:int = 0; j < lineData.length; j++) {
+
+                     var field:String = new String(lineData[j]);
+                     //Alert.show("field  = " + field);
+
+                     if (field.length>1) {
+                        if (field.charAt(0) == '"' && field.charAt(field.length-1) == '"') {
+                            field = field.substr(1,field.length-2);
+                        }
+                     }
+                     //Alert.show("field  = " + field);
+
+                     if ( j == indLastname ) {
+                        person.lastname = field;
+                     } else if (j == indFirstname ) {
+                        person.firstname = field;
+                     } else if (j == indClub ) {
+                        person.club = field;
+                     } else if (j == indBirthday ) {
+                        person.birthday = DateField.stringToDate(field,"DD/MM/YYYY");
+                     } else if (j == indSex ) {
+                        person.sex = field;
+                     } else if (j == indEmail ) {
+                        person.email = field;
+                     } else if (j == indLicense ) {
+                        person.license = field;
+                     } else if (j == indCompetition ) {
+                        // to be done
+                        registered.competition = null;
+                     } else if (j == indCategory ) {
+                        // to be done
+                        registered.category = null;
+                     }
+                  }
+
+                  registered.persons.addItem(person);
+                  importedRegisteredList.addItem(registered);
+                  //Alert.show("invoke(" + lineData.length + ")  = " + person.lastname);
+
+
+               }
+
+            }
+            //Alert.show("invoke = "+importedRegisteredList);
+
+            // invoke import service
+            RO_registering.importRegistered(importedRegisteredList);
+
+
+            // Change the import button label back
+            importFileButton.label = "Import Data File";
+
+            //progressBar.visible = false;
+
+         }
+
+         private function fileRef_progress(evt:ProgressEvent):void {
+             //progressBar.visible = true;
+         }
+
+
+
+			private function onFault(ev:Event):void {
+            Alert.show( ObjectUtil.toString(ev) );
+			}
+
+
+			private function buildRegisteredTip(item:Object):String
+			{
+				var myString:String = "";
+
+				if(item != null)
+				{
+					//myString = myString + item.id + ",";
+					//myString = myString + item.name + ",";
+					//myString = myString + item.competition.name + ",";
+					//myString = myString + item.category.name + ",";
+					//myString = myString + item.label.name + ",";
+
+					myString += Util.displayPersonsAsString(item) ;
+
+					//myString = myString + item.teamed + ",";
+					//myString = myString + item.paid + ",";
+					//myString = myString + item.registeringDate + ",";
+					//myString = myString + item.arrivalDate + ",";
+					//myString = myString + item.elapsedTime + "\n";
+				}
+
+				return myString;
+			}
+
+			private function resultGetCompetitions(event:ResultEvent):void {
+				competitionList = event.result as ArrayCollection;
+			}
+
+			private function resultGetCategories(event:ResultEvent):void {
+				categoryList = event.result as ArrayCollection;
+			}
+
+			private function resultGetRegistered(event:ResultEvent):void {
+				registeredList = event.result as ArrayCollection;
+
+           // refresh selected list if some items have been removed
+            var found:Boolean = false;
+            for(var i:int = 0; i < selectedItems.length; i++) {
+               var id:int = selectedItems.getItemAt(i, 0) as int;
+               found = false;
+               for(var j:int = 0; j < registeredList.length; j++) {
+                  var r:Registered = registeredList.getItemAt(j, 0) as Registered;
+                  if (r.id == id) {
+                     found = true;
+                     break;
+                  }
+               }
+               if (found == false) {
+                  selectedItems.removeItemAt(i);
+               }
+            }
+            // action buttons has to be disabled ?
+            actionSelectionEnabled = (selectedItems.length > 0);
+
+            // apply filter
+            setFilters();
+			}
+
+
+			private function resultRemoveRegistered(event:ResultEvent):void {
+				RO_registering.getRegistereds();
+			}
+
+         private function resultImportRegistered(event:ResultEvent):void {
+            RO_registering.getRegistereds();
+         }
+
+			// return null if not found
+			private function getRegistered(id:int):Registered {
+
+				for(var count:int = 0; count < registeredList.length; count++) {
+					var r:Registered = registeredList.getItemAt(count, 0) as Registered;
+					if (r.id == id) {
+						return r;
+					}
+				}
+				return null;
+			}
+
+			public function editRegistered(id:int):void {
+				var r:Registered = getRegistered(id);
+				if (r == null) {
+					Alert.show("Enregistrement inconnu <" + id + ">");
+				} else {
+					editedRegistered = r;
+					currentState="edit";
+
+					// if it(s the first call, MyRegisteredEditor will be initialized in the completeEditState
+					if (MyRegisteredEditor != null) {
+						setUpdate4RegisteredEditor();
+					}
+				}
+			}
+
+			private function setUpdate4RegisteredEditor():void {
+				MyRegisteredEditor.set4Update(editedRegistered);
+				MyRegisteredEditor.setExitCallback(this.init);
+			}
+
+			private function completeEditState():void {
+				setUpdate4RegisteredEditor();
+			}
+
+
+			public function removeRegistered(id:int):void {
+				removeSelectedItem(id);
+				RO_registering.removeRegistered(id);
+			}
+
+  			public function getLabel4Printing(id:int):void {
+				Alert.show("Generation du Pdf generation en cours pour l'enregistrement <" + id + ">");
+
+				var url:URLRequest;
+				url = new URLRequest(serverUrl +
+					"report?type=label&registeredId=" +
+					id);
+				navigateToURL(url,"_blank");
+
+			}
+
+			private function setFilters():void {
+
+            //Alert.show("ComF=" + selectedCompetitionFilter + ", NamF=" + selectedNameFilter + ", LabF=" + selectedLabelFilter);
+
+				if (selectedCompetitionFilter != null || selectedNameFilter != "" || selectedLabelFilter != "") {
+					registeredList.filterFunction = processFilters;
+				} else {
+					registeredList.filterFunction = null;
+				}
+				registeredList.refresh();
+			}
+
+			private function setFilterByCompetition(event:Event):void {
+				selectedCompetitionFilter=event.currentTarget.selectedItem as Competition;
+				if (selectedCompetitionFilter != null && selectedCompetitionFilter.name == "Unknown") {
+					selectedCompetitionFilter = null;
+				}
+				setFilters();
+			}
+
+			private function setFilterByName(event:Event):void {
+				selectedNameFilter=StringUtil.trim(TI_selectedNameFilter.text);
+				setFilters();
+			}
+
+			private function setFilterByLabel(event:Event):void {
+				selectedLabelFilter=StringUtil.trim(TI_selectedLabelFilter.text);
+				setFilters();
+			}
+
+			private function processFilters(item:Object):Boolean {
+
+				var resultCompetitionFilter:Boolean = true;
+				var resultNameFilter:Boolean = true;
+				var resultLabelFilter:Boolean = true;
+				var registered:Registered = item as Registered;
+
+				if (selectedCompetitionFilter != null) {
+					resultCompetitionFilter = (registered.competition.id == selectedCompetitionFilter.id);
+				}
+
+				if (selectedNameFilter != "") {
+					resultNameFilter = registered.name.toLowerCase().match(selectedNameFilter.toLowerCase());
+				}
+
+				if (selectedLabelFilter != "") {
+					resultLabelFilter = registered.label.value.match(selectedLabelFilter);
+				}
+
+				return (resultCompetitionFilter && resultNameFilter && resultLabelFilter);
+			}
+
+			public function addSelectedRegistered(id:int):void {
+				selectedItems.addItem(id);
+				actionSelectionEnabled = true;
+
+			}
+
+			// return -1 if not found
+			public function getIdxSelectedRegistered(id:int):int {
+
+				for(var count:int = 0; count < selectedItems.length; count++) {
+					var i:int = selectedItems.getItemAt(count, 0) as int;
+					if (i == id) {
+						return count;
+					}
+				}
+				return -1;
+			}
+
+			public function removeSelectedItem(id:int):void {
+
+				var idx:int = getIdxSelectedRegistered(id);
+				if (idx != -1) {
+					selectedItems.removeItemAt(idx);
+				}
+				actionSelectionEnabled = (selectedItems.length > 0);
+			}
+
+			public function onClickDeleteSelection(event:CloseEvent):void {
+				if(event.detail == Alert.OK) {
+
+					for(var count:int = 0; count < selectedItems.length; count++) {
+						var id:int = selectedItems.getItemAt(count, 0) as int;
+                  var registered:Registered = getRegistered(id);
+
+                  if (registered != null) {
+
+                     RO_registering.removeRegistered(id);
+
+                  }
+					}
+					selectedItems.removeAll();
+					actionSelectionEnabled = false;
+					selectAll=false;
+               CB_selectAll.selected=false;
+
+				}
+			}
+
+			private function confirmClickDeleteSelection():void {
+            var msg:String="";
+            msg = "inscrits";
+				Alert.show("Etes-vous sure de vouloir supprimer ces " + selectedItems.length + " enregistrements <" + msg + "> ?",
+					"Suppression ?",
+					Alert.OK | Alert.CANCEL,
+					this,
+					onClickDeleteSelection,
+					null,
+					Alert.OK);
+			}
+
+			public function onClickPrintSelection(event:Event):void {
+
+				for(var count:int = 0; count < selectedItems.length; count++) {
+					var id:int = selectedItems.getItemAt(count, 0) as int;
+					RO_reporting.printLabel(id, printDialog);
+				}
+				selectedItems.removeAll();
+				actionSelectionEnabled = false;
+				selectAll=false;
+
+			}
+
+			private function resultPrintLabel(event:ResultEvent):void {
+				RO_registering.getRegistereds();
+			}
+
+			// Set the scratch when change
+			private function modifySelectAll(event:Event):void {
+
+				if (CB_selectAll.selected == true) {
+					selectAll=true;
+					selectedItems.removeAll();
+					for(var j:int = 0; j < registeredList.length; j++) {
+						var r:Registered = registeredList.getItemAt(j, 0) as Registered;
+						selectedItems.addItem(r.id);
+					}
+				} else {
+					selectAll=false;
+					selectedItems.removeAll();
+				}
+
+				refreshRegisteredData();
+			}
+
+			// print dialog is asked ?
+			private function modifyPrintDialog(event:Event):void {
+
+				if (CB_printDialog.selected == true) {
+					printDialog=true;
+				}
+				else {
+					printDialog=false;
+				}
+			}
+
+		]]>
+	</mx:Script>
+
+	<mx:RemoteObject id="RO_admin" destination="admin" showBusyCursor="true" fault="onFault(event)">
+		<mx:method name="getCompetitions" result="resultGetCompetitions(event)"/>
+		<mx:method name="getCategories" result="resultGetCategories(event)"/>
+	</mx:RemoteObject>
+
+	<mx:RemoteObject id="RO_registering" destination="registering" showBusyCursor="true" fault="onFault(event)">
+		<mx:method name="getRegistereds" result="resultGetRegistered(event)"/>
+		<mx:method name="removeRegistered" result="resultRemoveRegistered(event)"/>
+      <mx:method name="importRegistered" result="resultImportRegistered(event)"/>
+	</mx:RemoteObject>
+
+	<mx:RemoteObject id="RO_reporting" destination="reporting" showBusyCursor="true" fault="onFault(event)">
+		<mx:method name="printLabel" result="resultPrintLabel(event)"/>
+	</mx:RemoteObject>
+
+	<mx:states>
+		<mx:State name="edit">
+			<mx:AddChild relativeTo="{VB_label}" position="lastChild">
+				<components:RegisteredEditor id="MyRegisteredEditor" width="100%"  height="90%" creationComplete="completeEditState()"/>
+			</mx:AddChild>
+			<mx:RemoveChild target="{HB_FiltersActions}"/>
+			<mx:RemoveChild target="{HB_registereds}"/>
+		</mx:State>
+	</mx:states>
+
+	<mx:transitions>
+		<mx:Transition id="fromListToEdit" fromState="*" toState="edit">
+			<mx:Sequence target="{this}">
+				<mx:WipeDown duration="500"/>
+			</mx:Sequence>
+		</mx:Transition>
+		<mx:Transition id="fromEditToList" fromState="edit" toState="*">
+			<mx:Sequence target="{this}">
+				<mx:Blur duration="200" blurYFrom="20.0" blurYTo="1.0" blurXFrom="20.0" blurXTo="1.0" />
+				<mx:RemoveChildAction/>
+			</mx:Sequence>
+		</mx:Transition>
+	</mx:transitions>
+
+	<mx:VBox id="VB_label" width="95%">
+      <components:EventPanel id="MyEventPanel"  width="100%"/>
+		<mx:HBox id="HB_FiltersActions" width="100%" height="15%">
+			<mx:Panel width="40%" height="100%" horizontalAlign="center" title="Filtres">
+				<mx:VBox width="100%" height="100%">
+					<mx:Form>
+						<mx:FormItem label="Filtre par competition" >
+							<mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setFilterByCompetition(event)" />
+						</mx:FormItem>
+						<mx:FormItem label="Filtre par nom" >
+							<mx:TextInput id="TI_selectedNameFilter" width="150" change="setFilterByName(event);"/>
+						</mx:FormItem>
+						<mx:FormItem label="Filtre par dossard" >
+							<mx:TextInput id="TI_selectedLabelFilter" width="150" change="setFilterByLabel(event);"/>
+						</mx:FormItem>
+					</mx:Form>
+				</mx:VBox>
+			</mx:Panel>
+			<mx:Panel width="60%" height="100%" horizontalAlign="center" title="Actions">
+				<mx:HBox width="100%" height="100%">
+					<mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
+
+ 						<mx:Button label="Reinit/Refresh" id="B_refresh" click="onClickRefresh(event)" enabled="true"/>
+                  <mx:Button id="importFileButton" label="Import CSV" click="importFileRef.browse([importFileFilter]);" enabled="true"/>
+                   <!--  <mx:ProgressBar id="progressBar" indeterminate="true" visible="false" /> -->
+					</mx:VBox>
+               <mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
+
+                  <mx:CheckBox id="CB_selectAll" label="Selectionner tout" selected="false" click="modifySelectAll(event)"/>
+                  <mx:CheckBox id="CB_printDialog" label="Activer la boite de dialogue d'impression" selected="false" click="modifyPrintDialog(event)"/>
+
+               </mx:VBox>
+
+               <mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
+
+						<mx:Button label="Supprimer la selection (inscrits)" id="B_delete1" click="confirmClickDeleteSelection()" enabled="{actionSelectionEnabled}"/>
+						<mx:Button label="Imprimer la selection" id="B_print" click="onClickPrintSelection(event)" enabled="{actionSelectionEnabled}"/>
+               </mx:VBox>
+				</mx:HBox>
+			</mx:Panel>
+		</mx:HBox>
+		<mx:HBox id="HB_registereds" width="100%" height="80%">
+			<mx:Panel width="100%" height="100%" horizontalAlign="center" title="Liste des inscrits">
+				<mx:DataGrid id="DG_registereds" dataProvider="{RO_registering.getRegistereds.lastResult}" dataTipFunction="buildRegisteredTip"
+							 rowCount="20"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
+					<mx:columns>
+						<mx:DataGridColumn headerText="Id" dataField="id" showDataTips="true" width="30"/>
+						<mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="150"/>
+						<mx:DataGridColumn headerText="Competition" labelFunction="Util.displayCompetition" showDataTips="true" width="115"/>
+						<mx:DataGridColumn headerText="Categorie" labelFunction="Util.displayCategory" showDataTips="true" width="115"/>
+						<mx:DataGridColumn headerText="Dossard" labelFunction="Util.displayLabel" showDataTips="true" width="70"/>
+
+						<mx:DataGridColumn headerText="Personnes" labelFunction="Util.displayPersonsIdAsString" showDataTips="true" width="80"/>
+
+						<mx:DataGridColumn headerText="Equipe" labelFunction="Util.displayTeam" showDataTips="true" width="30"/>
+						<mx:DataGridColumn headerText="Paye" labelFunction="Util.displayPaid" showDataTips="true" width="30"/>
+                  <mx:DataGridColumn headerText="CM" labelFunction="Util.displayProvidedHealthForm" showDataTips="true" width="30"/>
+                  <mx:DataGridColumn headerText="Origine" dataField="source" showDataTips="true" width="50"/>
+                  <mx:DataGridColumn headerText="Club" dataField="club" showDataTips="true" width="100"/>
+						<mx:DataGridColumn headerText="Date inscription" dataField="registeringDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
+						<mx:DataGridColumn headerText="Date arrivee" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
+						<mx:DataGridColumn headerText="Temps" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="Util.getElapsedTimeLabel"/>
+						<mx:DataGridColumn width="100" headerText="Actions"
+										   itemRenderer="net.o3s.webflex.components.ActionLabelDataGridColumnItemRenderer" />
+					</mx:columns>
+				</mx:DataGrid>
+			</mx:Panel>
+		</mx:HBox>
+	</mx:VBox>
+</mx:Canvas>

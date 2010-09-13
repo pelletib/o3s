@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+         xmlns:components="net.o3s.webflex.components.*"
+         xmlns:util="util.*"
+         width="100%" height="100%" creationComplete="init()">
+
+   <mx:Script>
+      <![CDATA[
+         import mx.collections.ArrayCollection;
+         import mx.controls.Alert;
+         import mx.events.ItemClickEvent;
+         import mx.rpc.events.ResultEvent;
+         import mx.utils.ObjectUtil;
+    	 import mx.events.CollectionEvent;
+
+         [Bindable]
+         private var terminalList:ArrayCollection= new ArrayCollection(
+                        [  {name:"Arrival1", data:1},
+                           {name:"Arrival2", data:2}]);
+
+         [Bindable]
+         public var terminalIsEmpty:Boolean = true;
+
+         [Bindable]
+         public var terminal:String;
+
+         [Bindable]
+         private var manualArrivalTime:Boolean = false;
+
+		  private var labelInput:String;
+		  private var timeInput:Date;
+
+
+         public function init():void {
+            refreshAdminData();
+            CB_terminal.selectedItem = -1;
+            manualArrivalTime = false;
+         }
+
+         public function refreshAdminData():void {
+         }
+
+         private function onFault(ev:Event):void
+         {
+            Alert.show( ObjectUtil.toString(ev) );
+         }
+
+         private function resultCreateArrivalEvent(event:ResultEvent):void {
+
+            var creationDate:Date = event.result as Date;
+
+            labelList.addItem({value:TI_labelValue.text,creationDate:creationDate});
+
+            L_processing.text = "Numero de dossard <" + TI_labelValue.text + "> emis !" ;
+
+            TI_labelValue.text="";
+            TI_labelValue.errorString="";
+			TI_arrivalTime.text="";
+			TI_arrivalTime.errorString="";
+			timeInput=null;
+			labelInput=null;
+
+         }
+
+         private function setTerminal(event:Event):void {
+            terminal=event.currentTarget.selectedItem.name as String;
+            terminalIsEmpty = false;
+         }
+
+
+		  public function getDateLabel(item:Object,column:DataGridColumn):String {
+			  return formatDate.format(item[column.dataField]);
+		  }
+
+		  private function modifyInputTypeArrivalTime(event:ItemClickEvent):void {
+			  if (event.currentTarget.selectedValue == "auto") {
+				  manualArrivalTime=false;
+			  }
+			  else {
+				  manualArrivalTime=true;
+			  }
+		  }
+
+
+		  private function sendEvent(event:Event):void {
+			  if (manualArrivalTime == false) {
+				  if (labelInput != null && labelInput != "") {
+				 	 L_processing.text = "Numero de dossard <" + labelInput + "> en cours d'envoi ..." ;
+				 	 RO_tracking.createArrivalEvent(terminal,labelInput);
+				  } else {
+					  Alert.show("Champ vide","Erreur");
+				  }
+			  } else {
+				  if (labelInput != null && labelInput != "" && timeInput != null) {
+					  L_processing.text = "Numero de dossard <" + labelInput + "> en cours d'envoi ..." ;
+					  RO_tracking.createArrivalEvent(terminal,labelInput,timeInput);
+				  } else {
+					  Alert.show("Champ vide","Erreur");
+				  }
+			  }
+
+		  }
+
+		  private function setLabelValue(event:Event):void {
+			 labelInput = TI_labelValue.text;
+          }
+
+		  private function handleBadFormatArrivalTime():void {
+			  if (TI_arrivalTime.text != "") {
+			 	Alert.show("Saisie invalide (HH:MM:SS)","Erreur");
+			  	TI_arrivalTime.text = "";
+			  }
+
+		  }
+
+		  private function setArrivalTime(event:Event):void {
+            var dateStr:String=TI_arrivalTime.text;
+            var dateValue:Date = new Date();
+            var dateArray:Array = dateStr.split(":");
+
+			if (dateArray.length != 3 ) {
+				handleBadFormatArrivalTime();
+			} else {
+				var h:Number = Number(dateArray[0]);
+				var m:Number = Number(dateArray[1]);
+				var s:Number = Number(dateArray[2]);
+
+				if (isNaN(h) || isNaN(m) || isNaN(s)) {
+					handleBadFormatArrivalTime();
+				}
+				if (h < 0 || h > 24) {
+					handleBadFormatArrivalTime();
+				}
+				if (m < 0 || m > 59) {
+					handleBadFormatArrivalTime();
+				}
+				if (s < 0 || s > 59) {
+					handleBadFormatArrivalTime();
+				}
+				dateValue.setHours(dateArray[0], dateArray[1], dateArray[2]);
+				timeInput = dateValue;
+			}
+		 }
+
+		  private function arrColl_collectionChange(evt:CollectionEvent):void {
+			  callLater(autoScrollDataGrid);
+		  }
+
+		  private function autoScrollDataGrid():void {
+			  if (DG_labels) {
+				  DG_labels.validateNow();
+				  DG_labels.verticalScrollPosition = DG_labels.maxVerticalScrollPosition;
+			  }
+		  }
+
+
+      ]]>
+   </mx:Script>
+
+   <mx:DateFormatter formatString="DD/MM/YY HH:NN:SS" id="formatDate"/>
+   <mx:DateFormatter formatString="HH:NN:SS" id="formatTime"/>
+
+   <mx:RemoteObject id="RO_tracking" destination="tracking" showBusyCursor="true" fault="onFault(event)">
+     <mx:method name="createArrivalEvent" result="resultCreateArrivalEvent(event)"/>
+   </mx:RemoteObject>
+
+	<mx:ArrayCollection id="labelList"
+						collectionChange="arrColl_collectionChange(event);" />
+
+   <mx:VBox width="95%" height="60%">
+
+      <components:EventPanel id="MyEventPanel"  width="100%"/>
+
+      <mx:HBox width="100%" height="10%">
+         <mx:Panel title="Terminal" width="100%" height="100%" horizontalAlign="center">
+            <mx:ComboBox id="CB_terminal" dataProvider="{terminalList}" labelField="name" width="200" change="setTerminal(event)"  />
+         </mx:Panel>
+      </mx:HBox>
+
+      <mx:HBox width="100%" height="10%">
+         <mx:Panel title="Lecture Dossard" width="100%" height="100%">
+            <mx:Form>
+				<mx:FormItem label="Type de saisie de l'heure d'arrivee" visible="{!terminalIsEmpty}" direction="horizontal" >
+					<mx:RadioButtonGroup id="inputtype" selectedValue="auto"  itemClick="modifyInputTypeArrivalTime(event);"/>
+					<mx:RadioButton groupName="inputtype" id="RB_auto" label="automatique" value="auto"/>
+					<mx:RadioButton groupName="inputtype" id="RB_manual" label="manuelle" value="manual"/>
+				</mx:FormItem>
+               <mx:FormItem label="Dossard" visible="{!terminalIsEmpty}" >
+                  <mx:TextInput id="TI_labelValue" width="150" enter="setLabelValue(event);sendEvent(event);" focusOut="setLabelValue(event);"/>
+               </mx:FormItem>
+                <mx:FormItem label="Heure d'arrivee (HH:MM:SS)" visible="{manualArrivalTime}" >
+                  <mx:TextInput id="TI_arrivalTime" width="150" enter="setArrivalTime(event);sendEvent(event);" focusOut="setArrivalTime(event);"/>
+               </mx:FormItem>
+            </mx:Form>
+            <mx:Label id="L_processing" color="blue" text="" textAlign="right"/>
+
+         </mx:Panel>
+      </mx:HBox>
+
+      <mx:HBox width="100%" height="70%">
+         <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Dossards lus">
+
+            <mx:DataGrid id="DG_labels" dataProvider="{labelList}"
+                      rowCount="10" verticalScrollPolicy="on" resizableColumns="true" >
+
+               <mx:columns>
+                  <mx:DataGridColumn headerText="Value" dataField="value" width="100"/>
+                  <mx:DataGridColumn headerText="Date" dataField="creationDate" width="150" labelFunction="getDateLabel"/>
+               </mx:columns>
+
+            </mx:DataGrid>
+
+         </mx:Panel>
+      </mx:HBox>
+   </mx:VBox>
+</mx:Canvas>

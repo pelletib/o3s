@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+               layout="absolute"
+               xmlns:component="net.o3s.webflex.component.*" xmlns:view="net.o3s.webflex.view.*"
+               preinitialize="preInit()"
+               creationComplete="init()">
+
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+
+			import mx.events.ValidationResultEvent;
+			import mx.controls.Alert;
+			import mx.events.ListEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ObjectUtil;
+			import mx.core.IUIComponent;
+			import net.o3s.webflex.bean.MyEvent;
+			import net.o3s.webflex.bean.FlexException;
+			import mx.events.FlexEvent;
+			import mx.rpc.Fault;
+			import mx.utils.StringUtil;
+
+			import net.o3s.webflex.components.StaticVars;
+			import net.o3s.webflex.components.Util;
+
+			private var username:String;
+			private var password:String;
+
+         public function preInit():void {
+            //initTest();
+            Application.application.setStyle("styleName", "o3s");
+         }
+
+         public function initTest():void {
+            // tempory for tests purpose
+            RO_init.populateAdminData();
+         }
+
+			public function init():void {
+            currentState = "init";
+			}
+
+			public function clearFormHandler():void
+			{
+				// Clear all input fields.
+				TI_username.text = "";
+				TI_password.text = "";
+
+
+				// Clear validation error messages.
+				TI_username.errorString = "";
+				TI_password.errorString = "";
+
+				username="";
+				password="";
+			}
+
+			private function onClickLogin(event:Event):void {
+
+				username = StringUtil.trim(TI_username.text);
+				password = StringUtil.trim(TI_password.text);
+				RO_login.login(username,password);
+			}
+
+			private function onClickLoginLink(event:Event):void {
+
+				if (this.currentState == null || this.currentState == "" || currentState == "init") {
+					this.currentState = "login";
+				} else if (this.currentState == "logged"){
+					RO_login.logOut();
+				}
+			}
+
+			private function resultLogin(event:ResultEvent):void {
+				StaticVars.isLogged = event.result as Boolean;
+
+
+				if (StaticVars.isLogged == true) {
+					this.currentState = "logged";
+				} else {
+					this.currentState = "init";
+				}
+			}
+
+         private function resultInit(event:ResultEvent):void {
+            this.currentState="init";
+         }
+
+			private function resultLogout(event:ResultEvent):void {
+
+				StaticVars.isLogged = ! (event.result as Boolean);
+
+				if (StaticVars.isLogged == true) {
+					this.currentState = "logged";
+				} else {
+					this.currentState = "init";
+				}
+				clearFormHandler();
+			}
+
+		]]>
+	</mx:Script>
+
+    <mx:Style>
+       .o3s {
+            backgroundColor: #d2d2d2;
+            color: #ea6a00;
+            fontSize: 10;
+            fontWeight: normal;
+            horizontalAlign: "left";
+            backgroundImage: ""; /* The empty string sets the image to nothing. */
+
+            paddingLeft: 0px;
+            paddingRight: 0px;
+            paddingTop: 0px;
+            paddingBottom: 0px;
+
+        }
+
+   </mx:Style>
+
+
+   <mx:RemoteObject id="RO_init" showBusyCursor="true" destination="init">
+      <mx:method name="populateAdminData" result="resultInit(event)" fault="Util.handleException(event)"/>
+   </mx:RemoteObject>
+
+	<mx:RemoteObject id="RO_login" destination="login" showBusyCursor="true" fault="Util.onFault(event)">
+		<mx:method name="login" result="resultLogin(event)" fault="Util.handleException(event)"/>
+		<mx:method name="logOut" result="resultLogout(event)" fault="Util.handleException(event)"/>
+	</mx:RemoteObject>
+
+
+	<mx:states>
+      <mx:State name="init" basedOn="">
+
+         <mx:AddChild relativeTo="{HB_linkLogin}" position="before" creationPolicy="all"  >
+            <mx:ToggleButtonBar id="TBB_minStack" dataProvider="{this.minStack}" width="50%"/>
+         </mx:AddChild>
+
+         <mx:AddChild relativeTo="{HB_linkLogin}"  position="before" creationPolicy="all" >
+
+            <mx:ViewStack id="minStack" width="100%" height="100%" >
+               <view:Registering id="VBox_registering" label="Inscription" />
+               <view:Ranking id="VBox_ranking" label="Classement" />
+            </mx:ViewStack>
+         </mx:AddChild>
+
+      </mx:State>
+
+		<mx:State name="login" basedOn="init">
+
+			<mx:AddChild relativeTo="{VB_o3s}" position="lastChild" creationPolicy="all"	>
+
+				<mx:Panel
+					title="Login" id="loginPanel" horizontalAlign="center"
+					horizontalScrollPolicy="off" verticalScrollPolicy="off" defaultButton="{loginButton}">
+
+					<mx:Form id="loginForm">
+						<mx:FormItem label="Username:">
+							<mx:TextInput id="TI_username"/>
+						</mx:FormItem>
+						<mx:FormItem label="Password:">
+							<mx:TextInput id="TI_password" displayAsPassword="true"/>
+						</mx:FormItem>
+					</mx:Form>
+
+					<mx:ControlBar>
+						<mx:Button label="Login" id="loginButton" click="onClickLogin(event);"/>
+					</mx:ControlBar>
+
+					<mx:Spacer width="100%" id="spacer1"/>
+
+					<mx:LinkButton label="Close the window" click="currentState='init';clearFormHandler();"/>
+
+				</mx:Panel>
+			</mx:AddChild>
+
+			<mx:RemoveChild target="{loginLink}"/>
+
+		</mx:State>
+
+		<mx:State name="logged" basedOn="init">
+
+			<mx:RemoveChild target="{TBB_minStack}"/>
+         <mx:RemoveChild target="{minStack}"/>
+
+			<mx:AddChild relativeTo="{HB_linkLogin}" position="before" creationPolicy="all"	>
+				<mx:ToggleButtonBar dataProvider="{this.fullStack}"/>
+			</mx:AddChild>
+
+			<mx:AddChild relativeTo="{HB_linkLogin}"  position="before" creationPolicy="all"	>
+
+				<mx:ViewStack id="fullStack" width="100%" height="100%" >
+					<view:Registering id="VS_registering" label="Inscriptions" />
+               <view:Ranking id="VS_ranking" label="Classement" />
+					<view:Label label="Liste des inscrits" />
+               <view:PersonTab label="Liste des personnes" />
+					<view:Departure label="Depart" />
+					<view:Arrival label="Arrivee" />
+					<view:Tracking label="Suivi" />
+               <view:Statistics label="Stats" />
+					<view:Admin label="Admin" />
+					<view:Test label="Test" />
+				</mx:ViewStack>
+			</mx:AddChild>
+
+			<mx:SetProperty target="{loginLink}"
+							name="label" value="Logout"/>
+
+		</mx:State>
+
+	</mx:states>
+
+	<mx:VBox id="VB_o3s" width="100%" height="100%" horizontalAlign="center">
+		<mx:HBox id="HB_linkLogin" horizontalAlign="center" width="100%">
+			<mx:LinkButton
+				label="Login" id="loginLink"
+				click="onClickLoginLink(event)"/>
+		</mx:HBox>
+	</mx:VBox>
+</mx:Application>

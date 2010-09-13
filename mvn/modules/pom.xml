@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.o3s</groupId>
+    <artifactId>o3s</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>net.o3s</groupId>
+  <artifactId>o3s-modules</artifactId>
+  <packaging>pom</packaging>
+
+  <name>o3s :: modules</name>
+
+  <modules>
+    <module>o3s-apis</module>
+    <module>o3s-persistence</module>
+    <module>o3s-beans</module>
+    <module>o3s-appclient-init</module>
+    <module>o3s-webflex</module>
+    <module>o3s-webds</module>
+    <module>o3s-application</module>
+  </modules>
+
+</project>

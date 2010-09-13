@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:application="http://java.sun.com/xml/ns/javaee/application_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_5.xsd" version="5">
+  <description>Open Source Sport Software</description>
+  <display-name>o3s application</display-name>
+  <module>
+    <ejb>o3s-beans.jar</ejb>
+  </module>
+  <module>
+    <java>o3s-appclient-init.jar</java>
+  </module>
+
+  <module>
+    <web>
+      <web-uri>o3s-webds.war</web-uri>
+      <context-root>o3s-webds</context-root>
+    </web>
+  </module>
+
+  <library-directory>lib</library-directory>
+
+</application>
