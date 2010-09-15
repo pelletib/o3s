@@ -34,7 +34,7 @@
 			import net.o3s.webflex.bean.Category;
 			import net.o3s.webflex.bean.Registered;
 			import net.o3s.webflex.bean.Person;
-         import net.o3s.webflex.components.Util;
+            import net.o3s.webflex.components.Util;
 
 			import mx.rpc.events.ResultEvent;
 			import mx.controls.Alert;
@@ -45,7 +45,7 @@
 			import mx.core.Application;
 			import mx.utils.StringUtil;
 			import mx.events.CloseEvent;
-         import mx.controls.DateField;
+            import mx.controls.DateField;
 
 			[Bindable]
 			private var registeredList:ArrayCollection= new ArrayCollection([]);

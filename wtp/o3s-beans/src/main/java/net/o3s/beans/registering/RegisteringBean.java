@@ -900,6 +900,23 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     }
 
     /**
+     * Get all registered on the specified event
+     */
+    @SuppressWarnings("unchecked")
+    public  List<IEntityRegistered> findAllRegisteredFromEvent(int eventId) {
+        Query query = this.entityManager.createNamedQuery("ALL_REGISTERED_FROM_EVENT");
+        query.setParameter("EVENTID", eventId);
+
+        List<IEntityRegistered> registereds = null;
+        try {
+        	registereds = query.getResultList();
+        } catch (javax.persistence.NoResultException e) {
+        	registereds = new ArrayList<IEntityRegistered>();
+        }
+        return registereds;
+    }
+
+    /**
      * Get all registered on default event where registration date is greater than mindate
      */
     @SuppressWarnings("unchecked")

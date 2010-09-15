@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:HBox
+    xmlns:mx="http://www.adobe.com/2006/mxml"
+    width="100%"
+    height="100%">
+
+    <mx:Script>
+        <![CDATA[
+
+            import mx.controls.Alert;
+            import mx.events.CloseEvent;
+
+
+            /**
+             * Remove icon (16 pixels)
+             */
+            [Embed(source='../images/remove16.png')]
+            [Bindable]
+            public var removeIcon16:Class;
+
+            /**
+             * Start icon (16 pixels)
+             */
+            [Embed(source='../images/start16.png')]
+            [Bindable]
+            public var startIcon16:Class;
+
+			/**
+			 * Printer icon (16 pixels)
+			 */
+			[Embed(source='../images/printer.png')]
+			[Bindable]
+			public var printerIcon16:Class;
+
+			/**
+			 * Printer icon (16 pixels)
+			 */
+			[Embed(source='../images/edit16.png')]
+			[Bindable]
+			public var editIcon16:Class;
+
+            /**
+             * Pause icon (16 pixels)
+             */
+            [Embed(source='../images/pause16.png')]
+            [Bindable]
+            public var pauseIcon16:Class;
+
+           /**
+             * copy/past icon (16 pixels)
+             */
+            [Embed(source='../images/copy-icon.png')]
+            [Bindable]
+            public var copyIcon16:Class;
+
+            private function confirmRemove():void {
+                Alert.show("Etes-vous sur de vouloir supprimer cet evenement ?",
+                    "Suppression ?",
+                    Alert.OK | Alert.CANCEL,
+                    this,
+					removeEvent,
+                    null,
+                    Alert.OK);
+            }
+
+            private function removeEvent(event:CloseEvent):void {
+                if(event.detail == Alert.OK) {
+					parentDocument.removeEvent(data.id);
+                }
+            }
+
+			private function editEvent():void {
+				parentDocument.editEvent(data.id);
+			}
+
+         private function confirmRemoveSetEventAsDefault():void {
+            Alert.show("Etes-vous sur de vouloir positionner cet evenement par defaut ?",
+                    "Evenement par defaut ?",
+                    Alert.OK | Alert.CANCEL,
+                    this,
+                    setEventAsDef,
+                    null,
+                    Alert.OK);
+            }
+
+
+         private function setEventAsDef(event:CloseEvent):void {
+            if(event.detail == Alert.OK) {
+               parentDocument.setEventAsDefault(data.id);
+            }
+         }
+
+         private function duplicateEvent():void {
+            parentDocument.duplicateEvent(data.id);
+         }
+
+        ]]>
+    </mx:Script>
+
+    <mx:Button id="B_removeItem" icon="{removeIcon16}" width="20" height="20" toolTip="Supprimer"
+               click="confirmRemove()" />
+
+	<mx:Button id="B_editItem" icon="{editIcon16}" width="20" height="20" toolTip="Editer"
+			   click="editEvent()" />
+
+   <mx:Button id="B_setAsDefItem" icon="{startIcon16}" width="20" height="20" toolTip="Positionner comme defaut"
+            click="confirmRemoveSetEventAsDefault()" />
+
+   <mx:Button id="B_copyItem" icon="{copyIcon16}" width="20" height="20" toolTip="Dupliquer l'evenement"
+            click="duplicateEvent()" />
+
+</mx:HBox>

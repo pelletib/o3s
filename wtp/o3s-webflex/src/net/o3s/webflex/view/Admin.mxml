@@ -28,15 +28,18 @@
 
 	<mx:Script>
 		<![CDATA[
-			import net.o3s.webflex.bean.Competition;
-         import net.o3s.webflex.bean.Category;
-
+			import mx.controls.Alert;
+			import mx.controls.DateField;
 			import mx.rpc.events.ResultEvent;
-         import mx.controls.Alert;
-         import mx.utils.ObjectUtil;
-         import mx.utils.StringUtil;
-         import mx.controls.DateField;
+			import mx.utils.StringUtil;
+         import mx.collections.ArrayCollection;
+         import mx.managers.PopUpManager;
 
+			import net.o3s.webflex.bean.Category;
+			import net.o3s.webflex.bean.Competition;
+			import net.o3s.webflex.bean.MyEvent;
+         import net.o3s.webflex.components.EventScreen;
+         import net.o3s.webflex.components.Util;
 
          [Bindable]
          public var importFileName:String="";
@@ -44,9 +47,25 @@
          [Bindable]
          public var actionImportEnabled:Boolean = false;
 
+			[Bindable]
+			public var eventSelectedItems:ArrayCollection= new ArrayCollection([]);
+
+			[Bindable]
+			private var editedEvent:MyEvent= null;
+
+			[Bindable]
+			public var eventActionSelectionEnabled:Boolean = false;
+
+			[Bindable]
+			private var eventList:ArrayCollection= new ArrayCollection([]);
+
+         private var eventScreen:EventScreen = null;
 
          public function init():void {
             refreshAdminData();
+
+            this.eventScreen = new EventScreen();
+            this.eventScreen.addEventListener("SaveEvent", saveEvent);
 
          }
 
@@ -182,10 +201,101 @@
         }
 
 
+         private function resultSetDefaultEvent(event:ResultEvent):void {
+            refreshAdminData();
+         }
+
+			private function resultGetAllEvents(event:ResultEvent):void {
+				eventList = event.result as ArrayCollection;
+			}
+
+
+
+			// return null if not found
+			private function getEvent(id:int):MyEvent {
+
+				for(var count:int = 0; count < eventList.length; count++) {
+					var r:MyEvent = eventList.getItemAt(count, 0) as MyEvent;
+					if (r.id == id) {
+						return r;
+					}
+				}
+				return null;
+			}
+
+			public function removeEvent(id:int):void {
+				var r:MyEvent = getEvent(id);
+				if (r == null) {
+					Alert.show("Enregistrement inconnu <" + id + ">");
+				} else {
+					editedEvent = r;
+				}
+            RO_admin.removeEvent(editedEvent.id);
+			}
+
+			public function editEvent(id:int):void {
+				var r:MyEvent = getEvent(id);
+				if (r == null) {
+					Alert.show("Enregistrement inconnu <" + id + ">");
+				} else {
+					editedEvent = r;
+				}
+
+				Alert.show("edit event " + editedEvent);
+			}
+
+			public function setEventAsDefault(id:int):void {
+				var r:MyEvent = getEvent(id);
+				if (r == null) {
+					Alert.show("Enregistrement inconnu <" + id + ">");
+				} else {
+               RO_admin.setDefaultEvent(r.id);
+				}
+			}
+
+         public function duplicateEvent(id:int):void {
+            var r:MyEvent = getEvent(id);
+            if (r == null) {
+               Alert.show("Enregistrement inconnu <" + id + ">");
+            } else {
+               editedEvent = r;
+            }
+
+            Alert.show("duplicate event " + editedEvent);
+         }
+
+         private function addMyEvent():void {
+            PopUpManager.addPopUp(this.eventScreen, this, true);
+            PopUpManager.centerPopUp(this.eventScreen);
+            this.eventScreen.eventName.text = "";
+            this.eventScreen.eventDate.text = "";
+         }
+
+         private function saveEvent(e:Event):void {
+            var ev:MyEvent = new MyEvent();
+            ev.name = this.eventScreen.eventName.text;
+            ev.date = this.eventScreen.eventDate.selectedDate;
+            RO_admin.createEvent(ev);
+            PopUpManager.removePopUp(this.eventScreen);
+         }
+
+         private function resultCreateEvent(event:ResultEvent):void {
+               RO_admin.getAllEvents();
+         }
+         private function resultRemoveEvent(event:ResultEvent):void {
+               RO_admin.getAllEvents();
+         }
+
+
 		]]>
 	</mx:Script>
 
 	<mx:RemoteObject id="RO_admin" destination="admin" showBusyCursor="true" fault="onFault(event)">
+    	<mx:method name="getAllEvents" result="resultGetAllEvents(event)"/>
+      <mx:method name="setDefaultEvent" result="resultSetDefaultEvent(event)"/>
+      <mx:method name="createEvent" result="resultCreateEvent(event)" fault="Util.handleException(event)"/>
+      <mx:method name="removeEvent" result="resultRemoveEvent(event)" fault="Util.handleException(event)"/>
+
       <mx:method name="exportRegisteredAsFileName" result="resultExportRegisteredAsFileName(event)"/>
       <mx:method name="importRegistered" result="resultImportFileName(event)"/>
 	</mx:RemoteObject>
@@ -210,9 +320,7 @@
                     formatString="DD/MM/YYYY"
                     textAlign="center"
                     fontSize="9"
-                    selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date()}}"
-                    change=""
-                    focusOut=""/>
+                    selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date()}}"/>
 
                 </mx:HBox>
 
@@ -240,8 +348,11 @@
                <mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="300"/>
                <mx:DataGridColumn headerText="Date" dataField="date" showDataTips="true" width="300"/>
                <mx:DataGridColumn headerText="Default" dataField="theDefault" showDataTips="true" width="100"/>
+				<mx:DataGridColumn width="150" headerText="Actions"
+								   itemRenderer="net.o3s.webflex.components.ActionEventDataGridColumnItemRenderer" />
             </mx:columns>
          </mx:DataGrid>
+            <mx:Button label="Ajouter" click="addMyEvent()"/>
       </mx:Panel>
       </mx:HBox>
 

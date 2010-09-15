@@ -34,6 +34,7 @@ public interface IEJBAdminLocal {
 	IEntityEvent findDefaultEvent();
 	void setDefaultEvent(final int id);
 	IEntityEvent createEvent(final String name, final Date date, final String fileName);
+	void removeEvent(final int id) throws AdminException;
 
 	IEntityCompetition findCompetitionFromId(final int id);
 	List<IEntityCompetition> findAllCompetitions();

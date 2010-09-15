@@ -26,21 +26,26 @@ package net.o3s.web.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import net.o3s.apis.AdminException;
+import net.o3s.apis.AlreadyExistException;
 import net.o3s.apis.IEJBAdminRemote;
 import net.o3s.apis.IEntityCategory;
 import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityEvent;
+import net.o3s.apis.IEntityPerson;
+import net.o3s.apis.RegisteringException;
 import net.o3s.web.common.Util;
 import net.o3s.web.vo.CategoryVO;
 import net.o3s.web.vo.CompetitionVO;
 import net.o3s.web.vo.EventVO;
 import net.o3s.web.vo.FlexException;
+import net.o3s.web.vo.PersonVO;
 
 
 public class Admin {
@@ -96,6 +101,38 @@ public class Admin {
 		setAdminEJB();
 		admin.setDefaultEvent(id);
 	}
+
+	public EventVO createEvent(EventVO eventVO) {
+		setAdminEJB();
+
+		IEntityEvent event = null;
+		try {
+
+			event = admin.createEvent(eventVO.getName(), eventVO.getDate(), null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+
+		EventVO eVO = Util.createEventVO(event);
+
+		logger.fine("event=" + eVO);
+		return eVO;
+	}
+
+	public void removeEvent(int id) {
+		setAdminEJB();
+		try {
+			admin.removeEvent(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+
+	}
+
 
 
 	public List<EventVO> getAllEvents() {

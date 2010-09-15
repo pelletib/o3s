@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
+ layout="absolute" width="348" height="218"
+ title="Formulaire evenement">
+  <mx:Metadata>
+    [Event(name="SaveEvent")]
+  </mx:Metadata>
+  <mx:Script>
+   <![CDATA[
+     import mx.managers.PopUpManager;
+
+     private function close():void
+     {
+       PopUpManager.removePopUp(this);
+     }
+
+     private function save():void
+     {
+       this.dispatchEvent(new Event("SaveEvent"));
+     }
+   ]]>
+ </mx:Script>
+
+ <mx:HBox>
+
+   <mx:Form>
+      <mx:FormItem label="Nom" >
+         <mx:TextInput id="eventName" width="150" restrict="A-Za-z0-9\- "/>
+      </mx:FormItem>
+
+      <mx:FormItem label="Date de l'evenement" >
+         <mx:DateField id="eventDate"
+                    yearNavigationEnabled="true"
+                    editable="true"
+                    formatString="DD/MM/YYYY"
+                    textAlign="center"
+                    fontSize="9"
+                    selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date(2020,0,1)}}"/>
+      </mx:FormItem>
+   </mx:Form>
+
+  <mx:Button label="Annuler" click="close()" />
+  <mx:Button label="Sauver" click="save()" />
+
+ </mx:HBox>
+</mx:TitleWindow>

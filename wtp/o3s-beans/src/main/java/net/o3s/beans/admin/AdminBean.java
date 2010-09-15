@@ -228,7 +228,15 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         	event = new Event();
             event.setName(name);
             event.setDate(date);
-            event.setTheDefault(false);
+
+            List <IEntityEvent> eventsList = findAllEvents();
+
+            // if there's only one event, set it as default
+            if (eventsList.size() == 0) {
+            	event.setTheDefault(true);
+            } else {
+            	event.setTheDefault(false);
+            }
 
             if (fileName != null) {
 				try {
@@ -244,11 +252,43 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         return event;
     }
 
+    /**
+     * Remove an event
+     */
+    public void removeEvent(final int id) throws AdminException {
+
+    	IEntityEvent event = findEventFromId(id);
+    	List<IEntityRegistered> registereds = null;
+
+    	if (event == null) {
+    		throw new AdminException("event is null");
+    	}
+    	// no delete if it's the default event
+    	if (event.isTheDefault()) {
+    		throw new AdminException("Unable to remove the default event");
+
+    	}
+    	// no delete if there's still some registered
+    	registereds = this.registering.findAllRegisteredFromEvent(id);
+       	if (registereds.size() > 0) {
+    		throw new AdminException("Unable to remove event with existing registered (" + registereds.size() + ")");
+    	}
+
+    	this.entityManager.remove(event);
+
+    	//TODO : remove categories, competitions
+    }
+
     public void setDefaultEvent(final int id) {
 
     	IEntityEvent oldDefaultEvent = findDefaultEvent();
     	IEntityEvent newDefaultEvent = findEventFromId(id);
 
+    	if (oldDefaultEvent.getId() == newDefaultEvent.getId()) {
+        	logger.log(Level.WARNING, "Event <" + newDefaultEvent + "> already set as default. Do nothing");
+    		newDefaultEvent.setTheDefault(true);
+        	return;
+    	}
     	if (newDefaultEvent != null) {
     		newDefaultEvent.setTheDefault(true);
         	oldDefaultEvent.setTheDefault(false);
