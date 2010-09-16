@@ -39,6 +39,8 @@
 			import net.o3s.webflex.bean.Competition;
 			import net.o3s.webflex.bean.MyEvent;
          import net.o3s.webflex.components.EventScreen;
+         import net.o3s.webflex.components.CompetitionScreen;
+         import net.o3s.webflex.components.CategoryScreen;
          import net.o3s.webflex.components.Util;
 
          [Bindable]
@@ -48,24 +50,42 @@
          public var actionImportEnabled:Boolean = false;
 
 			[Bindable]
-			public var eventSelectedItems:ArrayCollection= new ArrayCollection([]);
-
-			[Bindable]
 			private var editedEvent:MyEvent= null;
-
-			[Bindable]
-			public var eventActionSelectionEnabled:Boolean = false;
 
 			[Bindable]
 			private var eventList:ArrayCollection= new ArrayCollection([]);
 
          private var eventScreen:EventScreen = null;
 
+         [Bindable]
+         private var editedCompetition:Competition= null;
+
+         [Bindable]
+         private var competitionList:ArrayCollection= new ArrayCollection([]);
+
+         private var competitionScreen:CompetitionScreen = null;
+
+         [Bindable]
+         private var editedCategory:Category= null;
+
+         [Bindable]
+         private var categoryList:ArrayCollection= new ArrayCollection([]);
+
+         private var categoryScreen:CategoryScreen = null;
+
+         private var mode:String = "unknown";
+
          public function init():void {
             refreshAdminData();
 
             this.eventScreen = new EventScreen();
             this.eventScreen.addEventListener("SaveEvent", saveEvent);
+
+            this.competitionScreen = new CompetitionScreen();
+            this.competitionScreen.addEventListener("SaveCompetition", saveCompetition);
+
+            this.categoryScreen = new CategoryScreen();
+            this.categoryScreen.addEventListener("SaveCategory", saveCategory);
 
          }
 
@@ -74,13 +94,10 @@
          }
 
 			public function refreshAdminData():void {
-
-            	RO_admin.getAllEvents();
-				  RO_admin.getAllCompetitions();
-				  RO_admin.getAllCategories();
+            RO_admin.getAllEvents();
+				RO_admin.getAllCompetitions();
+				RO_admin.getAllCategories();
 			}
-
-
 
 			private function displayEvent(item:Object, col:DataGridColumn):String
 			{
@@ -201,6 +218,7 @@
         }
 
 
+         // EVENT
          private function resultSetDefaultEvent(event:ResultEvent):void {
             refreshAdminData();
          }
@@ -208,8 +226,6 @@
 			private function resultGetAllEvents(event:ResultEvent):void {
 				eventList = event.result as ArrayCollection;
 			}
-
-
 
 			// return null if not found
 			private function getEvent(id:int):MyEvent {
@@ -228,20 +244,25 @@
 				if (r == null) {
 					Alert.show("Enregistrement inconnu <" + id + ">");
 				} else {
-					editedEvent = r;
+               RO_admin.removeEvent(r.id);
 				}
-            RO_admin.removeEvent(editedEvent.id);
 			}
+         private function resultRemoveEvent(event:ResultEvent):void {
+               RO_admin.getAllEvents();
+         }
 
 			public function editEvent(id:int):void {
 				var r:MyEvent = getEvent(id);
 				if (r == null) {
 					Alert.show("Enregistrement inconnu <" + id + ">");
 				} else {
+               mode="edit";
 					editedEvent = r;
+               PopUpManager.addPopUp(this.eventScreen, this, true);
+               PopUpManager.centerPopUp(this.eventScreen);
+               this.eventScreen.eventName.text = r.name;
+               this.eventScreen.eventDate.selectedDate = r.date;
 				}
-
-				Alert.show("edit event " + editedEvent);
 			}
 
 			public function setEventAsDefault(id:int):void {
@@ -258,13 +279,15 @@
             if (r == null) {
                Alert.show("Enregistrement inconnu <" + id + ">");
             } else {
-               editedEvent = r;
+               RO_admin.duplicateEvent(r.id);
             }
-
-            Alert.show("duplicate event " + editedEvent);
+         }
+         private function resultDuplicateEvent(event:ResultEvent):void {
+               refreshAdminData();
          }
 
          private function addMyEvent():void {
+            mode="add";
             PopUpManager.addPopUp(this.eventScreen, this, true);
             PopUpManager.centerPopUp(this.eventScreen);
             this.eventScreen.eventName.text = "";
@@ -272,20 +295,168 @@
          }
 
          private function saveEvent(e:Event):void {
-            var ev:MyEvent = new MyEvent();
-            ev.name = this.eventScreen.eventName.text;
-            ev.date = this.eventScreen.eventDate.selectedDate;
-            RO_admin.createEvent(ev);
+            if (mode == "add") {
+               var ev:MyEvent = new MyEvent();
+               ev.name = this.eventScreen.eventName.text;
+               ev.date = this.eventScreen.eventDate.selectedDate;
+               RO_admin.createEvent(ev);
+            } else {
+               editedEvent.name = this.eventScreen.eventName.text;
+               editedEvent.date = this.eventScreen.eventDate.selectedDate;
+               RO_admin.updateEvent(editedEvent);
+            }
             PopUpManager.removePopUp(this.eventScreen);
-         }
 
+         }
          private function resultCreateEvent(event:ResultEvent):void {
                RO_admin.getAllEvents();
          }
-         private function resultRemoveEvent(event:ResultEvent):void {
-               RO_admin.getAllEvents();
+
+        // COMPETITION
+         private function resultGetAllCompetitions(event:ResultEvent):void {
+            competitionList = event.result as ArrayCollection;
          }
 
+         // return null if not found
+         private function getCompetition(id:int):Competition {
+
+            for(var count:int = 0; count < competitionList.length; count++) {
+               var c:Competition = competitionList.getItemAt(count, 0) as Competition;
+               if (c.id == id) {
+                  return c;
+               }
+            }
+            return null;
+         }
+
+         public function removeCompetition(id:int):void {
+            var c:Competition = getCompetition(id);
+            if (c == null) {
+               Alert.show("Enregistrement inconnu <" + id + ">");
+            } else {
+               RO_admin.removeCompetition(c.id);
+            }
+         }
+         private function resultRemoveCompetition(event:ResultEvent):void {
+               RO_admin.getAllCompetitions();
+         }
+
+         public function editCompetition(id:int):void {
+            var c:Competition = getCompetition(id);
+            if (c == null) {
+               Alert.show("Enregistrement inconnu <" + id + ">");
+            } else {
+               mode="edit";
+               editedCompetition = c;
+               PopUpManager.addPopUp(this.competitionScreen, this, true);
+               PopUpManager.centerPopUp(this.competitionScreen);
+               this.competitionScreen.competitionName.text = c.name;
+               //this.competitionScreen.eventDate.selectedDate = c.date;
+               // TODO : to complete
+            }
+         }
+
+         private function addCompetition():void {
+            mode="add";
+            PopUpManager.addPopUp(this.competitionScreen, this, true);
+            PopUpManager.centerPopUp(this.competitionScreen);
+            this.competitionScreen.competitionName.text = "";
+            //this.competitionScreen.eventDate.text = "";
+            // TODO : to complete
+         }
+
+         private function saveCompetition(e:Event):void {
+            if (mode == "add") {
+               var c:Competition = new Competition();
+               c.name = this.competitionScreen.competitionName.text;
+               //c.date = this.competitionScreen.eventDate.selectedDate;
+               // TODO : to complete
+               RO_admin.createCompetition(c);
+            } else {
+               editedCompetition.name = this.competitionScreen.competitionName.text;
+               //editedCompetition.date = this.competitionScreen.eventDate.selectedDate;
+               // TODO : to complete
+               RO_admin.updateCompetition(editedCompetition);
+            }
+            PopUpManager.removePopUp(this.competitionScreen);
+
+         }
+         private function resultCreateCompetition(event:ResultEvent):void {
+               RO_admin.getAllCompetitions();
+         }
+
+        // CATEGORY
+         private function resultGetAllCategories(event:ResultEvent):void {
+            categoryList = event.result as ArrayCollection;
+         }
+
+         // return null if not found
+         private function getCategory(id:int):Category {
+
+            for(var count:int = 0; count < categoryList.length; count++) {
+               var c:Category = categoryList.getItemAt(count, 0) as Category;
+               if (c.id == id) {
+                  return c;
+               }
+            }
+            return null;
+         }
+
+         public function removeCategory(id:int):void {
+            var c:Category = getCategory(id);
+            if (c == null) {
+               Alert.show("Enregistrement inconnu <" + id + ">");
+            } else {
+               RO_admin.removeCategory(c.id);
+            }
+         }
+         private function resultRemoveCategory(event:ResultEvent):void {
+               RO_admin.getAllCategories();
+         }
+
+         public function editCategory(id:int):void {
+            var c:Category = getCategory(id);
+            if (c == null) {
+               Alert.show("Enregistrement inconnu <" + id + ">");
+            } else {
+               mode="edit";
+               editedCategory = c;
+               PopUpManager.addPopUp(this.categoryScreen, this, true);
+               PopUpManager.centerPopUp(this.categoryScreen);
+               this.categoryScreen.categoryName.text = c.name;
+               //this.categoryScreen.eventDate.selectedDate = c.date;
+               // TODO : to complete
+            }
+         }
+
+         private function addCategory():void {
+            mode="add";
+            PopUpManager.addPopUp(this.categoryScreen, this, true);
+            PopUpManager.centerPopUp(this.categoryScreen);
+            this.categoryScreen.categoryName.text = "";
+            //this.categoryScreen.eventDate.text = "";
+            // TODO : to complete
+         }
+
+         private function saveCategory(e:Event):void {
+            if (mode == "add") {
+               var c:Category = new Category();
+               c.name = this.categoryScreen.categoryName.text;
+               //c.date = this.categoryScreen.eventDate.selectedDate;
+               // TODO : to complete
+               RO_admin.createCategory(c);
+            } else {
+               editedCategory.name = this.categoryScreen.categoryName.text;
+               //editedCompetition.date = this.categoryScreen.eventDate.selectedDate;
+               // TODO : to complete
+               RO_admin.updateCategory(editedCategory);
+            }
+            PopUpManager.removePopUp(this.categoryScreen);
+
+         }
+         private function resultCreateCategory(event:ResultEvent):void {
+               RO_admin.getAllCategories();
+         }
 
 		]]>
 	</mx:Script>
@@ -295,6 +466,15 @@
       <mx:method name="setDefaultEvent" result="resultSetDefaultEvent(event)"/>
       <mx:method name="createEvent" result="resultCreateEvent(event)" fault="Util.handleException(event)"/>
       <mx:method name="removeEvent" result="resultRemoveEvent(event)" fault="Util.handleException(event)"/>
+      <mx:method name="duplicateEvent" result="resultDuplicateEvent(event)" fault="Util.handleException(event)"/>
+
+      <mx:method name="getAllCompetitions" result="resultGetAllCompetitions(event)"/>
+      <mx:method name="createCompetition" result="resultCreateCompetition(event)" fault="Util.handleException(event)"/>
+      <mx:method name="removeCompetition" result="resultRemoveCompetition(event)" fault="Util.handleException(event)"/>
+
+      <mx:method name="getAllCategories" result="resultGetAllCategories(event)"/>
+      <mx:method name="createCategory" result="resultCreateCategory(event)" fault="Util.handleException(event)"/>
+      <mx:method name="removeCategory" result="resultRemoveCategory(event)" fault="Util.handleException(event)"/>
 
       <mx:method name="exportRegisteredAsFileName" result="resultExportRegisteredAsFileName(event)"/>
       <mx:method name="importRegistered" result="resultImportFileName(event)"/>
@@ -346,13 +526,13 @@
             <mx:columns>
                <mx:DataGridColumn headerText="Id" dataField="id" showDataTips="true" width="50"/>
                <mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="300"/>
-               <mx:DataGridColumn headerText="Date" dataField="date" showDataTips="true" width="300"/>
+               <mx:DataGridColumn headerText="Date" dataField="date" showDataTips="true" width="300" labelFunction="Util.getDateDDMMYYLabel"/>
                <mx:DataGridColumn headerText="Default" dataField="theDefault" showDataTips="true" width="100"/>
 				<mx:DataGridColumn width="150" headerText="Actions"
 								   itemRenderer="net.o3s.webflex.components.ActionEventDataGridColumnItemRenderer" />
             </mx:columns>
          </mx:DataGrid>
-            <mx:Button label="Ajouter" click="addMyEvent()"/>
+         <mx:Button label="Ajouter" click="addMyEvent()"/>
       </mx:Panel>
       </mx:HBox>
 
@@ -369,10 +549,13 @@
 					<mx:DataGridColumn headerText="Higher Label" dataField="higherLabelNumber" showDataTips="true" width="100"/>
 					<mx:DataGridColumn headerText="Last Label" dataField="lastLabelNumber" showDataTips="true" width="100"/>
                <mx:DataGridColumn headerText="Teamed" dataField="teamed" showDataTips="true" width="100"/>
-					<mx:DataGridColumn headerText="Starting Date" dataField="startingDate" showDataTips="true" width="200"/>
+					<mx:DataGridColumn headerText="Starting Date" dataField="startingDate" showDataTips="true" width="200" labelFunction="Util.getDateLabel"/>
+               <mx:DataGridColumn width="100" headerText="Actions"
+                           itemRenderer="net.o3s.webflex.components.ActionCompetitionDataGridColumnItemRenderer" />
 
 				</mx:columns>
 			</mx:DataGrid>
+         <mx:Button label="Ajouter" click="addCompetition()"/>
 		</mx:Panel>
 	  </mx:HBox>
 
@@ -386,14 +569,17 @@
 					<mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="200"/>
 					<mx:DataGridColumn headerText="Sex" dataField="sex" showDataTips="true" width="50"/>
 					<mx:DataGridColumn headerText="Short Name" dataField="shortName" showDataTips="true" width="50"/>
-					<mx:DataGridColumn headerText="Min Date" dataField="minDate" showDataTips="true" width="200"/>
-					<mx:DataGridColumn headerText="Max Date" dataField="maxDate" showDataTips="true" width="200"/>
+					<mx:DataGridColumn headerText="Min Date" dataField="minDate" showDataTips="true" width="200" labelFunction="Util.getDateDDMMYYLabel"/>
+					<mx:DataGridColumn headerText="Max Date" dataField="maxDate" showDataTips="true" width="200" labelFunction="Util.getDateDDMMYYLabel"/>
 
 					<mx:DataGridColumn headerText="Competitions" labelFunction="displayCompetitions" showDataTips="true" width="200"/>
+               <mx:DataGridColumn width="100" headerText="Actions"
+                           itemRenderer="net.o3s.webflex.components.ActionCategoryDataGridColumnItemRenderer" />
 
 
 				</mx:columns>
 			</mx:DataGrid>
+         <mx:Button label="Ajouter" click="addCategory()"/>
 		</mx:Panel>
      </mx:HBox>
 

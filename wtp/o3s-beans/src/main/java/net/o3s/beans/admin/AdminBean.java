@@ -30,7 +30,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,7 +39,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,8 +46,6 @@ import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -63,17 +59,15 @@ import net.o3s.apis.IEJBRegisteringLocal;
 import net.o3s.apis.IEntityCategory;
 import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityEvent;
-import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.NotificationMessageException;
 import net.o3s.apis.RegisteringException;
-import net.o3s.apis.ReportException;
 import net.o3s.persistence.Category;
 import net.o3s.persistence.Competition;
 import net.o3s.persistence.Event;
 import net.o3s.persistence.Person;
-import net.o3s.persistence.Registered;
+
 
 
 /**
@@ -219,10 +213,53 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     		final String name,
     		final Date date,
     		final String fileName) {
+    	return createEvent(name, date, fileName, false);
+    }
+
+    public IEntityEvent updateEvent(
+    		final int id,
+    		final String name,
+    		final Date date) throws AdminException {
+    	IEntityEvent event = null;
+
+    	event = findEventFromId(id);
+        if (event != null) {
+        	event.setName(name);
+        	event.setDate(date);
+        } else {
+        	throw new AdminException("L'evenement <" + id + "> n'existe pas !");
+        }
+        return event;
+    }
+
+    private IEntityEvent createEvent(
+    		final String name,
+    		final Date date,
+    		final String fileName,
+    		boolean force) {
+
+            if (fileName != null) {
+        		byte[] image = null;
+            	try {
+            		image = readImage(fileName);
+				} catch (IOException e) {
+					logger.log(Level.SEVERE, null, e);
+				}
+				return createEventWithBinImage(name,date,image, force);
+            } else {
+            	return createEventWithBinImage(name,date,null, force);
+            }
+    }
+
+    private IEntityEvent createEventWithBinImage(
+    		final String name,
+    		final Date date,
+    		final byte[] imageFile,
+    		boolean force) {
     	IEntityEvent event = null;
 
     	event = findEventFromName(name);
-    	if (event == null) {
+    	if (event == null || force) {
         	logger.fine("Create new event : " + name);
 
         	event = new Event();
@@ -238,13 +275,9 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
             	event.setTheDefault(false);
             }
 
-            if (fileName != null) {
-				try {
-					// Lets open an image file
-					event.setImageFile(readImage(fileName));
-				} catch (Exception ex) {
-					logger.log(Level.SEVERE, null, ex);
-				}
+            if (imageFile != null) {
+            	// Lets open an image file
+            	event.setImageFile(imageFile);
             }
 
             this.entityManager.persist(event);
@@ -275,6 +308,84 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     	}
 
     	this.entityManager.remove(event);
+
+    	//TODO : remove categories, competitions
+    }
+
+    /**
+     * Remove a competition
+     */
+    public void removeCompetition(final int id) throws AdminException {
+
+    	IEntityCompetition competition = findCompetitionFromId(id);
+    	IEntityEvent event = findEventFromId(competition.getEvent().getId());
+
+    	if (competition == null) {
+    		throw new AdminException("competition is null");
+    	}
+
+    	// no delete if there's still some registered
+    	List<IEntityRegistered> registereds = null;
+    	registereds = this.registering.findAllRegisteredFromEvent(event.getId());
+    	boolean found = false;
+    	for (IEntityRegistered registered:registereds) {
+    		if (registered.getCompetition().getId() == id) {
+    			found = true;
+    			break;
+    		}
+    	}
+       	if (found) {
+    		throw new AdminException("Unable to remove competition with existing registered");
+    	}
+
+    	// no delete if there's still some categories
+    	List<IEntityCategory> categories = null;
+    	categories = findAllCategoriesFromEvent(event.getId());
+    	found = false;
+    	for (IEntityCategory category:categories) {
+    		for (IEntityCompetition c:category.getCompetitions())
+    			if (c.getId() == id) {
+    			found = true;
+    			break;
+    		}
+    	}
+       	if (found) {
+    		throw new AdminException("Unable to remove competition with existing categories");
+    	}
+
+    	this.entityManager.remove(competition);
+
+    	//TODO : remove categories, competitions
+    }
+
+    /**
+     * Remove a category
+     */
+    public void removeCategory(final int id) throws AdminException {
+
+    	IEntityCategory category = findCategoryFromId(id);
+    	IEntityEvent event = findEventFromId(category.getEvent().getId());
+
+    	if (category == null) {
+    		throw new AdminException("category is null");
+    	}
+
+    	// no delete if there's still some registered
+    	List<IEntityRegistered> registereds = null;
+    	registereds = this.registering.findAllRegisteredFromEvent(event.getId());
+    	boolean found = false;
+    	for (IEntityRegistered registered:registereds) {
+    		if (registered.getCategory().getId() == id) {
+    			found = true;
+    			break;
+    		}
+    	}
+       	if (found) {
+    		throw new AdminException("Unable to remove category with existing registered");
+    	}
+
+
+    	this.entityManager.remove(category);
 
     	//TODO : remove categories, competitions
     }
@@ -335,12 +446,17 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
     @SuppressWarnings("unchecked")
     public  List<IEntityCompetition> findAllCompetitionsFromDefaultEvent() {
-        Query query = this.entityManager.createNamedQuery("ALL_COMPETITIONS_FROM_EVENT");
         IEntityEvent event = findDefaultEvent();
+        return findAllCompetitionsFromEvent(event.getId());
+    }
+
+    @SuppressWarnings("unchecked")
+    private  List<IEntityCompetition> findAllCompetitionsFromEvent(final int eventId) {
+        Query query = this.entityManager.createNamedQuery("ALL_COMPETITIONS_FROM_EVENT");
 
         List<IEntityCompetition> competitions = null;
         try {
-            query.setParameter("EVENTID", event.getId());
+            query.setParameter("EVENTID", eventId);
             competitions = query.getResultList();
         } catch (javax.persistence.NoResultException e) {
         	competitions = new ArrayList<IEntityCompetition>();
@@ -373,10 +489,28 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         return competition;
     }
 
-    public IEntityCompetition createCompetition(final String name, final int lowerLabelNumber, final int higherLabelNumber, final int lastLabelNumber, final IEntityEvent event, final boolean isTeamed) {
+
+    public IEntityCompetition createCompetition(
+    		final String name,
+    		final int lowerLabelNumber,
+    		final int higherLabelNumber,
+    		final int lastLabelNumber,
+    		final IEntityEvent event,
+    		final boolean isTeamed) {
+    	return createCompetition(name, lowerLabelNumber, higherLabelNumber, lastLabelNumber, event, isTeamed, false);
+    }
+
+    private IEntityCompetition createCompetition(
+    		final String name,
+    		final int lowerLabelNumber,
+    		final int higherLabelNumber,
+    		final int lastLabelNumber,
+    		final IEntityEvent event,
+    		final boolean isTeamed,
+    		final boolean force) {
     	IEntityCompetition competition = null;
     	competition = findCompetitionFromName(name);
-        if (competition == null) {
+        if (competition == null || force) {
         	logger.fine("Create new competition : " + name);
             competition = new Competition();
             competition.setName(name);
@@ -386,6 +520,30 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
             competition.setEvent(event);
             competition.setTeamed(isTeamed);
             this.entityManager.persist(competition);
+        }
+        return competition;
+    }
+
+    public IEntityCompetition updateCompetition(
+    		final int id,
+    		final String name,
+    		final int firstLabelNumber,
+    		final int lastLabelNumber,
+    		final int lowerLabelNumber,
+    		final Date startingDate,
+    		final boolean teamed) throws AdminException {
+    	IEntityCompetition competition = null;
+
+    	competition = findCompetitionFromId(id);
+        if (competition != null) {
+        	competition.setName(name);
+        	competition.setHigherLabelNumber(firstLabelNumber);
+        	competition.setLastLabelNumber(lastLabelNumber);
+        	competition.setLowerLabelNumber(lowerLabelNumber);
+        	competition.setStartingDate(startingDate);
+        	competition.setTeamed(teamed);
+        } else {
+        	throw new AdminException("La competition <" + id + "> n'existe pas !");
         }
         return competition;
     }
@@ -437,6 +595,15 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         IEntityCategory category = null;
         try {
         	category = (IEntityCategory) query.getSingleResult();
+        } catch (javax.persistence.NoResultException e) {
+        }
+        return category;
+    }
+
+    public IEntityCategory findCategoryFromId(final int id) {
+        IEntityCategory category = null;
+        try {
+        	category = (IEntityCategory) this.entityManager.find(Category.class, id);
         } catch (javax.persistence.NoResultException e) {
         }
         return category;
@@ -495,9 +662,14 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
     @SuppressWarnings("unchecked")
     public  List<IEntityCategory> findAllCategoriesFromDefaultEvent() {
-        Query query = this.entityManager.createNamedQuery("ALL_CATEGORIES_FROM_EVENT");
         IEntityEvent event = findDefaultEvent();
-        query.setParameter("EVENTID", event.getId());
+        return findAllCategoriesFromEvent(event.getId());
+    }
+
+    @SuppressWarnings("unchecked")
+    private  List<IEntityCategory> findAllCategoriesFromEvent(final int eventId) {
+        Query query = this.entityManager.createNamedQuery("ALL_CATEGORIES_FROM_EVENT");
+        query.setParameter("EVENTID", eventId);
 
         List<IEntityCategory> categories = null;
         try {
@@ -510,9 +682,22 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
     @SuppressWarnings("unchecked")
 	public IEntityCategory createCategory(final String name, final Date minDate, final Date maxDate, final char sex, final char shortName, final IEntityEvent event, final IEntityCompetition... competitions) {
+    	return createCategory( false, name, minDate, maxDate, sex, shortName, event, competitions);
+    }
+
+    @SuppressWarnings("unchecked")
+	private IEntityCategory createCategory(
+			final boolean force,
+			final String name,
+			final Date minDate,
+			final Date maxDate,
+			final char sex,
+			final char shortName,
+			final IEntityEvent event,
+			final IEntityCompetition... competitions) {
     	IEntityCategory category = null;
     	category = findCategoryFromNameAndSex(name, sex);
-        if (category == null) {
+        if (category == null || force) {
         	logger.fine("Create new category : " + name);
 
         	category = new Category();
@@ -527,6 +712,30 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
             this.entityManager.persist(category);
         }
 
+        return category;
+    }
+
+    public IEntityCategory updateCategory(
+    		final int id,
+    		final String name,
+    		final char sex,
+    		final char shortName,
+    		final Date minDate,
+    		final Date maxDate,
+    		final Set<IEntityCompetition> competitions) throws AdminException {
+    	IEntityCategory category = null;
+
+    	category = findCategoryFromId(id);
+        if (category != null) {
+        	category.setName(name);
+        	category.setSex(sex);
+        	category.setShortName(shortName);
+        	category.setMinDate(minDate);
+        	category.setMaxDate(maxDate);
+        	category.setCompetitions(competitions);
+        } else {
+        	throw new AdminException("La categorie <" + id + "> n'existe pas !");
+        }
         return category;
     }
 
@@ -882,4 +1091,44 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 		return row;
 	}
 
+	public IEntityEvent duplicateEvent(final int eventId) {
+    	IEntityEvent event = findEventFromId(eventId);
+    	boolean force = true;
+    	// clone event
+    	IEntityEvent cloneEvent = createEventWithBinImage(event.getName(), event.getDate(), event.getImageFile(), force);
+    	cloneEvent.setTheDefault(false);
+
+    	// clone competitions related to the event
+    	List <IEntityCompetition> competitions = findAllCompetitionsFromEvent(event.getId());
+    	for (IEntityCompetition competition : competitions) {
+    		createCompetition(
+    				competition.getName(),
+    				competition.getLowerLabelNumber(),
+    				competition.getHigherLabelNumber(),
+    				competition.getLastLabelNumber(),
+    				cloneEvent,
+    				competition.isTeamed(),
+    				force);
+    	}
+
+
+    	// clone categories related to the event
+    	List <IEntityCategory> categories = findAllCategoriesFromEvent(event.getId());
+    	for (IEntityCategory category: categories) {
+        	IEntityCompetition[] competitionsArray = new IEntityCompetition[category.getCompetitions().size()];
+    		createCategory(
+    				force,
+    				category.getName(),
+    				category.getMinDate(),
+    				category.getMaxDate(),
+    				category.getSex(),
+    				category.getShortName(),
+    				cloneEvent,
+    				category.getCompetitions().toArray(competitionsArray));
+
+    	}
+
+    	return cloneEvent;
+
+	}
 }

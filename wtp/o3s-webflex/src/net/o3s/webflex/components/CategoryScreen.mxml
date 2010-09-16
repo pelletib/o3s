@@ -26,9 +26,9 @@
 -->
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
  layout="absolute" width="348" height="218"
- title="Formulaire evenement">
+ title="Formulaire categorie">
   <mx:Metadata>
-    [Event(name="SaveEvent")]
+    [Event(name="SaveCategory")]
   </mx:Metadata>
   <mx:Script>
    <![CDATA[
@@ -41,7 +41,7 @@
 
      private function save():void
      {
-       this.dispatchEvent(new Event("SaveEvent"));
+       this.dispatchEvent(new Event("SaveCategory"));
      }
    ]]>
  </mx:Script>
@@ -50,9 +50,10 @@
 
    <mx:Form>
       <mx:FormItem label="Nom" >
-         <mx:TextInput id="eventName" width="150" restrict="A-Za-z0-9\- "/>
+         <mx:TextInput id="categoryName" width="150" restrict="A-Za-z0-9\- "/>
       </mx:FormItem>
 
+<!--
       <mx:FormItem label="Date de l'evenement" >
          <mx:DateField id="eventDate"
                     yearNavigationEnabled="true"
@@ -62,6 +63,8 @@
                     fontSize="9"
                     selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date(2020,0,1)}}"/>
       </mx:FormItem>
+-->
+
    </mx:Form>
    <mx:ControlBar horizontalAlign="center">
      <mx:HBox width="100%" horizontalAlign="center">

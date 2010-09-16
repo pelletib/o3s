@@ -25,6 +25,7 @@ package net.o3s.apis;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface IEJBAdminLocal {
 
@@ -35,12 +36,23 @@ public interface IEJBAdminLocal {
 	void setDefaultEvent(final int id);
 	IEntityEvent createEvent(final String name, final Date date, final String fileName);
 	void removeEvent(final int id) throws AdminException;
+	IEntityEvent duplicateEvent(final int eventId);
+    IEntityEvent updateEvent(final int id,final String name,final Date date) throws AdminException;
 
 	IEntityCompetition findCompetitionFromId(final int id);
 	List<IEntityCompetition> findAllCompetitions();
 	List<IEntityCompetition> findAllCompetitionsFromDefaultEvent();
 	Date setStartDateInCompetition(final int id) throws AdminException;
 	IEntityCompetition createCompetition(final String name, final int lowerLabelNumber, final int higherLabelNumber, final int lastLabelNumber, final IEntityEvent event, final boolean isTeamed);
+	IEntityCompetition updateCompetition(
+    		final int id,
+    		final String name,
+    		final int firstLabelNumber,
+    		final int lastLabelNumber,
+    		final int lowerLabelNumber,
+    		final Date startingDate,
+    		final boolean teamed) throws AdminException;
+	void removeCompetition(final int id) throws AdminException;
 
 	IEntityCategory findCategoryFromNameAndSex(final String name, final char sex);
 	List<IEntityCategory> findCategoryFromDatesAndSex(final Date date, final char sex);
@@ -48,6 +60,16 @@ public interface IEJBAdminLocal {
 	List<IEntityCategory> findAllCategories();
 	List<IEntityCategory> findAllCategoriesFromDefaultEvent();
 	IEntityCategory createCategory(final String name, final Date minDate, final Date maxDate, final char sex, final char shortName, final IEntityEvent event, final IEntityCompetition... competitions);
+	IEntityCategory updateCategory(
+    		final int id,
+    		final String name,
+    		final char sex,
+    		final char shortName,
+    		final Date minDate,
+    		final Date maxDate,
+    		final Set<IEntityCompetition> competitions) throws AdminException;
+	void removeCategory(final int id) throws AdminException;
+
 	String exportRegisteredAsFileName(final Date from);
 	int importRegistered(String fileName);
 }
