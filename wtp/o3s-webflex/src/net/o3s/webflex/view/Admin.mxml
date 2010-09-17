@@ -424,6 +424,8 @@
                PopUpManager.addPopUp(this.categoryScreen, this, true);
                PopUpManager.centerPopUp(this.categoryScreen);
                this.categoryScreen.categoryName.text = c.name;
+               this.categoryScreen.categorySex.text = c.sex;
+               this.categoryScreen.categoryShortName.text = c.shortName;
                //this.categoryScreen.eventDate.selectedDate = c.date;
                // TODO : to complete
             }
@@ -434,6 +436,8 @@
             PopUpManager.addPopUp(this.categoryScreen, this, true);
             PopUpManager.centerPopUp(this.categoryScreen);
             this.categoryScreen.categoryName.text = "";
+            this.categoryScreen.categorySex.text = "";
+            this.categoryScreen.categoryShortName.text = "";
             //this.categoryScreen.eventDate.text = "";
             // TODO : to complete
          }
@@ -442,11 +446,15 @@
             if (mode == "add") {
                var c:Category = new Category();
                c.name = this.categoryScreen.categoryName.text;
+               c.sex = this.categoryScreen.categorySex.text;
+               c.shortName = this.categoryScreen.categoryShortName.text;
                //c.date = this.categoryScreen.eventDate.selectedDate;
                // TODO : to complete
                RO_admin.createCategory(c);
             } else {
                editedCategory.name = this.categoryScreen.categoryName.text;
+               editedCategory.sex = this.categoryScreen.categorySex.text;
+               editedCategory.shortName = this.categoryScreen.categoryShortName.text;
                //editedCompetition.date = this.categoryScreen.eventDate.selectedDate;
                // TODO : to complete
                RO_admin.updateCategory(editedCategory);

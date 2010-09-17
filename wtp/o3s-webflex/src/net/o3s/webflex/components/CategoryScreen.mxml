@@ -26,13 +26,79 @@
 -->
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
  layout="absolute" width="348" height="218"
- title="Formulaire categorie">
+ title="Formulaire categorie"
+ creationComplete="init()">
   <mx:Metadata>
     [Event(name="SaveCategory")]
   </mx:Metadata>
   <mx:Script>
    <![CDATA[
      import mx.managers.PopUpManager;
+      import mx.validators.StringValidator;
+      import net.o3s.webflex.components.AdvancedStringValidator;
+      import mx.validators.DateValidator;
+      import mx.validators.Validator;
+      import mx.events.ValidationResultEvent;
+      import mx.collections.ArrayCollection;
+
+      [Bindable]
+      public var sexList:ArrayCollection = new ArrayCollection(
+         [ {label:"M", data:1},
+           {label:"F", data:2} ]);
+
+      [Bindable]
+      public var formIsValid:Boolean = false;
+
+      private var focussedFormControl:DisplayObject;
+      private var categoryNameValidator:StringValidator;
+      private var categorySexValidator:StringValidator;
+      private var categoryShortNameValidator:StringValidator;
+      //private var personBirthdayValidator:DateValidator;
+
+      private function init():void {
+
+         //categoryNameValidator = new AdvancedStringValidator();
+         //categoryNameValidator.source = categoryName;
+         //categoryNameValidator.property = "text";
+         //categoryNameValidator.minLength = 2;
+         //categoryNameValidator.required=true;
+         //categoryNameValidator.specialCharacterNotAllowedError="Caracteres speciaux interdits";
+         //categoryNameValidator.allowSpaces=true;
+         //categoryNameValidator.allowNumbers=true;
+         //categoryNameValidator.numeralNotAllowedError="Chiffres interdits";
+         //categoryNameValidator.tooShortError="Au moins 2 caracteres sont requis";
+         //categoryNameValidator.tooLongError="Champ trop long";
+         //categoryNameValidator.requiredFieldError="Champ obligatoire";
+
+         categoryNameValidator = new StringValidator();
+         categoryNameValidator.source = categoryName;
+         categoryNameValidator.property = "text";
+         categoryNameValidator.minLength = 2;
+         categoryNameValidator.maxLength = 30;
+         categoryNameValidator.required=true;
+
+         categorySexValidator = new StringValidator();
+         categorySexValidator.source = categorySex;
+         categorySexValidator.property = "text";
+         categorySexValidator.minLength = 1;
+         categorySexValidator.maxLength = 1;
+         categorySexValidator.required=true;
+
+         categoryShortNameValidator = new StringValidator();
+         categoryShortNameValidator.source = categoryShortName;
+         categoryShortNameValidator.property = "text";
+         categoryShortNameValidator.minLength = 1;
+         categoryShortNameValidator.maxLength = 1;
+         categoryShortNameValidator.required=true;
+
+         //personBirthdayValidator = new DateValidator();
+         //personBirthdayValidator.source = DF_personBirthday;
+         //personBirthdayValidator.property = "text";
+         //personBirthdayValidator.allowedFormatChars="/";
+         //personBirthdayValidator.inputFormat="DD/MM/YYYY";
+         //personBirthdayValidator.required=true;
+
+      }
 
      private function close():void
      {
@@ -43,6 +109,54 @@
      {
        this.dispatchEvent(new Event("SaveCategory"));
      }
+
+      // Validate the form
+      public function validateForm(event:Event):void  {
+          focussedFormControl = event.target as DisplayObject;
+
+         // Mark the form as valid to start with
+         formIsValid = true;
+
+
+         // Run each validator in turn, using the isValid()
+         // helper method and update the value of formIsValid
+         // accordingly.
+         validateCategory(categoryNameValidator);
+         validateCategory(categorySexValidator);
+         validateCategory(categoryShortNameValidator);
+         //validatePerson(personBirthdayValidator);
+
+      }
+
+
+      // Helper method. Performs validation on a passed Validator instance.
+      // Validator is the base class of all Flex validation classes so
+      // you can pass any validation class to this method.
+      private function validateCategory(validator:Validator):Boolean {
+         // Get a reference to the component that is the
+         // source of the validator.
+         var validatorSource:DisplayObject = validator.source as DisplayObject;
+
+         // Suppress events if the current control being validated is not
+         // the currently focussed control on the form. This stops the user
+         // from receiving visual validation cues on other form controls.
+         var suppressEvents:Boolean = (validatorSource != focussedFormControl);
+
+         // Carry out validation. Returns a ValidationResultEvent.
+         // Passing null for the first parameter makes the validator
+         // use the property defined in the property tag of the
+         // <mx:Validator> tag.
+         var event:ValidationResultEvent = validator.validate(null, suppressEvents);
+
+         // Check if validation passed and return a boolean value accordingly.
+         var currentControlIsValid:Boolean = (event.type == ValidationResultEvent.VALID);
+
+         // Update the formIsValid flag
+         formIsValid = formIsValid && currentControlIsValid;
+
+         return currentControlIsValid;
+      }
+
    ]]>
  </mx:Script>
 
@@ -50,7 +164,13 @@
 
    <mx:Form>
       <mx:FormItem label="Nom" >
-         <mx:TextInput id="categoryName" width="150" restrict="A-Za-z0-9\- "/>
+         <mx:TextInput id="categoryName" width="150" restrict="A-Za-z0-9\- " change="validateForm(event);"/>
+      </mx:FormItem>
+      <mx:FormItem label="Sexe (*)" >
+         <mx:ComboBox id="categorySex" dataProvider="{sexList}" width="50" change="validateForm(event);"/>
+      </mx:FormItem>
+      <mx:FormItem label="Nom court (*)" >
+         <mx:TextInput id="categoryShortName" width="50" change="validateForm(event);"/>
       </mx:FormItem>
 
 <!--
@@ -69,7 +189,7 @@
    <mx:ControlBar horizontalAlign="center">
      <mx:HBox width="100%" horizontalAlign="center">
        <mx:Button label="Annuler" click="close()" />
-       <mx:Button label="Sauver" click="save()" />
+       <mx:Button label="Sauver" click="save()" enabled="{formIsValid}" />
      </mx:HBox>
    </mx:ControlBar>
 

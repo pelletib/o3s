@@ -157,8 +157,8 @@ public class Admin {
 		IEntityEvent event = admin.findDefaultEvent();
 
 		List<IEntityCompetition> competitions = new ArrayList<IEntityCompetition>();
-
 		IEntityCompetition[] competitionsArray = null;
+
 		if (categoryVO.getCompetitions() != null) {
 			for (CompetitionVO competitionVO:categoryVO.getCompetitions()) {
 				competitions.add(admin.findCompetitionFromId(competitionVO.getId()));
@@ -169,7 +169,6 @@ public class Admin {
 		}
 
 		try {
-
 			category = admin.createCategory(
 					categoryVO.getName(),
 					categoryVO.getMinDate(),

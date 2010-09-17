@@ -375,9 +375,11 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     	registereds = this.registering.findAllRegisteredFromEvent(event.getId());
     	boolean found = false;
     	for (IEntityRegistered registered:registereds) {
-    		if (registered.getCategory().getId() == id) {
-    			found = true;
-    			break;
+    		if (registered.getCategory() != null) {
+        		if (registered.getCategory().getId() == id) {
+        			found = true;
+        			break;
+        		}
     		}
     	}
        	if (found) {
@@ -702,20 +704,46 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
         	category = new Category();
         	category.setName(name + " (" + sex + ")");
-        	category.setMinDate(minDate);
-        	category.setMaxDate(maxDate);
+        	if (minDate == null) {
+        		category.setMinDate(new Date());
+        	} else {
+        		category.setMinDate(minDate);
+        	}
+        	if (maxDate == null) {
+        		category.setMaxDate(new Date());
+        	} else {
+            	category.setMaxDate(maxDate);
+        	}
         	category.setSex(sex);
-        	category.setShortName(shortName);
+        	if (shortName == 0x0) {
+        		category.setShortName('?');
+        	} else {
+        		category.setShortName(shortName);
+        	}
         	category.setEvent(event);
-        	category.setCompetitions(new HashSet(Arrays.asList(competitions)));
 
+        	if (competitions == null) {
+        		// choose a competition randomly
+        		IEntityCompetition comp = null;
+        		int i = 0;
+        		while (comp == null & i < 99999) {
+            		comp = findCompetitionFromId(i);
+        			i++;
+        		}
+        		List<IEntityCompetition> comps = new ArrayList<IEntityCompetition>();
+        		comps.add(comp);
+        		category.setCompetitions (new HashSet(Arrays.asList(comps)));
+        	} else {
+        		category.setCompetitions (new HashSet(Arrays.asList(competitions)));
+        	}
             this.entityManager.persist(category);
         }
 
         return category;
     }
 
-    public IEntityCategory updateCategory(
+    @SuppressWarnings("unchecked")
+	public IEntityCategory updateCategory(
     		final int id,
     		final String name,
     		final char sex,
@@ -730,9 +758,34 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         	category.setName(name);
         	category.setSex(sex);
         	category.setShortName(shortName);
-        	category.setMinDate(minDate);
-        	category.setMaxDate(maxDate);
-        	category.setCompetitions(competitions);
+
+        	if (minDate == null) {
+            	category.setMinDate(new Date());
+        	} else {
+            	category.setMinDate(minDate);
+        	}
+
+           	if (maxDate == null) {
+            	category.setMaxDate(new Date());
+        	} else {
+            	category.setMaxDate(maxDate);
+        	}
+
+           	if (competitions == null) {
+        		// choose a competition randomly
+        		IEntityCompetition comp = null;
+        		int i = 0;
+        		while (comp == null & i < 99999) {
+            		comp = findCompetitionFromId(i);
+        			i++;
+        		}
+        		List<IEntityCompetition> comps = new ArrayList<IEntityCompetition>();
+        		comps.add(comp);
+        		category.setCompetitions (new HashSet(Arrays.asList(comps)));
+        	} else {
+            	category.setCompetitions(competitions);
+        	}
+
         } else {
         	throw new AdminException("La categorie <" + id + "> n'existe pas !");
         }
