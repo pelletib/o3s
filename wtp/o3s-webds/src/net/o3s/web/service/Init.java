@@ -46,6 +46,7 @@ import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
+import net.o3s.apis.TestData;
 import net.o3s.apis.TrackingMessage;
 
 public class Init {
@@ -135,9 +136,9 @@ public class Init {
 		} catch (AlreadyExistException e) {
 			e.printStackTrace();
 		}
-		IEntityCompetition competition1 = admin.findCompetitionFromId(16);
-		IEntityCompetition competition2 = admin.findCompetitionFromId(11);
-		IEntityCompetition competition3 = admin.findCompetitionFromId(17);
+		IEntityCompetition competition1 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_7);
+		IEntityCompetition competition2 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_2_2);
+		IEntityCompetition competition3 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_8);
 
 		vregistered.removeAllElements();
 
@@ -223,7 +224,7 @@ public class Init {
 
 		logger.fine("Starting date set to:" + startingDate);
 
-		IEntityCompetition competition1 = admin.findCompetitionFromId(16);
+		IEntityCompetition competition1 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_7);
 
 		try {
 			admin.setStartDateInCompetition(competition1.getId());

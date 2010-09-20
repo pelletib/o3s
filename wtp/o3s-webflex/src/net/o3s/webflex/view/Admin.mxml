@@ -271,7 +271,7 @@
 				}
 			}
          private function resultRemoveEvent(event:ResultEvent):void {
-               RO_admin.getAllEvents();
+               refreshAdminData();
          }
 
 			public function editEvent(id:int):void {

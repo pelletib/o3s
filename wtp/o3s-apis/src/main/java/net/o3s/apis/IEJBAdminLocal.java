@@ -43,6 +43,7 @@ public interface IEJBAdminLocal {
 	IEntityCompetition findCompetitionFromId(final int id);
 	List<IEntityCompetition> findAllCompetitions();
 	List<IEntityCompetition> findAllCompetitionsFromDefaultEvent();
+	IEntityCompetition findCompetitionFromName(final String name);
 	Date setStartDateInCompetition(final int id) throws AdminException;
 	IEntityCompetition createCompetition(final String name, final int lowerLabelNumber, final int higherLabelNumber, final int lastLabelNumber, final int eventId, final boolean isTeamed);
 	IEntityCompetition updateCompetition(

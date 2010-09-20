@@ -49,6 +49,7 @@ import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
 import net.o3s.apis.ReportException;
+import net.o3s.apis.TestData;
 import net.o3s.apis.TrackingMessage;
 
 public class Main {
@@ -137,9 +138,9 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		IEntityCompetition competition1 = admin.findCompetitionFromId(16);
-		IEntityCompetition competition2 = admin.findCompetitionFromId(11);
-		IEntityCompetition competition3 = admin.findCompetitionFromId(17);
+		IEntityCompetition competition1 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_7);
+		IEntityCompetition competition2 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_2_2);
+		IEntityCompetition competition3 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_8);
 
 		Vector<IEntityRegistered> vregistered = new Vector<IEntityRegistered>();
 

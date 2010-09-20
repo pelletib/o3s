@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -307,9 +306,20 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     		throw new AdminException("Unable to remove event with existing registered (" + registereds.size() + ")");
     	}
 
-    	this.entityManager.remove(event);
+       	// remove categories related to the event
+    	List<IEntityCategory> categories = findAllCategoriesFromEvent(id);
+    	for (IEntityCategory category:categories) {
+        	this.entityManager.remove(category);
+    	}
 
-    	//TODO : remove categories, competitions
+      	// remove competitions related to the event
+    	List<IEntityCompetition> competitions = findAllCompetitionsFromEvent(id);
+    	for (IEntityCompetition competition:competitions) {
+        	this.entityManager.remove(competition);
+    	}
+
+    	// finally remove the event
+    	this.entityManager.remove(event);
     }
 
     /**
