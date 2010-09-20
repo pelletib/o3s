@@ -497,9 +497,9 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     		final int lowerLabelNumber,
     		final int higherLabelNumber,
     		final int lastLabelNumber,
-    		final IEntityEvent event,
+    		final int eventId,
     		final boolean isTeamed) {
-    	return createCompetition(name, lowerLabelNumber, higherLabelNumber, lastLabelNumber, event, isTeamed, false);
+    	return createCompetition(name, lowerLabelNumber, higherLabelNumber, lastLabelNumber, eventId, isTeamed, false);
     }
 
     private IEntityCompetition createCompetition(
@@ -507,11 +507,16 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     		final int lowerLabelNumber,
     		final int higherLabelNumber,
     		final int lastLabelNumber,
-    		final IEntityEvent event,
+    		final int eventId,
     		final boolean isTeamed,
     		final boolean force) {
     	IEntityCompetition competition = null;
     	competition = findCompetitionFromName(name);
+    	IEntityEvent event = findEventFromId(eventId);
+    	if (event == null) {
+        	logger.log(Level.SEVERE, "Unknown event, set default one");
+    		event = findDefaultEvent();
+    	}
         if (competition == null || force) {
         	logger.fine("Create new competition : " + name);
             competition = new Competition();
@@ -683,8 +688,8 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     }
 
     @SuppressWarnings("unchecked")
-	public IEntityCategory createCategory(final String name, final Date minDate, final Date maxDate, final char sex, final char shortName, final IEntityEvent event, final IEntityCompetition... competitions) {
-    	return createCategory( false, name, minDate, maxDate, sex, shortName, event, competitions);
+	public IEntityCategory createCategory(final String name, final Date minDate, final Date maxDate, final char sex, final char shortName, final int eventId, final IEntityCompetition... competitions) {
+    	return createCategory( false, name, minDate, maxDate, sex, shortName, eventId, competitions);
     }
 
     @SuppressWarnings("unchecked")
@@ -695,10 +700,17 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 			final Date maxDate,
 			final char sex,
 			final char shortName,
-			final IEntityEvent event,
+			final int eventId,
 			final IEntityCompetition... competitions) {
     	IEntityCategory category = null;
     	category = findCategoryFromNameAndSex(name, sex);
+
+    	IEntityEvent event = findEventFromId(eventId);
+    	if (event == null) {
+        	logger.log(Level.SEVERE, "Unknown event, set default one");
+    		event = findDefaultEvent();
+    	}
+
         if (category == null || force) {
         	logger.fine("Create new category : " + name);
 
@@ -1163,7 +1175,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     				competition.getLowerLabelNumber(),
     				competition.getHigherLabelNumber(),
     				competition.getLastLabelNumber(),
-    				cloneEvent,
+    				cloneEvent.getId(),
     				competition.isTeamed(),
     				force);
     	}
@@ -1180,7 +1192,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     				category.getMaxDate(),
     				category.getSex(),
     				category.getShortName(),
-    				cloneEvent,
+    				cloneEvent.getId(),
     				category.getCompetitions().toArray(competitionsArray));
 
     	}

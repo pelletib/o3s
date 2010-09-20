@@ -30,6 +30,8 @@
  creationComplete="init()">
   <mx:Metadata>
     [Event(name="SaveCompetition")]
+    [Event(name="CloseCompetition")]
+
   </mx:Metadata>
   <mx:Script>
    <![CDATA[
@@ -69,6 +71,7 @@
      private function close():void
      {
        PopUpManager.removePopUp(this);
+       this.dispatchEvent(new Event("CloseCategory"));
      }
 
      private function save():void
@@ -125,6 +128,8 @@
  <mx:VBox>
 
    <mx:Form>
+      <mx:Label id="competitionEventName" textAlign="left"/>
+
       <mx:FormItem label="Nom" >
          <mx:TextInput id="competitionName" width="150" restrict="A-Za-z0-9\- "  change="validateForm(event);"/>
       </mx:FormItem>

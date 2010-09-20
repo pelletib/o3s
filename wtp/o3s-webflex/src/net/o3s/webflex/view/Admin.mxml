@@ -64,7 +64,7 @@
          private var competitionList:ArrayCollection= new ArrayCollection([]);
 
          [Bindable]
-         private var competitionDefaultEventList:ArrayCollection= new ArrayCollection([]);
+         private var competitionFilterCatEventList:ArrayCollection= new ArrayCollection([]);
 
          private var competitionScreen:CompetitionScreen = null;
 
@@ -78,6 +78,12 @@
 
          private var mode:String = "unknown";
 
+         [Bindable]
+         private var selectedEvent4AddCompetition:MyEvent = null;
+
+         [Bindable]
+         private var selectedEvent4AddCategory:MyEvent = null;
+
          public function init():void {
             refreshAdminData();
 
@@ -86,9 +92,14 @@
 
             this.competitionScreen = new CompetitionScreen();
             this.competitionScreen.addEventListener("SaveCompetition", saveCompetition);
+            this.competitionScreen.addEventListener("CancelCompetition", cancelCompetition);
 
             this.categoryScreen = new CategoryScreen();
             this.categoryScreen.addEventListener("SaveCategory", saveCategory);
+            this.categoryScreen.addEventListener("CancelCategory", cancelCategory);
+
+            competitionFilterCatEventList.filterFunction = competitionFilter4Category;
+            competitionFilterCatEventList.refresh();
 
          }
 
@@ -99,7 +110,6 @@
 			public function refreshAdminData():void {
             RO_admin.getAllEvents();
 				RO_admin.getAllCompetitions();
-            RO_admin.getCompetitions()
 				RO_admin.getAllCategories();
 			}
 
@@ -229,6 +239,15 @@
 
 			private function resultGetAllEvents(event:ResultEvent):void {
 				eventList = event.result as ArrayCollection;
+            for(var count:int = 0; count < eventList.length; count++) {
+               var r:MyEvent = eventList.getItemAt(count, 0) as MyEvent;
+               if (r.theDefault == true) {
+                  selectEvent4AddCompetition.selectedItem = -1;
+                  selectEvent4AddCategory.selectedItem = -1;
+                  selectedEvent4AddCompetition = null;
+                  selectedEvent4AddCategory = null;
+               }
+            }
 			}
 
 			// return null if not found
@@ -319,6 +338,14 @@
         // COMPETITION
          private function resultGetAllCompetitions(event:ResultEvent):void {
             competitionList = event.result as ArrayCollection;
+            competitionFilterCatEventList.removeAll();
+            for(var count:int = 0; count < competitionList.length; count++) {
+               var c:Competition = competitionList.getItemAt(count, 0) as Competition;
+               competitionFilterCatEventList.addItem(c);
+            }
+            competitionFilterCatEventList.filterFunction = competitionFilter4Category;
+            competitionFilterCatEventList.refresh();
+
          }
 
          // return null if not found
@@ -354,6 +381,7 @@
                editedCompetition = c;
                PopUpManager.addPopUp(this.competitionScreen, this, true);
                PopUpManager.centerPopUp(this.competitionScreen);
+               this.competitionScreen.competitionEventName.text = c.event.name;
                this.competitionScreen.competitionName.text = c.name;
                //this.competitionScreen.eventDate.selectedDate = c.date;
                // TODO : to complete
@@ -365,21 +393,32 @@
             PopUpManager.addPopUp(this.competitionScreen, this, true);
             PopUpManager.centerPopUp(this.competitionScreen);
             this.competitionScreen.competitionName.text = "";
+            this.competitionScreen.competitionEventName.text = selectedEvent4AddCompetition.name;
             //this.competitionScreen.eventDate.text = "";
             // TODO : to complete
+         }
+
+         private function cancelCompetition(e:Event):void {
+            refreshAdminData();
          }
 
          private function saveCompetition(e:Event):void {
             if (mode == "add") {
                var c:Competition = new Competition();
                c.name = this.competitionScreen.competitionName.text;
+               c.event = selectedEvent4AddCompetition;
                //c.date = this.competitionScreen.eventDate.selectedDate;
                // TODO : to complete
                RO_admin.createCompetition(c);
             } else {
                editedCompetition.name = this.competitionScreen.competitionName.text;
                //editedCompetition.date = this.competitionScreen.eventDate.selectedDate;
+               // Event is read-only here
+               //editedCompetition.event = selectedEvent4AddCompetition;
+
                // TODO : to complete
+
+
                RO_admin.updateCompetition(editedCompetition);
             }
             PopUpManager.removePopUp(this.competitionScreen);
@@ -389,12 +428,12 @@
                RO_admin.getAllCompetitions();
          }
 
-        // CATEGORY
-         private function resultGetCompetitions4DefaultEvent(event:ResultEvent):void {
-            competitionDefaultEventList = event.result as ArrayCollection;
+         private function setEvent4AddCompetition(e:Event):void {
+            selectedEvent4AddCompetition=e.currentTarget.selectedItem as MyEvent;
          }
 
-         private function resultGetAllCategories(event:ResultEvent):void {
+        // CATEGORY
+          private function resultGetAllCategories(event:ResultEvent):void {
             categoryList = event.result as ArrayCollection;
          }
 
@@ -429,6 +468,8 @@
             } else {
                mode="edit";
                editedCategory = c;
+               competitionFilterCatEventList.refresh();
+
                PopUpManager.addPopUp(this.categoryScreen, this, true);
                PopUpManager.centerPopUp(this.categoryScreen);
                this.categoryScreen.categoryName.text = c.name;
@@ -437,8 +478,18 @@
                this.categoryScreen.categoryMinDate.selectedDate = c.minDate;
                this.categoryScreen.categoryMaxDate.selectedDate = c.maxDate;
                this.categoryScreen.selectedCompetitions=c.competitions;
-               this.categoryScreen.competitionList=this.competitionDefaultEventList;
+               var compList:ArrayCollection= new ArrayCollection([]);
+
+               for(var count:int = 0; count < competitionList.length; count++) {
+                  var comp:Competition = competitionList.getItemAt(count, 0) as Competition;
+                  if (comp.event.id == editedCategory.event.id) {
+                     compList.addItem(comp);
+                  }
+               }
+               this.categoryScreen.competitionList=compList;
                this.categoryScreen.initCompetitions();
+               this.categoryScreen.categoryEventName.text = c.event.name;
+
             }
          }
 
@@ -447,13 +498,26 @@
             PopUpManager.addPopUp(this.categoryScreen, this, true);
             PopUpManager.centerPopUp(this.categoryScreen);
             this.categoryScreen.categoryName.text = "";
-            this.categoryScreen.categorySex.text = "";
+            this.categoryScreen.categorySex.selectedIndex=-1;
             this.categoryScreen.categoryShortName.text = "";
             this.categoryScreen.categoryMinDate.text = "";
             this.categoryScreen.categoryMaxDate.text = "";
             this.categoryScreen.selectedCompetitions.removeAll();
-            this.categoryScreen.competitionList=this.competitionDefaultEventList;
+            var compList:ArrayCollection= new ArrayCollection([]);
+            for(var count:int = 0; count < competitionList.length; count++) {
+                  var comp:Competition = competitionList.getItemAt(count, 0) as Competition;
+                  if (comp.event.id == selectedEvent4AddCategory.id) {
+                     compList.addItem(comp);
+                  }
+            }
+            this.categoryScreen.competitionList=compList;
             this.categoryScreen.initCompetitions();
+            this.categoryScreen.categoryEventName.text = selectedEvent4AddCategory.name;
+
+         }
+
+         private function cancelCategory(e:Event):void {
+            refreshAdminData();
          }
 
          private function saveCategory(e:Event):void {
@@ -465,6 +529,8 @@
                c.minDate = this.categoryScreen.categoryMinDate.selectedDate;
                c.maxDate = this.categoryScreen.categoryMaxDate.selectedDate;
                c.competitions = this.categoryScreen.selectedCompetitions;
+               c.event = selectedEvent4AddCategory;
+
                RO_admin.createCategory(c);
             } else {
                editedCategory.name = this.categoryScreen.categoryName.text;
@@ -473,6 +539,7 @@
                editedCategory.minDate = this.categoryScreen.categoryMinDate.selectedDate;
                editedCategory.maxDate = this.categoryScreen.categoryMaxDate.selectedDate;
                editedCategory.competitions = this.categoryScreen.selectedCompetitions;
+               // event is read-only here, doesn't set it
                RO_admin.updateCategory(editedCategory);
             }
             PopUpManager.removePopUp(this.categoryScreen);
@@ -481,6 +548,20 @@
          private function resultCreateCategory(event:ResultEvent):void {
                RO_admin.getAllCategories();
          }
+
+        private function setEvent4AddCategory(e:Event):void {
+            selectedEvent4AddCategory=e.currentTarget.selectedItem as MyEvent;
+            competitionFilterCatEventList.refresh();
+         }
+
+        public function competitionFilter4Category(item:Object):Boolean {
+           var c:Competition = item as Competition;
+           if (selectedEvent4AddCategory != null) {
+            return (c.event.id == selectedEvent4AddCategory.id);
+           } else {
+            return true;
+           }
+        }
 
 		]]>
 	</mx:Script>
@@ -493,7 +574,6 @@
       <mx:method name="duplicateEvent" result="resultDuplicateEvent(event)" fault="Util.handleException(event)"/>
 
       <mx:method name="getAllCompetitions" result="resultGetAllCompetitions(event)"/>
-      <mx:method name="getCompetitions" result="resultGetCompetitions4DefaultEvent(event)"/>
 
       <mx:method name="createCompetition" result="resultCreateCompetition(event)" fault="Util.handleException(event)"/>
       <mx:method name="removeCompetition" result="resultRemoveCompetition(event)" fault="Util.handleException(event)"/>
@@ -581,7 +661,11 @@
 
 				</mx:columns>
 			</mx:DataGrid>
-         <mx:Button label="Ajouter" click="addCompetition()"/>
+            <mx:HBox width="100%" horizontalAlign="center">
+               <mx:ComboBox id="selectEvent4AddCompetition" dataProvider="{eventList}" labelField="name" width="300" change="setEvent4AddCompetition(event);"/>
+               <mx:Button label="Ajouter" click="addCompetition()" enabled="{selectedEvent4AddCompetition!=null}"/>
+            </mx:HBox>
+
 		</mx:Panel>
 	  </mx:HBox>
 
@@ -605,7 +689,11 @@
 
 				</mx:columns>
 			</mx:DataGrid>
-         <mx:Button label="Ajouter" click="addCategory()"/>
+            <mx:HBox width="100%" horizontalAlign="center">
+               <mx:ComboBox id="selectEvent4AddCategory" dataProvider="{eventList}" labelField="name" width="300" change="setEvent4AddCategory(event);"/>
+               <mx:Button label="Ajouter" click="addCategory()"  enabled="{selectedEvent4AddCategory!=null}"/>
+            </mx:HBox>
+
 		</mx:Panel>
      </mx:HBox>
 

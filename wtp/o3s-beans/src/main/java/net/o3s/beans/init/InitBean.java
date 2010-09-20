@@ -276,68 +276,68 @@ public class InitBean implements IEJBInitRemote {
 		}
 
         // Init Competitions
-    	IEntityCompetition nocompetition = admin.createCompetition(NOCOMPETITION_NAME, NOCOMPETITION_LOWER_LABEL_NB, NOCOMPETITION_HIGHER_LABEL_NB, NOCOMPETITION_LOWER_LABEL_NB, event, false);
+    	IEntityCompetition nocompetition = admin.createCompetition(NOCOMPETITION_NAME, NOCOMPETITION_LOWER_LABEL_NB, NOCOMPETITION_HIGHER_LABEL_NB, NOCOMPETITION_LOWER_LABEL_NB, event.getId(), false);
 
-    	IEntityCompetition competition0_1 = admin.createCompetition(COMPETITION_NAME_0_1, COMPETITION_LOWER_LABEL_NB_0_1, COMPETITION_HIGHER_LABEL_NB_0_1, COMPETITION_LOWER_LABEL_NB_0_1, event, false);
-    	IEntityCompetition competition0_2 = admin.createCompetition(COMPETITION_NAME_0_2, COMPETITION_LOWER_LABEL_NB_0_2, COMPETITION_HIGHER_LABEL_NB_0_2, COMPETITION_LOWER_LABEL_NB_0_2, event, false);
-    	IEntityCompetition competition0_3 = admin.createCompetition(COMPETITION_NAME_0_3, COMPETITION_LOWER_LABEL_NB_0_3, COMPETITION_HIGHER_LABEL_NB_0_3, COMPETITION_LOWER_LABEL_NB_0_3, event, false);
-    	IEntityCompetition competition1_1 = admin.createCompetition(COMPETITION_NAME_1_1, COMPETITION_LOWER_LABEL_NB_1_1, COMPETITION_HIGHER_LABEL_NB_1_1, COMPETITION_LOWER_LABEL_NB_1_1, event, false);
-    	IEntityCompetition competition1_2 = admin.createCompetition(COMPETITION_NAME_1_2, COMPETITION_LOWER_LABEL_NB_1_2, COMPETITION_HIGHER_LABEL_NB_1_2, COMPETITION_LOWER_LABEL_NB_1_2, event, false);
-    	IEntityCompetition competition1_3 = admin.createCompetition(COMPETITION_NAME_1_3, COMPETITION_LOWER_LABEL_NB_1_3, COMPETITION_HIGHER_LABEL_NB_1_3, COMPETITION_LOWER_LABEL_NB_1_3, event, false);
-    	IEntityCompetition competition1_4 = admin.createCompetition(COMPETITION_NAME_1_4, COMPETITION_LOWER_LABEL_NB_1_4, COMPETITION_HIGHER_LABEL_NB_1_4, COMPETITION_LOWER_LABEL_NB_1_4, event, false);
-    	IEntityCompetition competition2_1 = admin.createCompetition(COMPETITION_NAME_2_1, COMPETITION_LOWER_LABEL_NB_2_1, COMPETITION_HIGHER_LABEL_NB_2_1, COMPETITION_LOWER_LABEL_NB_2_1, event, false);
-    	IEntityCompetition competition2_2 = admin.createCompetition(COMPETITION_NAME_2_2, COMPETITION_LOWER_LABEL_NB_2_2, COMPETITION_HIGHER_LABEL_NB_2_2, COMPETITION_LOWER_LABEL_NB_2_2, event, false);
-    	IEntityCompetition competition3 = admin.createCompetition(COMPETITION_NAME_3, COMPETITION_LOWER_LABEL_NB_3, COMPETITION_HIGHER_LABEL_NB_3, COMPETITION_LOWER_LABEL_NB_3, event, false);
-    	IEntityCompetition competition4 = admin.createCompetition(COMPETITION_NAME_4, COMPETITION_LOWER_LABEL_NB_4, COMPETITION_HIGHER_LABEL_NB_4, COMPETITION_LOWER_LABEL_NB_4, event, false);
-    	IEntityCompetition competition5 = admin.createCompetition(COMPETITION_NAME_5, COMPETITION_LOWER_LABEL_NB_5, COMPETITION_HIGHER_LABEL_NB_5, COMPETITION_LOWER_LABEL_NB_5, event, false);
-    	IEntityCompetition competition6 = admin.createCompetition(COMPETITION_NAME_6, COMPETITION_LOWER_LABEL_NB_6, COMPETITION_HIGHER_LABEL_NB_6, COMPETITION_LOWER_LABEL_NB_6, event, false);
-    	IEntityCompetition competition7 = admin.createCompetition(COMPETITION_NAME_7, COMPETITION_LOWER_LABEL_NB_7, COMPETITION_HIGHER_LABEL_NB_7, COMPETITION_LOWER_LABEL_NB_7, event, false);
-    	IEntityCompetition competition8 = admin.createCompetition(COMPETITION_NAME_8, COMPETITION_LOWER_LABEL_NB_8, COMPETITION_HIGHER_LABEL_NB_8, COMPETITION_LOWER_LABEL_NB_8, event, true);
+    	IEntityCompetition competition0_1 = admin.createCompetition(COMPETITION_NAME_0_1, COMPETITION_LOWER_LABEL_NB_0_1, COMPETITION_HIGHER_LABEL_NB_0_1, COMPETITION_LOWER_LABEL_NB_0_1, event.getId(), false);
+    	IEntityCompetition competition0_2 = admin.createCompetition(COMPETITION_NAME_0_2, COMPETITION_LOWER_LABEL_NB_0_2, COMPETITION_HIGHER_LABEL_NB_0_2, COMPETITION_LOWER_LABEL_NB_0_2, event.getId(), false);
+    	IEntityCompetition competition0_3 = admin.createCompetition(COMPETITION_NAME_0_3, COMPETITION_LOWER_LABEL_NB_0_3, COMPETITION_HIGHER_LABEL_NB_0_3, COMPETITION_LOWER_LABEL_NB_0_3, event.getId(), false);
+    	IEntityCompetition competition1_1 = admin.createCompetition(COMPETITION_NAME_1_1, COMPETITION_LOWER_LABEL_NB_1_1, COMPETITION_HIGHER_LABEL_NB_1_1, COMPETITION_LOWER_LABEL_NB_1_1, event.getId(), false);
+    	IEntityCompetition competition1_2 = admin.createCompetition(COMPETITION_NAME_1_2, COMPETITION_LOWER_LABEL_NB_1_2, COMPETITION_HIGHER_LABEL_NB_1_2, COMPETITION_LOWER_LABEL_NB_1_2, event.getId(), false);
+    	IEntityCompetition competition1_3 = admin.createCompetition(COMPETITION_NAME_1_3, COMPETITION_LOWER_LABEL_NB_1_3, COMPETITION_HIGHER_LABEL_NB_1_3, COMPETITION_LOWER_LABEL_NB_1_3, event.getId(), false);
+    	IEntityCompetition competition1_4 = admin.createCompetition(COMPETITION_NAME_1_4, COMPETITION_LOWER_LABEL_NB_1_4, COMPETITION_HIGHER_LABEL_NB_1_4, COMPETITION_LOWER_LABEL_NB_1_4, event.getId(), false);
+    	IEntityCompetition competition2_1 = admin.createCompetition(COMPETITION_NAME_2_1, COMPETITION_LOWER_LABEL_NB_2_1, COMPETITION_HIGHER_LABEL_NB_2_1, COMPETITION_LOWER_LABEL_NB_2_1, event.getId(), false);
+    	IEntityCompetition competition2_2 = admin.createCompetition(COMPETITION_NAME_2_2, COMPETITION_LOWER_LABEL_NB_2_2, COMPETITION_HIGHER_LABEL_NB_2_2, COMPETITION_LOWER_LABEL_NB_2_2, event.getId(), false);
+    	IEntityCompetition competition3 = admin.createCompetition(COMPETITION_NAME_3, COMPETITION_LOWER_LABEL_NB_3, COMPETITION_HIGHER_LABEL_NB_3, COMPETITION_LOWER_LABEL_NB_3, event.getId(), false);
+    	IEntityCompetition competition4 = admin.createCompetition(COMPETITION_NAME_4, COMPETITION_LOWER_LABEL_NB_4, COMPETITION_HIGHER_LABEL_NB_4, COMPETITION_LOWER_LABEL_NB_4, event.getId(), false);
+    	IEntityCompetition competition5 = admin.createCompetition(COMPETITION_NAME_5, COMPETITION_LOWER_LABEL_NB_5, COMPETITION_HIGHER_LABEL_NB_5, COMPETITION_LOWER_LABEL_NB_5, event.getId(), false);
+    	IEntityCompetition competition6 = admin.createCompetition(COMPETITION_NAME_6, COMPETITION_LOWER_LABEL_NB_6, COMPETITION_HIGHER_LABEL_NB_6, COMPETITION_LOWER_LABEL_NB_6, event.getId(), false);
+    	IEntityCompetition competition7 = admin.createCompetition(COMPETITION_NAME_7, COMPETITION_LOWER_LABEL_NB_7, COMPETITION_HIGHER_LABEL_NB_7, COMPETITION_LOWER_LABEL_NB_7, event.getId(), false);
+    	IEntityCompetition competition8 = admin.createCompetition(COMPETITION_NAME_8, COMPETITION_LOWER_LABEL_NB_8, COMPETITION_HIGHER_LABEL_NB_8, COMPETITION_LOWER_LABEL_NB_8, event.getId(), true);
 
         // Init Categories
 
     	try {
-        admin.createCategory(NOCATEGORY_NAME, df.parse(NOCATEGORY_MINDATE), df.parse(NOCATEGORY_MAXDATE), 'M', NOCATEGORY_SNAME, event, nocompetition);
+        admin.createCategory(NOCATEGORY_NAME, df.parse(NOCATEGORY_MINDATE), df.parse(NOCATEGORY_MAXDATE), 'M', NOCATEGORY_SNAME, event.getId(), nocompetition);
 
-		admin.createCategory(CATEGORY_NAME_0_1, df.parse(CATEGORY_MINDATE_0_1), df.parse(CATEGORY_MAXDATE_0_1), 'M', CATEGORY_SNAME_0, event, competition0_1);
-		admin.createCategory(CATEGORY_NAME_0_2, df.parse(CATEGORY_MINDATE_0_2), df.parse(CATEGORY_MAXDATE_0_2), 'M', CATEGORY_SNAME_0, event, competition0_2);
-		admin.createCategory(CATEGORY_NAME_0_3, df.parse(CATEGORY_MINDATE_0_3), df.parse(CATEGORY_MAXDATE_0_3), 'M', CATEGORY_SNAME_0, event, competition0_3);
-    	admin.createCategory(CATEGORY_NAME_1_1, df.parse(CATEGORY_MINDATE_1_1), df.parse(CATEGORY_MAXDATE_1_1), 'M', CATEGORY_SNAME_1, event, competition1_1);
-    	admin.createCategory(CATEGORY_NAME_1_2, df.parse(CATEGORY_MINDATE_1_2), df.parse(CATEGORY_MAXDATE_1_2), 'M', CATEGORY_SNAME_1, event, competition1_2);
-    	admin.createCategory(CATEGORY_NAME_1_3, df.parse(CATEGORY_MINDATE_1_3), df.parse(CATEGORY_MAXDATE_1_3), 'M', CATEGORY_SNAME_1, event, competition1_3);
-    	admin.createCategory(CATEGORY_NAME_1_4, df.parse(CATEGORY_MINDATE_1_4), df.parse(CATEGORY_MAXDATE_1_4), 'M', CATEGORY_SNAME_1, event, competition1_4);
-    	admin.createCategory(CATEGORY_NAME_2_1, df.parse(CATEGORY_MINDATE_2_1), df.parse(CATEGORY_MAXDATE_2_1), 'M', CATEGORY_SNAME_2, event, competition2_1);
-    	admin.createCategory(CATEGORY_NAME_2_2, df.parse(CATEGORY_MINDATE_2_2), df.parse(CATEGORY_MAXDATE_2_2), 'M', CATEGORY_SNAME_2, event, competition2_2);
-    	admin.createCategory(CATEGORY_NAME_3, df.parse(CATEGORY_MINDATE_3), df.parse(CATEGORY_MAXDATE_3), 'M', CATEGORY_SNAME_3, event, competition3);
-    	admin.createCategory(CATEGORY_NAME_4, df.parse(CATEGORY_MINDATE_4), df.parse(CATEGORY_MAXDATE_4), 'M', CATEGORY_SNAME_4, event, competition4);
-    	admin.createCategory(CATEGORY_NAME_5, df.parse(CATEGORY_MINDATE_5), df.parse(CATEGORY_MAXDATE_5), 'M', CATEGORY_SNAME_5, event, competition5);
-    	admin.createCategory(CATEGORY_NAME_6, df.parse(CATEGORY_MINDATE_6), df.parse(CATEGORY_MAXDATE_6), 'M', CATEGORY_SNAME_6, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_7, df.parse(CATEGORY_MINDATE_7), df.parse(CATEGORY_MAXDATE_7), 'M', CATEGORY_SNAME_7, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_8, df.parse(CATEGORY_MINDATE_8), df.parse(CATEGORY_MAXDATE_8), 'M', CATEGORY_SNAME_8, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_9, df.parse(CATEGORY_MINDATE_9), df.parse(CATEGORY_MAXDATE_9), 'M', CATEGORY_SNAME_9, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_10, df.parse(CATEGORY_MINDATE_10), df.parse(CATEGORY_MAXDATE_10), 'M', CATEGORY_SNAME_10, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_11, df.parse(CATEGORY_MINDATE_11), df.parse(CATEGORY_MAXDATE_11), 'M', CATEGORY_SNAME_11, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_12, df.parse(CATEGORY_MINDATE_12), df.parse(CATEGORY_MAXDATE_12), 'M', CATEGORY_SNAME_12, event, competition5, competition6, competition7);
+		admin.createCategory(CATEGORY_NAME_0_1, df.parse(CATEGORY_MINDATE_0_1), df.parse(CATEGORY_MAXDATE_0_1), 'M', CATEGORY_SNAME_0, event.getId(), competition0_1);
+		admin.createCategory(CATEGORY_NAME_0_2, df.parse(CATEGORY_MINDATE_0_2), df.parse(CATEGORY_MAXDATE_0_2), 'M', CATEGORY_SNAME_0, event.getId(), competition0_2);
+		admin.createCategory(CATEGORY_NAME_0_3, df.parse(CATEGORY_MINDATE_0_3), df.parse(CATEGORY_MAXDATE_0_3), 'M', CATEGORY_SNAME_0, event.getId(), competition0_3);
+    	admin.createCategory(CATEGORY_NAME_1_1, df.parse(CATEGORY_MINDATE_1_1), df.parse(CATEGORY_MAXDATE_1_1), 'M', CATEGORY_SNAME_1, event.getId(), competition1_1);
+    	admin.createCategory(CATEGORY_NAME_1_2, df.parse(CATEGORY_MINDATE_1_2), df.parse(CATEGORY_MAXDATE_1_2), 'M', CATEGORY_SNAME_1, event.getId(), competition1_2);
+    	admin.createCategory(CATEGORY_NAME_1_3, df.parse(CATEGORY_MINDATE_1_3), df.parse(CATEGORY_MAXDATE_1_3), 'M', CATEGORY_SNAME_1, event.getId(), competition1_3);
+    	admin.createCategory(CATEGORY_NAME_1_4, df.parse(CATEGORY_MINDATE_1_4), df.parse(CATEGORY_MAXDATE_1_4), 'M', CATEGORY_SNAME_1, event.getId(), competition1_4);
+    	admin.createCategory(CATEGORY_NAME_2_1, df.parse(CATEGORY_MINDATE_2_1), df.parse(CATEGORY_MAXDATE_2_1), 'M', CATEGORY_SNAME_2, event.getId(), competition2_1);
+    	admin.createCategory(CATEGORY_NAME_2_2, df.parse(CATEGORY_MINDATE_2_2), df.parse(CATEGORY_MAXDATE_2_2), 'M', CATEGORY_SNAME_2, event.getId(), competition2_2);
+    	admin.createCategory(CATEGORY_NAME_3, df.parse(CATEGORY_MINDATE_3), df.parse(CATEGORY_MAXDATE_3), 'M', CATEGORY_SNAME_3, event.getId(), competition3);
+    	admin.createCategory(CATEGORY_NAME_4, df.parse(CATEGORY_MINDATE_4), df.parse(CATEGORY_MAXDATE_4), 'M', CATEGORY_SNAME_4, event.getId(), competition4);
+    	admin.createCategory(CATEGORY_NAME_5, df.parse(CATEGORY_MINDATE_5), df.parse(CATEGORY_MAXDATE_5), 'M', CATEGORY_SNAME_5, event.getId(), competition5);
+    	admin.createCategory(CATEGORY_NAME_6, df.parse(CATEGORY_MINDATE_6), df.parse(CATEGORY_MAXDATE_6), 'M', CATEGORY_SNAME_6, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_7, df.parse(CATEGORY_MINDATE_7), df.parse(CATEGORY_MAXDATE_7), 'M', CATEGORY_SNAME_7, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_8, df.parse(CATEGORY_MINDATE_8), df.parse(CATEGORY_MAXDATE_8), 'M', CATEGORY_SNAME_8, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_9, df.parse(CATEGORY_MINDATE_9), df.parse(CATEGORY_MAXDATE_9), 'M', CATEGORY_SNAME_9, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_10, df.parse(CATEGORY_MINDATE_10), df.parse(CATEGORY_MAXDATE_10), 'M', CATEGORY_SNAME_10, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_11, df.parse(CATEGORY_MINDATE_11), df.parse(CATEGORY_MAXDATE_11), 'M', CATEGORY_SNAME_11, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_12, df.parse(CATEGORY_MINDATE_12), df.parse(CATEGORY_MAXDATE_12), 'M', CATEGORY_SNAME_12, event.getId(), competition5, competition6, competition7);
 
-    	admin.createCategory(CATEGORY_NAME_20_1, df.parse(CATEGORY_MINDATE_20_1), df.parse(CATEGORY_MAXDATE_20_1), 'F', CATEGORY_SNAME_20, event, competition0_1);
-    	admin.createCategory(CATEGORY_NAME_20_2, df.parse(CATEGORY_MINDATE_20_2), df.parse(CATEGORY_MAXDATE_20_2), 'F', CATEGORY_SNAME_20, event, competition0_2);
-    	admin.createCategory(CATEGORY_NAME_20_3, df.parse(CATEGORY_MINDATE_20_3), df.parse(CATEGORY_MAXDATE_20_3), 'F', CATEGORY_SNAME_20, event, competition0_3);
-    	admin.createCategory(CATEGORY_NAME_21_1, df.parse(CATEGORY_MINDATE_21_1), df.parse(CATEGORY_MAXDATE_21_1), 'F', CATEGORY_SNAME_21, event, competition1_1);
-    	admin.createCategory(CATEGORY_NAME_21_2, df.parse(CATEGORY_MINDATE_21_2), df.parse(CATEGORY_MAXDATE_21_2), 'F', CATEGORY_SNAME_21, event, competition1_2);
-    	admin.createCategory(CATEGORY_NAME_21_3, df.parse(CATEGORY_MINDATE_21_3), df.parse(CATEGORY_MAXDATE_21_3), 'F', CATEGORY_SNAME_21, event, competition1_3);
-    	admin.createCategory(CATEGORY_NAME_21_4, df.parse(CATEGORY_MINDATE_21_4), df.parse(CATEGORY_MAXDATE_21_4), 'F', CATEGORY_SNAME_21, event, competition1_4);
-    	admin.createCategory(CATEGORY_NAME_22_1, df.parse(CATEGORY_MINDATE_22_1), df.parse(CATEGORY_MAXDATE_22_1), 'F', CATEGORY_SNAME_22, event, competition2_1);
-    	admin.createCategory(CATEGORY_NAME_22_2, df.parse(CATEGORY_MINDATE_22_2), df.parse(CATEGORY_MAXDATE_22_2), 'F', CATEGORY_SNAME_22, event, competition2_2);
-    	admin.createCategory(CATEGORY_NAME_23, df.parse(CATEGORY_MINDATE_23), df.parse(CATEGORY_MAXDATE_23), 'F', CATEGORY_SNAME_23, event, competition3);
-    	admin.createCategory(CATEGORY_NAME_24, df.parse(CATEGORY_MINDATE_24), df.parse(CATEGORY_MAXDATE_24), 'F', CATEGORY_SNAME_24, event, competition4);
-    	admin.createCategory(CATEGORY_NAME_25, df.parse(CATEGORY_MINDATE_25), df.parse(CATEGORY_MAXDATE_25), 'F', CATEGORY_SNAME_25, event, competition5);
-    	admin.createCategory(CATEGORY_NAME_26, df.parse(CATEGORY_MINDATE_26), df.parse(CATEGORY_MAXDATE_26), 'F', CATEGORY_SNAME_26, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_27, df.parse(CATEGORY_MINDATE_27), df.parse(CATEGORY_MAXDATE_27), 'F', CATEGORY_SNAME_27, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_28, df.parse(CATEGORY_MINDATE_28), df.parse(CATEGORY_MAXDATE_28), 'F', CATEGORY_SNAME_28, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_29, df.parse(CATEGORY_MINDATE_29), df.parse(CATEGORY_MAXDATE_29), 'F', CATEGORY_SNAME_29, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_30, df.parse(CATEGORY_MINDATE_30), df.parse(CATEGORY_MAXDATE_30), 'F', CATEGORY_SNAME_30, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_31, df.parse(CATEGORY_MINDATE_31), df.parse(CATEGORY_MAXDATE_31), 'F', CATEGORY_SNAME_31, event, competition5, competition6, competition7);
-    	admin.createCategory(CATEGORY_NAME_32, df.parse(CATEGORY_MINDATE_32), df.parse(CATEGORY_MAXDATE_32), 'F', CATEGORY_SNAME_32, event, competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_20_1, df.parse(CATEGORY_MINDATE_20_1), df.parse(CATEGORY_MAXDATE_20_1), 'F', CATEGORY_SNAME_20, event.getId(), competition0_1);
+    	admin.createCategory(CATEGORY_NAME_20_2, df.parse(CATEGORY_MINDATE_20_2), df.parse(CATEGORY_MAXDATE_20_2), 'F', CATEGORY_SNAME_20, event.getId(), competition0_2);
+    	admin.createCategory(CATEGORY_NAME_20_3, df.parse(CATEGORY_MINDATE_20_3), df.parse(CATEGORY_MAXDATE_20_3), 'F', CATEGORY_SNAME_20, event.getId(), competition0_3);
+    	admin.createCategory(CATEGORY_NAME_21_1, df.parse(CATEGORY_MINDATE_21_1), df.parse(CATEGORY_MAXDATE_21_1), 'F', CATEGORY_SNAME_21, event.getId(), competition1_1);
+    	admin.createCategory(CATEGORY_NAME_21_2, df.parse(CATEGORY_MINDATE_21_2), df.parse(CATEGORY_MAXDATE_21_2), 'F', CATEGORY_SNAME_21, event.getId(), competition1_2);
+    	admin.createCategory(CATEGORY_NAME_21_3, df.parse(CATEGORY_MINDATE_21_3), df.parse(CATEGORY_MAXDATE_21_3), 'F', CATEGORY_SNAME_21, event.getId(), competition1_3);
+    	admin.createCategory(CATEGORY_NAME_21_4, df.parse(CATEGORY_MINDATE_21_4), df.parse(CATEGORY_MAXDATE_21_4), 'F', CATEGORY_SNAME_21, event.getId(), competition1_4);
+    	admin.createCategory(CATEGORY_NAME_22_1, df.parse(CATEGORY_MINDATE_22_1), df.parse(CATEGORY_MAXDATE_22_1), 'F', CATEGORY_SNAME_22, event.getId(), competition2_1);
+    	admin.createCategory(CATEGORY_NAME_22_2, df.parse(CATEGORY_MINDATE_22_2), df.parse(CATEGORY_MAXDATE_22_2), 'F', CATEGORY_SNAME_22, event.getId(), competition2_2);
+    	admin.createCategory(CATEGORY_NAME_23, df.parse(CATEGORY_MINDATE_23), df.parse(CATEGORY_MAXDATE_23), 'F', CATEGORY_SNAME_23, event.getId(), competition3);
+    	admin.createCategory(CATEGORY_NAME_24, df.parse(CATEGORY_MINDATE_24), df.parse(CATEGORY_MAXDATE_24), 'F', CATEGORY_SNAME_24, event.getId(), competition4);
+    	admin.createCategory(CATEGORY_NAME_25, df.parse(CATEGORY_MINDATE_25), df.parse(CATEGORY_MAXDATE_25), 'F', CATEGORY_SNAME_25, event.getId(), competition5);
+    	admin.createCategory(CATEGORY_NAME_26, df.parse(CATEGORY_MINDATE_26), df.parse(CATEGORY_MAXDATE_26), 'F', CATEGORY_SNAME_26, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_27, df.parse(CATEGORY_MINDATE_27), df.parse(CATEGORY_MAXDATE_27), 'F', CATEGORY_SNAME_27, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_28, df.parse(CATEGORY_MINDATE_28), df.parse(CATEGORY_MAXDATE_28), 'F', CATEGORY_SNAME_28, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_29, df.parse(CATEGORY_MINDATE_29), df.parse(CATEGORY_MAXDATE_29), 'F', CATEGORY_SNAME_29, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_30, df.parse(CATEGORY_MINDATE_30), df.parse(CATEGORY_MAXDATE_30), 'F', CATEGORY_SNAME_30, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_31, df.parse(CATEGORY_MINDATE_31), df.parse(CATEGORY_MAXDATE_31), 'F', CATEGORY_SNAME_31, event.getId(), competition5, competition6, competition7);
+    	admin.createCategory(CATEGORY_NAME_32, df.parse(CATEGORY_MINDATE_32), df.parse(CATEGORY_MAXDATE_32), 'F', CATEGORY_SNAME_32, event.getId(), competition5, competition6, competition7);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

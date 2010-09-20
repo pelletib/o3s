@@ -30,6 +30,7 @@ import java.util.Set;
 public interface IEJBAdminLocal {
 
 	IEntityEvent findEventFromName(final String name);
+	IEntityEvent findEventFromId(final int id);
 	IEntityEvent findLastEvent();
 	List<IEntityEvent> findAllEvents();
 	IEntityEvent findDefaultEvent();
@@ -43,7 +44,7 @@ public interface IEJBAdminLocal {
 	List<IEntityCompetition> findAllCompetitions();
 	List<IEntityCompetition> findAllCompetitionsFromDefaultEvent();
 	Date setStartDateInCompetition(final int id) throws AdminException;
-	IEntityCompetition createCompetition(final String name, final int lowerLabelNumber, final int higherLabelNumber, final int lastLabelNumber, final IEntityEvent event, final boolean isTeamed);
+	IEntityCompetition createCompetition(final String name, final int lowerLabelNumber, final int higherLabelNumber, final int lastLabelNumber, final int eventId, final boolean isTeamed);
 	IEntityCompetition updateCompetition(
     		final int id,
     		final String name,
@@ -59,7 +60,7 @@ public interface IEJBAdminLocal {
 	IEntityCategory findNoCategory();
 	List<IEntityCategory> findAllCategories();
 	List<IEntityCategory> findAllCategoriesFromDefaultEvent();
-	IEntityCategory createCategory(final String name, final Date minDate, final Date maxDate, final char sex, final char shortName, final IEntityEvent event, final IEntityCompetition... competitions);
+	IEntityCategory createCategory(final String name, final Date minDate, final Date maxDate, final char sex, final char shortName, final int eventId, final IEntityCompetition... competitions);
 	IEntityCategory updateCategory(
     		final int id,
     		final String name,

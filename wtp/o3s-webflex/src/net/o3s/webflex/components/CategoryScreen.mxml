@@ -30,9 +30,12 @@
  creationComplete="init()">
   <mx:Metadata>
     [Event(name="SaveCategory")]
+    [Event(name="CloseCategory")]
   </mx:Metadata>
   <mx:Script>
    <![CDATA[
+         import mx.controls.Alert;
+
       import mx.managers.PopUpManager;
       import mx.validators.StringValidator;
       import net.o3s.webflex.components.AdvancedStringValidator;
@@ -43,7 +46,7 @@
       import net.o3s.webflex.bean.Competition;
 
       [Bindable]
-      public var competitionList:ArrayCollection;
+      public var competitionList:ArrayCollection= new ArrayCollection([]);
 
       [Bindable]
       public var selectedCompetitions:ArrayCollection = new ArrayCollection([]);
@@ -119,6 +122,8 @@
      private function close():void
      {
        PopUpManager.removePopUp(this);
+       this.dispatchEvent(new Event("CloseCategory"));
+
      }
 
      private function save():void
@@ -213,6 +218,9 @@
  <mx:VBox>
 
    <mx:Form>
+
+      <mx:Label id="categoryEventName" textAlign="left"/>
+
       <mx:FormItem label="Nom" >
          <mx:TextInput id="categoryName" width="150" restrict="A-Za-z0-9\- " change="validateForm(event);"/>
       </mx:FormItem>
@@ -243,6 +251,9 @@
                     change="validateForm(event);"/>
       </mx:FormItem>
       <mx:FormItem label="Competitions" >
+           <mx:Tile direction="horizontal" width="100%" borderStyle="inset"
+                     horizontalGap="3" verticalGap="3"
+                     paddingLeft="2" paddingTop="2" paddingBottom="2" paddingRight="2" label="Selectionner les competitions">
              <mx:Repeater id="categoryCompetitionsRepeater" dataProvider="{competitionList}">
                 <mx:CheckBox id="categoryCompetitions"
                            label="{categoryCompetitionsRepeater.currentItem.name}"
@@ -250,6 +261,7 @@
                            change="setCompetitions(event);validateForm(event);" />
 
               </mx:Repeater>
+          </mx:Tile>
       </mx:FormItem>
 
 

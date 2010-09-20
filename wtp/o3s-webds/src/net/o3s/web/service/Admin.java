@@ -127,7 +127,6 @@ public class Admin {
 		setAdminEJB();
 
 		IEntityCompetition competition = null;
-		IEntityEvent event = admin.findDefaultEvent();
 
 		try {
 
@@ -136,7 +135,7 @@ public class Admin {
 					competitionVO.getLowerLabelNumber(),
 					competitionVO.getHigherLabelNumber(),
 					competitionVO.getLastLabelNumber(),
-					event,
+					competitionVO.getEvent().getId(),
 					competitionVO.isTeamed());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -154,7 +153,6 @@ public class Admin {
 		setAdminEJB();
 
 		IEntityCategory category = null;
-		IEntityEvent event = admin.findDefaultEvent();
 
 		List<IEntityCompetition> competitions = new ArrayList<IEntityCompetition>();
 		IEntityCompetition[] competitionsArray = null;
@@ -175,7 +173,7 @@ public class Admin {
 					categoryVO.getMaxDate(),
 					categoryVO.getSex(),
 					categoryVO.getShortName(),
-					event,
+					categoryVO.getEvent().getId(),
 					competitions.toArray(competitionsArray));
 		} catch (Exception e) {
 			e.printStackTrace();
