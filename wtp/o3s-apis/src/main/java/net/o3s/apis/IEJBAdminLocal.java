@@ -67,7 +67,7 @@ public interface IEJBAdminLocal {
     		final char shortName,
     		final Date minDate,
     		final Date maxDate,
-    		final Set<IEntityCompetition> competitions) throws AdminException;
+    		final List<IEntityCompetition> competitions) throws AdminException;
 	void removeCategory(final int id) throws AdminException;
 
 	String exportRegisteredAsFileName(final Date from);

@@ -63,6 +63,9 @@
          [Bindable]
          private var competitionList:ArrayCollection= new ArrayCollection([]);
 
+         [Bindable]
+         private var competitionDefaultEventList:ArrayCollection= new ArrayCollection([]);
+
          private var competitionScreen:CompetitionScreen = null;
 
          [Bindable]
@@ -96,6 +99,7 @@
 			public function refreshAdminData():void {
             RO_admin.getAllEvents();
 				RO_admin.getAllCompetitions();
+            RO_admin.getCompetitions()
 				RO_admin.getAllCategories();
 			}
 
@@ -386,6 +390,10 @@
          }
 
         // CATEGORY
+         private function resultGetCompetitions4DefaultEvent(event:ResultEvent):void {
+            competitionDefaultEventList = event.result as ArrayCollection;
+         }
+
          private function resultGetAllCategories(event:ResultEvent):void {
             categoryList = event.result as ArrayCollection;
          }
@@ -426,8 +434,11 @@
                this.categoryScreen.categoryName.text = c.name;
                this.categoryScreen.categorySex.text = c.sex;
                this.categoryScreen.categoryShortName.text = c.shortName;
-               //this.categoryScreen.eventDate.selectedDate = c.date;
-               // TODO : to complete
+               this.categoryScreen.categoryMinDate.selectedDate = c.minDate;
+               this.categoryScreen.categoryMaxDate.selectedDate = c.maxDate;
+               this.categoryScreen.selectedCompetitions=c.competitions;
+               this.categoryScreen.competitionList=this.competitionDefaultEventList;
+               this.categoryScreen.initCompetitions();
             }
          }
 
@@ -438,8 +449,11 @@
             this.categoryScreen.categoryName.text = "";
             this.categoryScreen.categorySex.text = "";
             this.categoryScreen.categoryShortName.text = "";
-            //this.categoryScreen.eventDate.text = "";
-            // TODO : to complete
+            this.categoryScreen.categoryMinDate.text = "";
+            this.categoryScreen.categoryMaxDate.text = "";
+            this.categoryScreen.selectedCompetitions.removeAll();
+            this.categoryScreen.competitionList=this.competitionDefaultEventList;
+            this.categoryScreen.initCompetitions();
          }
 
          private function saveCategory(e:Event):void {
@@ -448,15 +462,17 @@
                c.name = this.categoryScreen.categoryName.text;
                c.sex = this.categoryScreen.categorySex.text;
                c.shortName = this.categoryScreen.categoryShortName.text;
-               //c.date = this.categoryScreen.eventDate.selectedDate;
-               // TODO : to complete
+               c.minDate = this.categoryScreen.categoryMinDate.selectedDate;
+               c.maxDate = this.categoryScreen.categoryMaxDate.selectedDate;
+               c.competitions = this.categoryScreen.selectedCompetitions;
                RO_admin.createCategory(c);
             } else {
                editedCategory.name = this.categoryScreen.categoryName.text;
                editedCategory.sex = this.categoryScreen.categorySex.text;
                editedCategory.shortName = this.categoryScreen.categoryShortName.text;
-               //editedCompetition.date = this.categoryScreen.eventDate.selectedDate;
-               // TODO : to complete
+               editedCategory.minDate = this.categoryScreen.categoryMinDate.selectedDate;
+               editedCategory.maxDate = this.categoryScreen.categoryMaxDate.selectedDate;
+               editedCategory.competitions = this.categoryScreen.selectedCompetitions;
                RO_admin.updateCategory(editedCategory);
             }
             PopUpManager.removePopUp(this.categoryScreen);
@@ -477,6 +493,8 @@
       <mx:method name="duplicateEvent" result="resultDuplicateEvent(event)" fault="Util.handleException(event)"/>
 
       <mx:method name="getAllCompetitions" result="resultGetAllCompetitions(event)"/>
+      <mx:method name="getCompetitions" result="resultGetCompetitions4DefaultEvent(event)"/>
+
       <mx:method name="createCompetition" result="resultCreateCompetition(event)" fault="Util.handleException(event)"/>
       <mx:method name="removeCompetition" result="resultRemoveCompetition(event)" fault="Util.handleException(event)"/>
 

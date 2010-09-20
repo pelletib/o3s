@@ -750,7 +750,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     		final char shortName,
     		final Date minDate,
     		final Date maxDate,
-    		final Set<IEntityCompetition> competitions) throws AdminException {
+    		final List<IEntityCompetition> competitions) throws AdminException {
     	IEntityCategory category = null;
 
     	category = findCategoryFromId(id);
@@ -781,9 +781,13 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         		}
         		List<IEntityCompetition> comps = new ArrayList<IEntityCompetition>();
         		comps.add(comp);
-        		category.setCompetitions (new HashSet(Arrays.asList(comps)));
+        		category.setCompetitions (new HashSet(comps));
         	} else {
-            	category.setCompetitions(competitions);
+        		List<IEntityCompetition> comps = new ArrayList<IEntityCompetition>();
+        		for (IEntityCompetition comp:competitions) {
+        			comps.add(findCompetitionFromId(comp.getId()));
+        		}
+        		category.setCompetitions (new HashSet(comps));
         	}
 
         } else {

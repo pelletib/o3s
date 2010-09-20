@@ -274,7 +274,7 @@ public class Admin {
 					categoryVO.getShortName(),
 					categoryVO.getMinDate(),
 					categoryVO.getMaxDate(),
-					new HashSet(Arrays.asList(competitions)));
+					competitions);
 		} catch (AdminException e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());

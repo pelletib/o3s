@@ -25,7 +25,7 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 -->
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
- layout="absolute" width="348" height="218"
+ layout="absolute" width="600" height="400"
  title="Formulaire categorie"
  creationComplete="init()">
   <mx:Metadata>
@@ -33,15 +33,22 @@
   </mx:Metadata>
   <mx:Script>
    <![CDATA[
-     import mx.managers.PopUpManager;
+      import mx.managers.PopUpManager;
       import mx.validators.StringValidator;
       import net.o3s.webflex.components.AdvancedStringValidator;
       import mx.validators.DateValidator;
       import mx.validators.Validator;
       import mx.events.ValidationResultEvent;
       import mx.collections.ArrayCollection;
+      import net.o3s.webflex.bean.Competition;
 
       [Bindable]
+      public var competitionList:ArrayCollection;
+
+      [Bindable]
+      public var selectedCompetitions:ArrayCollection = new ArrayCollection([]);
+
+     [Bindable]
       public var sexList:ArrayCollection = new ArrayCollection(
          [ {label:"M", data:1},
            {label:"F", data:2} ]);
@@ -49,11 +56,13 @@
       [Bindable]
       public var formIsValid:Boolean = false;
 
+
       private var focussedFormControl:DisplayObject;
       private var categoryNameValidator:StringValidator;
       private var categorySexValidator:StringValidator;
       private var categoryShortNameValidator:StringValidator;
-      //private var personBirthdayValidator:DateValidator;
+      private var categoryMinDateValidator:DateValidator;
+      private var categoryMaxDateValidator:DateValidator;
 
       private function init():void {
 
@@ -91,12 +100,19 @@
          categoryShortNameValidator.maxLength = 1;
          categoryShortNameValidator.required=true;
 
-         //personBirthdayValidator = new DateValidator();
-         //personBirthdayValidator.source = DF_personBirthday;
-         //personBirthdayValidator.property = "text";
-         //personBirthdayValidator.allowedFormatChars="/";
-         //personBirthdayValidator.inputFormat="DD/MM/YYYY";
-         //personBirthdayValidator.required=true;
+         categoryMinDateValidator = new DateValidator();
+         categoryMinDateValidator.source = categoryMinDate;
+         categoryMinDateValidator.property = "text";
+         categoryMinDateValidator.allowedFormatChars="/";
+         categoryMinDateValidator.inputFormat="DD/MM/YYYY";
+         categoryMinDateValidator.required=true;
+
+         categoryMaxDateValidator = new DateValidator();
+         categoryMaxDateValidator.source = categoryMaxDate;
+         categoryMaxDateValidator.property = "text";
+         categoryMaxDateValidator.allowedFormatChars="/";
+         categoryMaxDateValidator.inputFormat="DD/MM/YYYY";
+         categoryMaxDateValidator.required=true;
 
       }
 
@@ -117,14 +133,17 @@
          // Mark the form as valid to start with
          formIsValid = true;
 
-
          // Run each validator in turn, using the isValid()
          // helper method and update the value of formIsValid
          // accordingly.
          validateCategory(categoryNameValidator);
          validateCategory(categorySexValidator);
          validateCategory(categoryShortNameValidator);
-         //validatePerson(personBirthdayValidator);
+         validateCategory(categoryMinDateValidator);
+         validateCategory(categoryMaxDateValidator);
+
+         formIsValid = formIsValid && (selectedCompetitions.length>0);
+
 
       }
 
@@ -157,6 +176,37 @@
          return currentControlIsValid;
       }
 
+         // Set the competition when change
+         private function setCompetitions(event:Event):void {
+
+            // rebuilt the full list
+            selectedCompetitions.removeAll();
+            var idx:int;
+            var selectedNb:int = 0;
+            var len:int = competitionList.length;
+            for (idx=0; idx<len; idx++) {
+               if (categoryCompetitions[idx].selected) {
+                  selectedCompetitions.addItem(competitionList.getItemAt(idx));
+                  selectedNb++;
+               }
+            }
+         }
+
+         public function initCompetitions():void {
+
+            for(var count1:int = 0; count1 < competitionList.length; count1++) {
+               var c:Competition = competitionList.list.getItemAt(count1, 0) as Competition;
+               categoryCompetitions[count1].selected = false;
+               for(var count2:int = 0; count2 < selectedCompetitions.length; count2++) {
+                  var sc:Competition = selectedCompetitions.list.getItemAt(count2, 0) as Competition;
+                  if (c.id == sc.id) {
+                     categoryCompetitions[count1].selected = true;
+                  }
+               }
+            }
+         }
+
+
    ]]>
  </mx:Script>
 
@@ -166,24 +216,43 @@
       <mx:FormItem label="Nom" >
          <mx:TextInput id="categoryName" width="150" restrict="A-Za-z0-9\- " change="validateForm(event);"/>
       </mx:FormItem>
-      <mx:FormItem label="Sexe (*)" >
+      <mx:FormItem label="Sexe" >
          <mx:ComboBox id="categorySex" dataProvider="{sexList}" width="50" change="validateForm(event);"/>
       </mx:FormItem>
-      <mx:FormItem label="Nom court (*)" >
+      <mx:FormItem label="Nom court" >
          <mx:TextInput id="categoryShortName" width="50" change="validateForm(event);"/>
       </mx:FormItem>
-
-<!--
-      <mx:FormItem label="Date de l'evenement" >
-         <mx:DateField id="eventDate"
+      <mx:FormItem label="Date Min" >
+         <mx:DateField id="categoryMinDate"
                     yearNavigationEnabled="true"
                     editable="true"
                     formatString="DD/MM/YYYY"
                     textAlign="center"
                     fontSize="9"
-                    selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date(2020,0,1)}}"/>
+                    selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date(2020,0,1)}}"
+                    change="validateForm(event);"/>
       </mx:FormItem>
--->
+      <mx:FormItem label="Date Max" >
+         <mx:DateField id="categoryMaxDate"
+                    yearNavigationEnabled="true"
+                    editable="true"
+                    formatString="DD/MM/YYYY"
+                    textAlign="center"
+                    fontSize="9"
+                    selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date(2020,0,1)}}"
+                    change="validateForm(event);"/>
+      </mx:FormItem>
+      <mx:FormItem label="Competitions" >
+             <mx:Repeater id="categoryCompetitionsRepeater" dataProvider="{competitionList}">
+                <mx:CheckBox id="categoryCompetitions"
+                           label="{categoryCompetitionsRepeater.currentItem.name}"
+                           data="{categoryCompetitionsRepeater.currentItem.data}"
+                           change="setCompetitions(event);validateForm(event);" />
+
+              </mx:Repeater>
+      </mx:FormItem>
+
+
 
    </mx:Form>
    <mx:ControlBar horizontalAlign="center">

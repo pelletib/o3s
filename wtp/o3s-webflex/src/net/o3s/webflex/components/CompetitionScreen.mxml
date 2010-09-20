@@ -26,13 +26,45 @@
 -->
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
  layout="absolute" width="348" height="218"
- title="Formulaire competition">
+ title="Formulaire competition"
+ creationComplete="init()">
   <mx:Metadata>
     [Event(name="SaveCompetition")]
   </mx:Metadata>
   <mx:Script>
    <![CDATA[
      import mx.managers.PopUpManager;
+     import mx.validators.StringValidator;
+      import net.o3s.webflex.components.AdvancedStringValidator;
+      import mx.validators.DateValidator;
+      import mx.validators.Validator;
+      import mx.events.ValidationResultEvent;
+      import mx.collections.ArrayCollection;
+
+      [Bindable]
+      public var formIsValid:Boolean = false;
+
+      private var focussedFormControl:DisplayObject;
+      private var competitionNameValidator:StringValidator;
+      //private var eventDateValidator:DateValidator;
+
+      private function init():void {
+
+         competitionNameValidator = new StringValidator();
+         competitionNameValidator.source = competitionName;
+         competitionNameValidator.property = "text";
+         competitionNameValidator.minLength = 2;
+         competitionNameValidator.maxLength = 30;
+         competitionNameValidator.required=true;
+
+         //eventDateValidator = new DateValidator();
+         //eventDateValidator.source = eventDate;
+         //eventDateValidator.property = "text";
+         //eventDateValidator.allowedFormatChars="/";
+         //eventDateValidator.inputFormat="DD/MM/YYYY";
+         //eventDateValidator.required=true;
+
+      }
 
      private function close():void
      {
@@ -43,6 +75,50 @@
      {
        this.dispatchEvent(new Event("SaveCompetition"));
      }
+
+      // Validate the form
+      public function validateForm(event:Event):void  {
+          focussedFormControl = event.target as DisplayObject;
+
+         // Mark the form as valid to start with
+         formIsValid = true;
+
+         // Run each validator in turn, using the isValid()
+         // helper method and update the value of formIsValid
+         // accordingly.
+         validateCompetition(competitionNameValidator);
+         //validateEvent(eventDateValidator);
+      }
+
+
+      // Helper method. Performs validation on a passed Validator instance.
+      // Validator is the base class of all Flex validation classes so
+      // you can pass any validation class to this method.
+      private function validateCompetition(validator:Validator):Boolean {
+         // Get a reference to the component that is the
+         // source of the validator.
+         var validatorSource:DisplayObject = validator.source as DisplayObject;
+
+         // Suppress events if the current control being validated is not
+         // the currently focussed control on the form. This stops the user
+         // from receiving visual validation cues on other form controls.
+         var suppressEvents:Boolean = (validatorSource != focussedFormControl);
+
+         // Carry out validation. Returns a ValidationResultEvent.
+         // Passing null for the first parameter makes the validator
+         // use the property defined in the property tag of the
+         // <mx:Validator> tag.
+         var event:ValidationResultEvent = validator.validate(null, suppressEvents);
+
+         // Check if validation passed and return a boolean value accordingly.
+         var currentControlIsValid:Boolean = (event.type == ValidationResultEvent.VALID);
+
+         // Update the formIsValid flag
+         formIsValid = formIsValid && currentControlIsValid;
+
+         return currentControlIsValid;
+      }
+
    ]]>
  </mx:Script>
 
@@ -50,7 +126,7 @@
 
    <mx:Form>
       <mx:FormItem label="Nom" >
-         <mx:TextInput id="competitionName" width="150" restrict="A-Za-z0-9\- "/>
+         <mx:TextInput id="competitionName" width="150" restrict="A-Za-z0-9\- "  change="validateForm(event);"/>
       </mx:FormItem>
 
 <!--
@@ -69,7 +145,7 @@
    <mx:ControlBar horizontalAlign="center">
      <mx:HBox width="100%" horizontalAlign="center">
        <mx:Button label="Annuler" click="close()" />
-       <mx:Button label="Sauver" click="save()" />
+       <mx:Button label="Sauver" click="save()"  enabled="{formIsValid}"/>
      </mx:HBox>
    </mx:ControlBar>
 
