@@ -383,8 +383,14 @@
                PopUpManager.centerPopUp(this.competitionScreen);
                this.competitionScreen.competitionEventName.text = c.event.name;
                this.competitionScreen.competitionName.text = c.name;
-               //this.competitionScreen.eventDate.selectedDate = c.date;
-               // TODO : to complete
+               this.competitionScreen.competitionLowerLabelNumber.text = c.lowerLabelNumber.toString();
+               this.competitionScreen.competitionHigherLabelNumber.text = c.higherLabelNumber.toString();
+               this.competitionScreen.competitionLastLabelNumber.text = c.lastLabelNumber.toString();
+               this.competitionScreen.competitionTeam.selectedValue = c.teamed;
+               this.competitionScreen.competitionStartingDate = c.startingDate;
+               this.competitionScreen.dispatchEvent(new Event("change"));
+
+
             }
          }
 
@@ -394,8 +400,12 @@
             PopUpManager.centerPopUp(this.competitionScreen);
             this.competitionScreen.competitionName.text = "";
             this.competitionScreen.competitionEventName.text = selectedEvent4AddCompetition.name;
-            //this.competitionScreen.eventDate.text = "";
-            // TODO : to complete
+            this.competitionScreen.competitionLowerLabelNumber.text = "";
+            this.competitionScreen.competitionHigherLabelNumber.text = "";
+            this.competitionScreen.competitionLastLabelNumber.text = "";
+            this.competitionScreen.competitionStartingDate = null;
+            this.competitionScreen.dispatchEvent(new Event("change"));
+
          }
 
          private function cancelCompetition(e:Event):void {
@@ -407,18 +417,22 @@
                var c:Competition = new Competition();
                c.name = this.competitionScreen.competitionName.text;
                c.event = selectedEvent4AddCompetition;
-               //c.date = this.competitionScreen.eventDate.selectedDate;
-               // TODO : to complete
+               c.lowerLabelNumber = parseInt(this.competitionScreen.competitionLowerLabelNumber.text);
+               c.higherLabelNumber = parseInt(this.competitionScreen.competitionHigherLabelNumber.text);
+               c.lastLabelNumber = parseInt(this.competitionScreen.competitionLastLabelNumber.text);
+               c.teamed = this.competitionScreen.competitionTeamed;
+               c.startingDate = this.competitionScreen.competitionStartingDate;
                RO_admin.createCompetition(c);
+
             } else {
                editedCompetition.name = this.competitionScreen.competitionName.text;
-               //editedCompetition.date = this.competitionScreen.eventDate.selectedDate;
                // Event is read-only here
                //editedCompetition.event = selectedEvent4AddCompetition;
-
-               // TODO : to complete
-
-
+               editedCompetition.lowerLabelNumber = parseInt(this.competitionScreen.competitionLowerLabelNumber.text);
+               editedCompetition.higherLabelNumber = parseInt(this.competitionScreen.competitionHigherLabelNumber.text);
+               editedCompetition.lastLabelNumber = parseInt(this.competitionScreen.competitionLastLabelNumber.text);
+               editedCompetition.teamed = this.competitionScreen.competitionTeamed;
+               editedCompetition.startingDate = this.competitionScreen.competitionStartingDate;
                RO_admin.updateCompetition(editedCompetition);
             }
             PopUpManager.removePopUp(this.competitionScreen);

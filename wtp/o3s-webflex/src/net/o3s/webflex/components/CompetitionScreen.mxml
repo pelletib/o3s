@@ -24,8 +24,8 @@
 - $Id: pelletib $
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 -->
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
- layout="absolute" width="348" height="218"
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:components="net.o3s.webflex.components.*"
+ layout="absolute" width="600" height="400"
  title="Formulaire competition"
  creationComplete="init()">
   <mx:Metadata>
@@ -35,6 +35,7 @@
   </mx:Metadata>
   <mx:Script>
    <![CDATA[
+         import mx.controls.Alert;
      import mx.managers.PopUpManager;
      import mx.validators.StringValidator;
       import net.o3s.webflex.components.AdvancedStringValidator;
@@ -46,9 +47,17 @@
       [Bindable]
       public var formIsValid:Boolean = false;
 
+      [Bindable]
+      public var competitionTeamed:Boolean = false;
+
+      [Bindable]
+      public var competitionStartingDate:Date = new Date();
+
       private var focussedFormControl:DisplayObject;
       private var competitionNameValidator:StringValidator;
-      //private var eventDateValidator:DateValidator;
+      private var competitionLowerLabelNumberValidator:StringValidator;
+      private var competitionHigherLabelNumberValidator:StringValidator;
+      private var competitionLastLabelNumberValidator:StringValidator;
 
       private function init():void {
 
@@ -59,12 +68,26 @@
          competitionNameValidator.maxLength = 30;
          competitionNameValidator.required=true;
 
-         //eventDateValidator = new DateValidator();
-         //eventDateValidator.source = eventDate;
-         //eventDateValidator.property = "text";
-         //eventDateValidator.allowedFormatChars="/";
-         //eventDateValidator.inputFormat="DD/MM/YYYY";
-         //eventDateValidator.required=true;
+         competitionLowerLabelNumberValidator = new StringValidator();
+         competitionLowerLabelNumberValidator.source = competitionLowerLabelNumber;
+         competitionLowerLabelNumberValidator.property = "text";
+         competitionLowerLabelNumberValidator.minLength = 1;
+         competitionLowerLabelNumberValidator.maxLength = 30;
+         competitionLowerLabelNumberValidator.required=true;
+
+         competitionHigherLabelNumberValidator = new StringValidator();
+         competitionHigherLabelNumberValidator.source = competitionHigherLabelNumber;
+         competitionHigherLabelNumberValidator.property = "text";
+         competitionHigherLabelNumberValidator.minLength = 1;
+         competitionHigherLabelNumberValidator.maxLength = 30;
+         competitionHigherLabelNumberValidator.required=true;
+
+         competitionLastLabelNumberValidator = new StringValidator();
+         competitionLastLabelNumberValidator.source = competitionLastLabelNumber;
+         competitionLastLabelNumberValidator.property = "text";
+         competitionLastLabelNumberValidator.minLength = 1;
+         competitionLastLabelNumberValidator.maxLength = 30;
+         competitionLastLabelNumberValidator.required=true;
 
       }
 
@@ -90,7 +113,9 @@
          // helper method and update the value of formIsValid
          // accordingly.
          validateCompetition(competitionNameValidator);
-         //validateEvent(eventDateValidator);
+         validateCompetition(competitionLowerLabelNumberValidator);
+         validateCompetition(competitionHigherLabelNumberValidator);
+         validateCompetition(competitionLastLabelNumberValidator);
       }
 
 
@@ -122,6 +147,19 @@
          return currentControlIsValid;
       }
 
+      private function setCompetitionTeam():void {
+         if(competitionTeam.selectedValue == true) {
+            competitionTeamed=true;
+         } else {
+            competitionTeamed=false;
+         }
+      }
+
+      private function setCompetitionStartingDate():void {
+         this.competitionStartingDate = picker.selectedDate;
+      }
+
+
    ]]>
  </mx:Script>
 
@@ -133,18 +171,24 @@
       <mx:FormItem label="Nom" >
          <mx:TextInput id="competitionName" width="150" restrict="A-Za-z0-9\- "  change="validateForm(event);"/>
       </mx:FormItem>
-
-<!--
-      <mx:FormItem label="Date de l'evenement" >
-         <mx:DateField id="eventDate"
-                    yearNavigationEnabled="true"
-                    editable="true"
-                    formatString="DD/MM/YYYY"
-                    textAlign="center"
-                    fontSize="9"
-                    selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date(2020,0,1)}}"/>
+      <mx:FormItem label="Plus bas numero de dossard" >
+         <mx:TextInput id="competitionLowerLabelNumber" width="150" restrict="0-9"  change="validateForm(event);"/>
       </mx:FormItem>
--->
+      <mx:FormItem label="Plus haut numero de dossard" >
+         <mx:TextInput id="competitionHigherLabelNumber" width="150" restrict="0-9"  change="validateForm(event);"/>
+      </mx:FormItem>
+      <mx:FormItem label="Dernier numero de dossard attribue" >
+         <mx:TextInput id="competitionLastLabelNumber" width="150" restrict="0-9"  change="validateForm(event);"/>
+      </mx:FormItem>
+      <mx:FormItem label="Par equipe" >
+         <mx:RadioButtonGroup id="competitionTeam" change="setCompetitionTeam()"/>
+         <mx:RadioButton id="competitionTeamTrue" value="true" label="Oui" group="{competitionTeam}"/>
+         <mx:RadioButton id="competitionTeamFalse" value="false" label="Non" group="{competitionTeam}"/>
+      </mx:FormItem>
+      <mx:FormItem label="Date/Heure de depart" >
+         <components:DateTimePicker id="picker" change="setCompetitionStartingDate()"
+                                    minuteIncrement="5" backgroundColor="#FFFFFF"/>
+      </mx:FormItem>
 
    </mx:Form>
    <mx:ControlBar horizontalAlign="center">
