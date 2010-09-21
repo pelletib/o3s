@@ -55,7 +55,7 @@ import net.o3s.apis.IEntityEvent;
 	@NamedQuery(name = "CATEGORY_FROM_NAME_AND_EVENT", query = "SELECT c FROM Category c WHERE c.name = :NAME AND c.event.id = :EVENTID"),
 	@NamedQuery(name = "CATEGORY_FROM_NAME_AND_SEX_AND_EVENT", query = "SELECT c FROM Category c WHERE c.name = :NAME and c.sex = :SEX AND c.event.id = :EVENTID"),
 	@NamedQuery(name = "CATEGORY_FROM_DATES_AND_SEX_AND_EVENT", query = "SELECT c FROM Category c WHERE c.sex = :SEX and :DATE between c.minDate and c.maxDate AND c.event.id = :EVENTID"),
-	@NamedQuery(name = "NOCATEGORY", query = "SELECT c FROM Category c WHERE c.name LIKE 'Unknown%'"),
+	@NamedQuery(name = "NOCATEGORY", query = "SELECT c FROM Category c WHERE c.name LIKE 'Unknown%' and c.event.id = :EVENTID"),
 	@NamedQuery(name = "ALL_CATEGORIES_FROM_EVENT", query = "SELECT c FROM Category c WHERE c.event.id = :EVENTID"),
 	@NamedQuery(name = "ALL_CATEGORIES", query = "SELECT c FROM Category c") })
 public class Category implements IEntityCategory, Serializable {

@@ -77,7 +77,13 @@
          public var selectedClub:Boolean = false;
 
 			[Bindable]
-			public var competitionList:ArrayCollection= new ArrayCollection([]);
+			public var eventList:ArrayCollection= new ArrayCollection([]);
+
+         public var selectedEvent:MyEvent;
+         public var defaultEvent:MyEvent;
+
+         [Bindable]
+         public var competitionList:ArrayCollection= new ArrayCollection([]);
 
          [Bindable]
          public var selectedCompetition:Competition;
@@ -155,7 +161,7 @@
 
 			private function init():void {
 
-            refreshAdminData();
+            initAdminData();
             resetRegisteredData();
 
             CB_competition.selectedItem = -1;
@@ -191,10 +197,28 @@
 
 			}
 
-         public function refreshAdminData():void {
-            RO_admin.getCompetitions();
-            RO_admin.getCategories();
+         public function initAdminData():void {
+            RO_admin.getAllEvents();
+          }
+
+         private function resultGetAllEvents(event:ResultEvent):void {
+            eventList = event.result as ArrayCollection;
+            for(var count:int = 0; count < eventList.length; count++) {
+               var e:MyEvent = eventList.list.getItemAt(count, 0) as MyEvent;
+               if (e.theDefault == true) {
+                  defaultEvent = e;
+                  selectedEvent = e;
+                  CB_event.selectedItem = e;
+               }
+            }
+            refreshAdminData(selectedEvent.id);
+
          }
+
+        public function refreshAdminData(id:int):void {
+            RO_admin.getAllCompetitions4Event(id);
+            RO_admin.getAllCategories4Event(id);
+        }
 
          private function resultGetCompetitions(event:ResultEvent):void {
             competitionList = event.result as ArrayCollection;
@@ -297,6 +321,13 @@
                competitionIsEmpty = true;
             }
             refreshSubmitButtonEnabled();
+         }
+
+         private function setEvent(event:Event):void {
+            selectedEvent=event.currentTarget.selectedItem as MyEvent;
+            refreshAdminData(selectedEvent.id);
+            clearFormHandler();
+
          }
 
          private function refreshSubmitButtonEnabled():void {
@@ -585,8 +616,9 @@
 	</mx:Script>
 
    <mx:RemoteObject id="RO_admin" destination="admin" showBusyCursor="true" fault="onFault(event)">
-      <mx:method name="getCompetitions" result="resultGetCompetitions(event)"/>
-      <mx:method name="getCategories" result="resultGetCategories(event)"/>
+      <mx:method name="getAllEvents" result="resultGetAllEvents(event)"/>
+      <mx:method name="getAllCompetitions4Event" result="resultGetCompetitions(event)"/>
+      <mx:method name="getAllCategories4Event" result="resultGetCategories(event)"/>
    </mx:RemoteObject>
 
    <mx:RemoteObject id="RO_reporting" destination="reporting" showBusyCursor="true" fault="onFault(event)">
@@ -613,6 +645,8 @@
 		<mx:HBox width="100%" height="30%">
 			<mx:Panel title="Selection du classement" width="100%" height="100%" horizontalAlign="center">
            <mx:HBox width="100%" height="20%" horizontalAlign="center">
+             <mx:Label id="L_event" text="Selectionner un evenement: " textAlign="right"/>
+             <mx:ComboBox id="CB_event" dataProvider="{eventList}" labelField="name" width="200" change="setEvent(event)" />
              <mx:Label id="L_competition" text="Selectionner une competition: " textAlign="right"/>
 		 		 <mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setCompetition(event)" />
              <mx:CheckBox id="CB_scratch" label="Classement scratch" selected="false" click="modifyScratch(event)"/>

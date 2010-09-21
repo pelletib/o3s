@@ -41,6 +41,7 @@
          import net.o3s.webflex.components.EventScreen;
          import net.o3s.webflex.components.CompetitionScreen;
          import net.o3s.webflex.components.CategoryScreen;
+         import net.o3s.webflex.components.StartingDateScreen;
          import net.o3s.webflex.components.Util;
 
          [Bindable]
@@ -67,6 +68,7 @@
          private var competitionFilterCatEventList:ArrayCollection= new ArrayCollection([]);
 
          private var competitionScreen:CompetitionScreen = null;
+         private var startingDateScreen:StartingDateScreen = null;
 
          [Bindable]
          private var editedCategory:Category= null;
@@ -93,6 +95,10 @@
             this.competitionScreen = new CompetitionScreen();
             this.competitionScreen.addEventListener("SaveCompetition", saveCompetition);
             this.competitionScreen.addEventListener("CloseCompetition", cancelCompetition);
+
+            this.startingDateScreen = new StartingDateScreen();
+            this.startingDateScreen.addEventListener("SaveStartingDate", saveStartingDate);
+            this.startingDateScreen.addEventListener("CloseStartingDate", cancelStartingDate);
 
             this.categoryScreen = new CategoryScreen();
             this.categoryScreen.addEventListener("SaveCategory", saveCategory);
@@ -387,13 +393,6 @@
                this.competitionScreen.competitionHigherLabelNumber.text = c.higherLabelNumber.toString();
                this.competitionScreen.competitionLastLabelNumber.text = c.lastLabelNumber.toString();
                this.competitionScreen.competitionTeam.selectedValue = c.teamed;
-               if (c.startingDate == null) {
-                  this.competitionScreen.picker.selectedDate = new Date();
-
-               } else {
-                  this.competitionScreen.picker.selectedDate = c.startingDate;
-                  this.competitionScreen.dispatchEvent(new Event("change"));
-               }
             }
          }
 
@@ -406,7 +405,6 @@
             this.competitionScreen.competitionLowerLabelNumber.text = "";
             this.competitionScreen.competitionHigherLabelNumber.text = "";
             this.competitionScreen.competitionLastLabelNumber.text = "";
-            this.competitionScreen.competitionStartingDate = null;
             this.competitionScreen.dispatchEvent(new Event("change"));
 
          }
@@ -424,7 +422,6 @@
                c.higherLabelNumber = parseInt(this.competitionScreen.competitionHigherLabelNumber.text);
                c.lastLabelNumber = parseInt(this.competitionScreen.competitionLastLabelNumber.text);
                c.teamed = this.competitionScreen.competitionTeamed;
-               c.startingDate = this.competitionScreen.competitionStartingDate;
                RO_admin.createCompetition(c);
 
             } else {
@@ -435,12 +432,45 @@
                editedCompetition.higherLabelNumber = parseInt(this.competitionScreen.competitionHigherLabelNumber.text);
                editedCompetition.lastLabelNumber = parseInt(this.competitionScreen.competitionLastLabelNumber.text);
                editedCompetition.teamed = this.competitionScreen.competitionTeamed;
-               editedCompetition.startingDate = this.competitionScreen.competitionStartingDate;
                RO_admin.updateCompetition(editedCompetition);
             }
             PopUpManager.removePopUp(this.competitionScreen);
 
          }
+
+         public function editStartingDate(id:int):void {
+            var c:Competition = getCompetition(id);
+            if (c == null) {
+               Alert.show("Enregistrement inconnu <" + id + ">");
+            } else {
+               PopUpManager.addPopUp(this.startingDateScreen, this, true);
+               PopUpManager.centerPopUp(this.startingDateScreen);
+               this.startingDateScreen.eventName.text = c.event.name;
+               this.startingDateScreen.competitionName.text = c.name;
+               this.startingDateScreen.idCompetition = c.id;
+               if (c.startingDate == null) {
+                  this.startingDateScreen.picker.selectedDate = new Date();
+
+               } else {
+                  this.startingDateScreen.picker.selectedDate = c.startingDate;
+                  this.startingDateScreen.dispatchEvent(new Event("change"));
+               }
+            }
+         }
+
+         private function cancelStartingDate(e:Event):void {
+            refreshAdminData();
+         }
+
+         private function saveStartingDate(e:Event):void {
+            RO_admin.setStartDate(this.startingDateScreen.idCompetition, this.startingDateScreen.date);
+            PopUpManager.removePopUp(this.startingDateScreen);
+         }
+
+         private function resultSetStartDate(event:ResultEvent):void {
+               RO_admin.getAllCompetitions();
+         }
+
          private function resultCreateCompetition(event:ResultEvent):void {
                RO_admin.getAllCompetitions();
          }
@@ -594,6 +624,7 @@
 
       <mx:method name="createCompetition" result="resultCreateCompetition(event)" fault="Util.handleException(event)"/>
       <mx:method name="removeCompetition" result="resultRemoveCompetition(event)" fault="Util.handleException(event)"/>
+      <mx:method name="setStartDate" result="resultSetStartDate(event)" fault="Util.handleException(event)"/>
 
       <mx:method name="getAllCategories" result="resultGetAllCategories(event)"/>
       <mx:method name="createCategory" result="resultCreateCategory(event)" fault="Util.handleException(event)"/>

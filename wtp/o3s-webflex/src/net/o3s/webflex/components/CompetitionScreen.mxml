@@ -50,9 +50,6 @@
       [Bindable]
       public var competitionTeamed:Boolean = false;
 
-      [Bindable]
-      public var competitionStartingDate:Date = new Date();
-
       private var focussedFormControl:DisplayObject;
       private var competitionNameValidator:StringValidator;
       private var competitionLowerLabelNumberValidator:StringValidator;
@@ -155,10 +152,6 @@
          }
       }
 
-      private function setCompetitionStartingDate():void {
-         this.competitionStartingDate = picker.selectedDate;
-      }
-
 
    ]]>
  </mx:Script>
@@ -185,11 +178,6 @@
          <mx:RadioButton id="competitionTeamTrue" value="true" label="Oui" group="{competitionTeam}"/>
          <mx:RadioButton id="competitionTeamFalse" value="false" label="Non" group="{competitionTeam}"/>
       </mx:FormItem>
-      <mx:FormItem label="Date/Heure de depart" >
-         <components:DateTimePicker id="picker" change="setCompetitionStartingDate()"
-                                    minuteIncrement="5" backgroundColor="#FFFFFF"/>
-      </mx:FormItem>
-
    </mx:Form>
    <mx:ControlBar horizontalAlign="center">
      <mx:HBox width="100%" horizontalAlign="center">

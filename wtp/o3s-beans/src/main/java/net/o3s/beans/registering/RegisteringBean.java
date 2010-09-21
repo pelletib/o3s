@@ -96,8 +96,12 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     	boolean found = false;
     	Set<IEntityCompetition> competitionsInCategory = category.getCompetitions();
+		logger.fine("Check Category <" + category.getName() + "> with Competition <" + competition.getName() + ">");
+
     	for (IEntityCompetition competitionInCategory : competitionsInCategory) {
-    		if (competitionInCategory.equals(competition)) {
+			logger.fine("Check competitionInCategory <" + competitionInCategory.getId() + "> Competition <" + competition.getId() + ">");
+
+    		if (competitionInCategory.getId() == competition.getId()) {
     			logger.fine("Category <" + category.getName() + "> is compatible with Competition <" + competition.getName() + ">");
     			found = true;
     			break;
@@ -657,11 +661,8 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByDuration(final int competitionId) throws RegisteringException {
 
-    	IEntityEvent event = admin.findDefaultEvent();
-
         Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_ETIME");
         query.setParameter("COMPETITION", competitionId);
-        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
@@ -681,11 +682,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      */
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId) throws RegisteringException {
-    	IEntityEvent event = admin.findDefaultEvent();
 
     	Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_CATEGORY_ETIME");
         query.setParameter("COMPETITION", competitionId);
-        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
@@ -705,11 +704,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      */
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByClubAndDuration(final int competitionId) throws RegisteringException {
-    	IEntityEvent event = admin.findDefaultEvent();
 
     	Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_CLUB_ETIME");
         query.setParameter("COMPETITION", competitionId);
-        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
@@ -729,11 +726,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      */
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId,  List<Integer> categoriesId) throws RegisteringException {
-    	IEntityEvent event = admin.findDefaultEvent();
 
     	Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_CATEGORY_ETIME");
         query.setParameter("COMPETITION", competitionId);
-        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
@@ -1061,7 +1056,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     }
 
     /**
-     * Update a registered
+     * Update arrival date for a registered
      */
     @SuppressWarnings("unchecked")
 	public void updateArrivalDateRegistered(
@@ -1081,6 +1076,31 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 			throw new RegisteringException ("Competition pas encore demarree pour l'inscrit :" + id);
 		}
 		registered.setElapsedTime(registered.getArrivalDate().getTime()-registered.getCompetition().getStartingDate().getTime());
+
+    }
+
+    /**
+     * Re-Compute elapsed time for a registered
+     */
+    @SuppressWarnings("unchecked")
+	public void recomputeElapsedTimeRegistereds(
+			final int competitionId) throws RegisteringException {
+
+    	IEntityCompetition competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+			throw new RegisteringException ("Competition inconnue :" + competitionId);
+    	}
+
+		// Compute the duration
+		if (competition.getStartingDate() == null) {
+			throw new RegisteringException ("Competition pas encore demarree pour l'inscrit :" + competitionId);
+		}
+
+    	List<IEntityRegistered> registereds = findRegisteredFromCompetitionOrderByDuration(competitionId);
+    	for (IEntityRegistered registered:registereds) {
+    		registered.setElapsedTime(registered.getArrivalDate().getTime()-registered.getCompetition().getStartingDate().getTime());
+    	}
 
     }
 

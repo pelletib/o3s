@@ -36,8 +36,10 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -418,7 +420,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     	}
     }
 
-    public IEntityCompetition findCompetitionFromName(final String name) {
+    private IEntityCompetition findCompetitionFromName(final String name) {
     	IEntityEvent event = findDefaultEvent();
     	Query query = this.entityManager.createNamedQuery("COMPETITION_FROM_NAME_AND_EVENT");
         query.setParameter("NAME", name);
@@ -463,7 +465,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     }
 
     @SuppressWarnings("unchecked")
-    private  List<IEntityCompetition> findAllCompetitionsFromEvent(final int eventId) {
+    public  List<IEntityCompetition> findAllCompetitionsFromEvent(final int eventId) {
         Query query = this.entityManager.createNamedQuery("ALL_COMPETITIONS_FROM_EVENT");
 
         List<IEntityCompetition> competitions = null;
@@ -567,8 +569,11 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
 
     public Date setStartDateInCompetition(final int id) throws AdminException {
+    	return setStartDateInCompetition(id, new Date());
+    }
+
+    public Date setStartDateInCompetition(final int id, final Date date) throws AdminException {
     	IEntityCompetition competition = findCompetitionFromId(id);
-    	Date date = new Date();
     	if (competition == null) {
     		throw new AdminException("Unable to find Competition (id=" + id + ")");
 
@@ -578,9 +583,15 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     		try {
     			notification.sendDepartureNotification(competition);
     		} catch (NotificationMessageException e) {
-    			logger.severe("Unable to send a notification :" + e.getMessage());
+    			logger.log(Level.SEVERE, "Unable to send a notification :" + e.getMessage());
     		}
 
+    		// recompute elapsed time for related registereds
+    		try {
+				registering.recomputeElapsedTimeRegistereds(id);
+			} catch (RegisteringException e) {
+    			logger.log(Level.SEVERE, "Unable to recompute elapsed time :" + e.getMessage());
+			}
     	}
     	return date;
     }
@@ -628,13 +639,16 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
 
     public IEntityCategory findNoCategory() {
-    	Query query = this.entityManager.createNamedQuery("NOCATEGORY");
     	IEntityCategory category = null;
+    	IEntityEvent event = findDefaultEvent();
+
         try {
-       	 category = (IEntityCategory) query.getSingleResult();
+    		Query query = this.entityManager.createNamedQuery("NOCATEGORY");
+            query.setParameter("EVENTID", event.getId());
+            category = (IEntityCategory) query.getSingleResult();
         } catch (javax.persistence.NoResultException e) {
         }
-         return category;
+        return category;
 
     }
 
@@ -684,7 +698,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     }
 
     @SuppressWarnings("unchecked")
-    private  List<IEntityCategory> findAllCategoriesFromEvent(final int eventId) {
+    public  List<IEntityCategory> findAllCategoriesFromEvent(final int eventId) {
         Query query = this.entityManager.createNamedQuery("ALL_CATEGORIES_FROM_EVENT");
         query.setParameter("EVENTID", eventId);
 
@@ -725,7 +739,13 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         	logger.fine("Create new category : " + name);
 
         	category = new Category();
-        	category.setName(name + " (" + sex + ")");
+
+        	// if force, the same name exist, so don't add the sex attribute
+        	if (force) {
+        		category.setName(name);
+        	} else {
+        		category.setName(name + " (" + sex + ")");
+        	}
         	if (minDate == null) {
         		category.setMinDate(new Date());
         	} else {
@@ -1178,9 +1198,12 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     	cloneEvent.setTheDefault(false);
 
     	// clone competitions related to the event
+    	// create a mapping table for retrieving competitions when duplicating categories
     	List <IEntityCompetition> competitions = findAllCompetitionsFromEvent(event.getId());
+    	Map<Integer,IEntityCompetition> competitionsArray = new HashMap<Integer, IEntityCompetition>();
+
     	for (IEntityCompetition competition : competitions) {
-    		createCompetition(
+    		IEntityCompetition newCompetition = createCompetition(
     				competition.getName(),
     				competition.getLowerLabelNumber(),
     				competition.getHigherLabelNumber(),
@@ -1188,13 +1211,20 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     				cloneEvent.getId(),
     				competition.isTeamed(),
     				force);
+    		competitionsArray.put(competition.getId(), newCompetition);
+
     	}
 
 
     	// clone categories related to the event
     	List <IEntityCategory> categories = findAllCategoriesFromEvent(event.getId());
     	for (IEntityCategory category: categories) {
-        	IEntityCompetition[] competitionsArray = new IEntityCompetition[category.getCompetitions().size()];
+    		IEntityCompetition[] competitionsCategoryArray = new IEntityCompetition[category.getCompetitions().size()];
+        	int index = 0;
+        	for(IEntityCompetition competition : category.getCompetitions()) {
+        		competitionsCategoryArray[index] = competitionsArray.get(competition.getId());
+        		index++;
+        	}
     		createCategory(
     				force,
     				category.getName(),
@@ -1203,7 +1233,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     				category.getSex(),
     				category.getShortName(),
     				cloneEvent.getId(),
-    				category.getCompetitions().toArray(competitionsArray));
+    				competitionsCategoryArray);
 
     	}
 

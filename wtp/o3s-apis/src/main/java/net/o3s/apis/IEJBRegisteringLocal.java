@@ -76,6 +76,9 @@ public interface IEJBRegisteringLocal {
 			final int id,
 			final Date arrivalDate) throws RegisteringException;
 
+	void recomputeElapsedTimeRegistereds(
+			final int id) throws RegisteringException;
+
 	int countRegisteredFromCompetition(final int competitionId) throws RegisteringException;
 	int countArrivalFromCompetition(final int competitionId) throws RegisteringException;
 	int countRegisteredFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException;

@@ -92,6 +92,19 @@ public class Admin {
 		return date;
 	}
 
+	public void setStartDate(int competitionId, Date date) {
+
+		setAdminEJB();
+
+		try {
+			date = admin.setStartDateInCompetition(competitionId, date);
+		} catch (AdminException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	public EventVO getDefaultEvent() {
 		setAdminEJB();
 		IEntityEvent event = admin.findDefaultEvent();
@@ -362,6 +375,13 @@ public class Admin {
 		return Util.createCompetitionListVO(competitions);
 	}
 
+	public List<CompetitionVO> getAllCompetitions4Event(int eventId) {
+		setAdminEJB();
+		List<IEntityCompetition> competitions = admin.findAllCompetitionsFromEvent(eventId);
+		logger.fine("competitions=" + competitions);
+		return Util.createCompetitionListVO(competitions);
+	}
+
 
 	// get categories related to the default event
 	public List<CategoryVO> getCategories() {
@@ -376,6 +396,14 @@ public class Admin {
 
 		setAdminEJB();
 		List<IEntityCategory> categories = admin.findAllCategories();
+		logger.fine("categories=" + categories);
+		return Util.createCategoryListVO(categories);
+	}
+
+	public List<CategoryVO> getAllCategories4Event(int eventId) {
+
+		setAdminEJB();
+		List<IEntityCategory> categories = admin.findAllCategoriesFromEvent(eventId);
 		logger.fine("categories=" + categories);
 		return Util.createCategoryListVO(categories);
 	}

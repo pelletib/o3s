@@ -43,8 +43,11 @@ public interface IEJBAdminLocal {
 	IEntityCompetition findCompetitionFromId(final int id);
 	List<IEntityCompetition> findAllCompetitions();
 	List<IEntityCompetition> findAllCompetitionsFromDefaultEvent();
-	IEntityCompetition findCompetitionFromName(final String name);
+	List<IEntityCompetition> findAllCompetitionsFromEvent(final int eventId);
+
+	IEntityCompetition findCompetitionFromName(final String name, IEntityEvent event);
 	Date setStartDateInCompetition(final int id) throws AdminException;
+	Date setStartDateInCompetition(final int id, final Date date) throws AdminException;
 	IEntityCompetition createCompetition(final String name, final int lowerLabelNumber, final int higherLabelNumber, final int lastLabelNumber, final int eventId, final boolean isTeamed);
 	IEntityCompetition updateCompetition(
     		final int id,
@@ -61,6 +64,7 @@ public interface IEJBAdminLocal {
 	IEntityCategory findNoCategory();
 	List<IEntityCategory> findAllCategories();
 	List<IEntityCategory> findAllCategoriesFromDefaultEvent();
+	List<IEntityCategory> findAllCategoriesFromEvent(final int eventId);
 	IEntityCategory createCategory(final String name, final Date minDate, final Date maxDate, final char sex, final char shortName, final int eventId, final IEntityCompetition... competitions);
 	IEntityCategory updateCategory(
     		final int id,

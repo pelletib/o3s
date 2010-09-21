@@ -71,6 +71,13 @@
             [Bindable]
             public var pauseIcon16:Class;
 
+         /**
+          * Flag icon (16 pixels)
+          */
+         [Embed(source='../images/flag.png')]
+         [Bindable]
+         public var flagIcon16:Class;
+
            /**
              * copy/past icon (16 pixels)
              */
@@ -98,6 +105,11 @@
 				parentDocument.editCompetition(data.id);
 			}
 
+        private function editStartingDate():void {
+            parentDocument.editStartingDate(data.id);
+        }
+
+
         ]]>
     </mx:Script>
 
@@ -106,5 +118,9 @@
 
 	<mx:Button id="B_editItem" icon="{editIcon16}" width="20" height="20" toolTip="Editer"
 			   click="editCompetition()" />
+
+   <mx:Button id="B_startingItem" icon="{flagIcon16}" width="20" height="20" toolTip="Editer la date de depart"
+            click="editStartingDate()" />
+
 
 </mx:HBox>

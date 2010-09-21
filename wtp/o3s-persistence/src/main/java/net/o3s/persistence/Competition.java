@@ -61,7 +61,7 @@ public class Competition implements IEntityCompetition, Serializable {
 	private int lastLabelNumber;
 	private boolean isTeamed;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date startingDate;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH, targetEntity=Event.class)

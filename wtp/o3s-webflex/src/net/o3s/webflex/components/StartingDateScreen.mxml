@@ -26,39 +26,38 @@
 -->
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:components="net.o3s.webflex.components.*"
  layout="absolute" width="600" height="400"
- title="Formulaire competition"
+ title="Formulaire Date Depart"
  creationComplete="init()">
   <mx:Metadata>
-    [Event(name="SaveArrivalTimeRegistered")]
-    [Event(name="CancelArrivalTimeRegistered")]
+    [Event(name="SaveStartingDate")]
+    [Event(name="CloseStartingDate")]
 
   </mx:Metadata>
   <mx:Script>
    <![CDATA[
-      import mx.controls.Alert;
-      import mx.managers.PopUpManager;
-      import mx.collections.ArrayCollection;
+     import mx.managers.PopUpManager;
+
 
       [Bindable]
-      public var arrivalTime:Date = new Date();
+      public var date:Date = new Date();
 
+      public var idCompetition:int;
 
       private function init():void {
       }
 
-     private function close():void
-     {
+     private function close():void {
        PopUpManager.removePopUp(this);
-       this.dispatchEvent(new Event("CancelArrivalTimeRegistered"));
+       this.dispatchEvent(new Event("CloseStartingDate"));
      }
 
      private function save():void
      {
-       this.dispatchEvent(new Event("SaveArrivalTimeRegistered"));
+       this.dispatchEvent(new Event("SaveStartingDate"));
      }
 
-      private function setArrivalTime():void {
-         this.arrivalTime = picker.selectedDate;
+      private function setDate():void {
+         this.date = picker.selectedDate;
       }
 
 
@@ -69,19 +68,18 @@
 
    <mx:Form>
       <mx:Label id="eventName" textAlign="left"/>
-      <mx:Label id="registeredName" textAlign="left"/>
-      <mx:Label id="registeredLabel" textAlign="left"/>
+      <mx:Label id="competitionName" textAlign="left"/>
 
-      <mx:FormItem label="Date/Heure d'arrivee" >
-         <components:DateTimeSecPicker id="picker" selectedDate="{new Date()}" change="setArrivalTime()"
-                                    backgroundColor="#FFFFFF"/>
+      <mx:FormItem label="Date/Heure de depart" >
+         <components:DateTimePicker id="picker" change="setDate()"
+                                    minuteIncrement="1" backgroundColor="#FFFFFF"/>
       </mx:FormItem>
 
    </mx:Form>
    <mx:ControlBar horizontalAlign="center">
      <mx:HBox width="100%" horizontalAlign="center">
        <mx:Button label="Annuler" click="close()" />
-       <mx:Button label="Sauver" click="save()"/>
+       <mx:Button label="Sauver" click="save()" />
      </mx:HBox>
    </mx:ControlBar>
 

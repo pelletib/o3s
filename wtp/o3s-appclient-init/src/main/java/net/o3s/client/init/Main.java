@@ -44,6 +44,7 @@ import net.o3s.apis.IEJBRegisteringRemote;
 import net.o3s.apis.IEJBReportRemote;
 import net.o3s.apis.IEntityCategory;
 import net.o3s.apis.IEntityCompetition;
+import net.o3s.apis.IEntityEvent;
 import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
@@ -138,9 +139,11 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		IEntityCompetition competition1 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_7);
-		IEntityCompetition competition2 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_2_2);
-		IEntityCompetition competition3 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_8);
+		IEntityEvent event = admin.findDefaultEvent();
+
+		IEntityCompetition competition1 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_7, event);
+		IEntityCompetition competition2 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_2_2, event);
+		IEntityCompetition competition3 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_8, event);
 
 		Vector<IEntityRegistered> vregistered = new Vector<IEntityRegistered>();
 
