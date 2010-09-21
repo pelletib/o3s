@@ -92,11 +92,11 @@
 
             this.competitionScreen = new CompetitionScreen();
             this.competitionScreen.addEventListener("SaveCompetition", saveCompetition);
-            this.competitionScreen.addEventListener("CancelCompetition", cancelCompetition);
+            this.competitionScreen.addEventListener("CloseCompetition", cancelCompetition);
 
             this.categoryScreen = new CategoryScreen();
             this.categoryScreen.addEventListener("SaveCategory", saveCategory);
-            this.categoryScreen.addEventListener("CancelCategory", cancelCategory);
+            this.categoryScreen.addEventListener("CloseCategory", cancelCategory);
 
             competitionFilterCatEventList.filterFunction = competitionFilter4Category;
             competitionFilterCatEventList.refresh();
@@ -387,10 +387,13 @@
                this.competitionScreen.competitionHigherLabelNumber.text = c.higherLabelNumber.toString();
                this.competitionScreen.competitionLastLabelNumber.text = c.lastLabelNumber.toString();
                this.competitionScreen.competitionTeam.selectedValue = c.teamed;
-               this.competitionScreen.competitionStartingDate = c.startingDate;
-               this.competitionScreen.dispatchEvent(new Event("change"));
+               if (c.startingDate == null) {
+                  this.competitionScreen.picker.selectedDate = new Date();
 
-
+               } else {
+                  this.competitionScreen.picker.selectedDate = c.startingDate;
+                  this.competitionScreen.dispatchEvent(new Event("change"));
+               }
             }
          }
 

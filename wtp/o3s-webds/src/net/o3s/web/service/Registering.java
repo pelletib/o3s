@@ -450,6 +450,20 @@ public class Registering {
 
 	}
 
+
+	// update registered with arrival date
+	public void updateArrivalDateRegistered(int id, Date arrivalDate) {
+		setRegisteringEJB();
+		try {
+			registering.updateArrivalDateRegistered(id, arrivalDate);
+		} catch (RegisteringException e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+	}
+
+
 	// update registered
 	public RegisteredVO updateRegistered(RegisteredVO registeredVO) {
 		setRegisteringEJB();

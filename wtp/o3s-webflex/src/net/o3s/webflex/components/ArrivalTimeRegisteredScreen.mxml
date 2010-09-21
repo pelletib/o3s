@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- O3S: Open Source Sport Software
+- Copyright (C) 2010 Benoit Pelletier
+- Contact: btpelletier@gmail.com
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Lesser General Public
+- License as published by the Free Software Foundation; either
+- version 2.1 of the License, or any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Lesser General Public License for more details.
+-
+- You should have received a copy of the GNU Lesser General Public
+- License along with this library; if not, write to the Free Software
+- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- USA
+-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- $Id: pelletib $
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-->
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:components="net.o3s.webflex.components.*"
+ layout="absolute" width="600" height="400"
+ title="Formulaire competition"
+ creationComplete="init()">
+  <mx:Metadata>
+    [Event(name="SaveArrivalTimeRegistered")]
+    [Event(name="CancelArrivalTimeRegistered")]
+
+  </mx:Metadata>
+  <mx:Script>
+   <![CDATA[
+      import mx.controls.Alert;
+      import mx.managers.PopUpManager;
+      import mx.collections.ArrayCollection;
+
+      [Bindable]
+      public var arrivalTime:Date = new Date();
+
+
+      private function init():void {
+
+      }
+
+     private function close():void
+     {
+       PopUpManager.removePopUp(this);
+       this.dispatchEvent(new Event("CancelArrivalTimeRegistered"));
+     }
+
+     private function save():void
+     {
+       this.dispatchEvent(new Event("SaveArrivalTimeRegistered"));
+     }
+
+
+      private function setArrivalTime():void {
+         this.arrivalTime = picker.selectedDate;
+      }
+
+
+   ]]>
+ </mx:Script>
+
+ <mx:VBox>
+
+   <mx:Form>
+      <mx:Label id="eventName" textAlign="left"/>
+      <mx:Label id="registeredName" textAlign="left"/>
+      <mx:Label id="registeredLabel" textAlign="left"/>
+
+      <mx:FormItem label="Date/Heure d'arrivee" >
+         <components:DateTimeSecPicker id="picker" selectedDate="{new Date()}" change="setArrivalTime()"
+                                    backgroundColor="#FFFFFF"/>
+      </mx:FormItem>
+
+   </mx:Form>
+   <mx:ControlBar horizontalAlign="center">
+     <mx:HBox width="100%" horizontalAlign="center">
+       <mx:Button label="Annuler" click="close()" />
+       <mx:Button label="Sauver" click="save()"/>
+     </mx:HBox>
+   </mx:ControlBar>
+
+ </mx:VBox>
+</mx:TitleWindow>

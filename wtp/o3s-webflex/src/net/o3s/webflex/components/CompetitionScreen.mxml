@@ -94,7 +94,7 @@
      private function close():void
      {
        PopUpManager.removePopUp(this);
-       this.dispatchEvent(new Event("CloseCategory"));
+       this.dispatchEvent(new Event("CloseCompetition"));
      }
 
      private function save():void

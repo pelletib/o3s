@@ -55,6 +55,7 @@ import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
+import net.o3s.apis.TrackingMessageException;
 import net.o3s.persistence.Label;
 import net.o3s.persistence.Person;
 import net.o3s.persistence.Registered;
@@ -1057,6 +1058,30 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	}
 
         return registeredsReturn;
+    }
+
+    /**
+     * Update a registered
+     */
+    @SuppressWarnings("unchecked")
+	public void updateArrivalDateRegistered(
+			final int id,
+			final Date arrivalDate) throws RegisteringException {
+
+		IEntityRegistered registered = findRegisteredFromId(id);
+		if (registered == null) {
+			throw new RegisteringException ("Impossible de recuperer l'inscrit <" + id + ">");
+		}
+
+		// Set the arrival date
+		registered.setArrivalDate(arrivalDate);
+
+		// Compute the duration
+		if (registered.getCompetition().getStartingDate() == null) {
+			throw new RegisteringException ("Competition pas encore demarree pour l'inscrit :" + id);
+		}
+		registered.setElapsedTime(registered.getArrivalDate().getTime()-registered.getCompetition().getStartingDate().getTime());
+
     }
 
     /**
