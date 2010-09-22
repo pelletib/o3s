@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" 
-              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" 
-              name="LabelReport" 
-              language="groovy" 
-              pageWidth="842" 
-              pageHeight="595" 
-              orientation="Landscape" 
-              columnWidth="802" 
-              leftMargin="20" 
-              rightMargin="20" 
-              topMargin="20" 
-              bottomMargin="20">
-
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LabelReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="539" leftMargin="28" rightMargin="28" topMargin="28" bottomMargin="28">
 	<style name="Barcode" isDefault="false" fontName="DejaVu Sans" fontSize="10"/>
-
 	<parameter name="eventName" class="java.lang.String"/>
+	<parameter name="sex" class="java.lang.String"/>
+	<parameter name="birthday" class="java.lang.String"/>
+	<parameter name="club" class="java.lang.String"/>
+	<parameter name="license" class="java.lang.String"/>
+	<parameter name="paid" class="java.lang.String"/>
+	<parameter name="providedHealthForm" class="java.lang.String"/>
 	<field name="id" class="java.lang.Integer">
 		<fieldDescription><![CDATA[id]]></fieldDescription>
 	</field>
@@ -34,84 +26,242 @@
 	<field name="event" class="net.o3s.apis.IEntityEvent">
 		<fieldDescription><![CDATA[event]]></fieldDescription>
 	</field>
-
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-      		<band height="450" splitType="Stretch">
-
+		<band height="786" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="800" height="50"/>
+				<reportElement mode="Opaque" x="-1" y="410" width="539" height="42" forecolor="#000000" backcolor="#AEB1A3"/>
 				<textElement textAlignment="Center">
-					<font size="40" isBold="true"/>
+					<font size="30" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{event}.getName()]]></textFieldExpression>
 			</textField>
-
 			<textField>
-				<reportElement x="0" y="100" width="800" height="50"/>
+				<reportElement x="-1" y="452" width="496" height="145"/>
 				<textElement textAlignment="Center">
-					<font size="30"/>
+					<font fontName="SansSerif" size="106" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{label}.getNumber()]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement style="Barcode" mode="Transparent" x="165" y="601" width="180" height="36"/>
+				<c:Code128 xmlns:c="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" moduleWidth="1.5" textPosition="bottom">
+					<c:codeExpression><![CDATA[$F{label}.getValue()]]></c:codeExpression>
+				</c:Code128>
+			</componentElement>
+			<textField>
+				<reportElement x="0" y="641" width="538" height="46"/>
+				<textElement textAlignment="Center">
+					<font size="30" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
-
 			<textField>
-				<reportElement x="0" y="150" width="400" height="50"/>
+				<reportElement x="0" y="691" width="258" height="32"/>
 				<textElement textAlignment="Center">
-					<font size="30"/>
+					<font size="20" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{competition}.getName()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="400" y="150" width="400" height="50"/>
+				<reportElement x="0" y="725" width="258" height="30"/>
 				<textElement textAlignment="Center">
-					<font size="30"/>
+					<font size="20" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{category}.getName()]]></textFieldExpression>
 			</textField>
-
-<!--
-			<componentElement>
-				<reportElement x="0" y="100" width="400" height="100"/>
-				<c:barbecue 
-						xmlns:c="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd"
-						type="Code128" drawText="true">
-					<c:codeExpression><![CDATA[$F{label}.getValue()]]></c:codeExpression>
-				</c:barbecue>
-			</componentElement>
-
--->
-
-			<textField>
-				<reportElement x="0" y="200" width="800" height="200"/>
-				<textElement textAlignment="Center">
-					<font size="150" isBold="true"/>
+			<image scaleImage="FillFrame">
+				<reportElement x="275" y="689" width="264" height="97"/>
+				<imageExpression class="java.lang.String"><![CDATA["logo_gozzi_nb.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="-1" y="766" width="276" height="20" forecolor="#D01616"/>
+				<textElement>
+					<font isBold="true"/>
 				</textElement>
-
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{label}.getNumber()]]></textFieldExpression>
+				<text><![CDATA[N° d'urgence : 06 16 70 77 51 ou 06 81 22 94 78]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="495" y="452" width="43" height="145"/>
+				<jr:Code128 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" orientation="270" moduleWidth="1.5" textPosition="bottom">
+					<jr:codeExpression><![CDATA[$F{label}.getValue()]]></jr:codeExpression>
+				</jr:Code128>
+			</componentElement>
+			<staticText>
+				<reportElement x="-1" y="106" width="47" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOM ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-1" y="246" width="47" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CAT ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="106" width="88" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DOSSARD ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="141" width="88" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CLUB ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="176" width="88" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LICENCE ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="211" width="88" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PAYE ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="246" width="88" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CM ]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Opaque" x="-1" y="0" width="539" height="46" forecolor="#000000" backcolor="#AEB1A3"/>
+				<textElement textAlignment="Center">
+					<font size="30" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{event}.getName()]]></textFieldExpression>
 			</textField>
-
-         		<componentElement>
-				<reportElement style="Barcode" x="330" y="400" width="400" height="50" />
-            			<c:Code128 xmlns:c="http://jasperreports.sourceforge.net/jasperreports/components" 
-                                  xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" 
-                                      moduleWidth="1.2" textPosition="bottom">
-
-					<c:codeExpression><![CDATA[$F{label}.getValue()]]></c:codeExpression>
-				</c:Code128>
-         		</componentElement>
-
-
-
-      		</band>
-   	</title>
+			<textField>
+				<reportElement x="0" y="57" width="538" height="32"/>
+				<textElement textAlignment="Center">
+					<font size="20" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{competition}.getName()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="68" y="246" width="203" height="20" backcolor="#C0C0C0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{category}.getName()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="69" y="106" width="202" height="20" backcolor="#C0C0C0"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="383" y="106" width="146" height="20" backcolor="#C0C0C0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{label}.getNumber()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="383" y="141" width="146" height="20" backcolor="#C0C0C0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{club}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="383" y="176" width="146" height="20" backcolor="#C0C0C0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{license}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="383" y="211" width="146" height="20" backcolor="#C0C0C0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{paid}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="383" y="246" width="146" height="20" backcolor="#C0C0C0"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{providedHealthForm}.toString()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-2" y="141" width="48" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SEXE ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="176" width="46" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DNA ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="68" y="141" width="202" height="20" backcolor="#C0C0C0"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{sex}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="68" y="176" width="202" height="20" backcolor="#C0C0C0"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{birthday}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="372" y="106" width="157" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="372" y="141" width="157" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="372" y="176" width="157" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="372" y="211" width="157" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="372" y="246" width="157" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="59" y="106" width="213" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="59" y="141" width="213" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="59" y="176" width="213" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="59" y="246" width="212" height="20"/>
+			</rectangle>
+		</band>
+	</title>
 	<pageHeader>
-		<band height="40" splitType="Stretch"/>
+		<band splitType="Stretch"/>
 	</pageHeader>
-
 	<pageFooter>
-		<band height="40"/>
+		<band/>
 	</pageFooter>
 </jasperReport>

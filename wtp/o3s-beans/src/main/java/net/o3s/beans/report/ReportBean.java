@@ -26,8 +26,11 @@ package net.o3s.beans.report;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +54,7 @@ import net.o3s.apis.IEJBRegisteringLocal;
 import net.o3s.apis.IEJBReportLocal;
 import net.o3s.apis.IEJBReportRemote;
 import net.o3s.apis.IEntityCompetition;
+import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
 import net.o3s.apis.ReportException;
@@ -975,10 +979,8 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     		throw new ReportException("Registered <" + registeredId + "> unknown");
         }
 
-
     	// set parameters
-		Map parameters = new HashMap();
-		parameters.put("eventName", registered.getEvent().getName());
+		Map parameters = getParameters4LabelReport(registered);
 
 		String sourceFileName = LABEL_REPORT + ".jrxml";
 
@@ -1043,8 +1045,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
 
     	// set parameters
-		Map parameters = new HashMap();
-		parameters.put("eventName", registered.getEvent().getName());
+		Map parameters = getParameters4LabelReport(registered);
 
 		String sourceFileName = LABEL_REPORT + ".jrxml";
 
@@ -1052,6 +1053,40 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		registereds.add(registered);
 		logger.fine("registered=" + registered);
 		invokeJasperReportStream(sourceFileName, outputStream, parameters, registereds);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map getParameters4LabelReport(IEntityRegistered registered){
+    	Map parameters = new HashMap();
+		parameters.put("eventName", registered.getEvent().getName());
+		if (registered.isPaid()) {
+			parameters.put("paid", "OUI");
+		} else {
+			parameters.put("paid", "NON");
+		}
+		if (registered.isProvidedHealthForm()) {
+			parameters.put("providedHealthForm", "OUI");
+		} else {
+			parameters.put("providedHealthForm", "NON");
+		}
+
+    	DateFormat dfyyyyMMdd = new SimpleDateFormat("dd/MM/yyyy");
+
+		if (!registered.isTeamed()) {
+			for (IEntityPerson person:registered.getPersons()) {
+				parameters.put("sex",(person.getSex()=='M'?"M":"F"));
+				parameters.put("birthday",dfyyyyMMdd.format(person.getBirthday()));
+				parameters.put("license",person.getLicense());
+				parameters.put("club",person.getClub());
+				break;
+			}
+		} else {
+			parameters.put("sex","N/A");
+			parameters.put("birthday","N/A");
+			parameters.put("license","N/A");
+			parameters.put("club","N/A");
+		}
+		return parameters;
     }
 
     /**
@@ -1072,8 +1107,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
         }
 
     	// set parameters
-		Map parameters = new HashMap();
-		parameters.put("eventName", registered.getEvent().getName());
+		Map parameters = getParameters4LabelReport(registered);
 
 		String sourceFileName = LABEL_REPORT + ".jrxml";
 
