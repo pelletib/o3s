@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+		 paddingBottom="2" paddingLeft="2" paddingRight="2" paddingTop="2" horizontalGap="0" verticalAlign="middle">
+
+	<mx:Metadata>
+		[Event(name="change", type="flash.events.Event")]
+	</mx:Metadata>
+
+	<mx:Script>
+		<![CDATA[
+
+			[Bindable] private var _selectedDate:Date = new Date();
+
+			[Bindable]
+			[Inspectable(defaultValue='5', category="Other", enumeration="1,5,10,15,30")]
+			public var minuteIncrement:int = 5;
+
+
+			public function get selectedDate():Date
+			{
+				this.validateNow();
+				return this._selectedDate;
+			}
+
+			[Bindable]
+			public function set selectedDate(value:Date):void
+			{
+				this._selectedDate = value
+				this.date.selectedDate = this._selectedDate
+				this.hours.value = value.getHours()
+				this.minutes.value = value.getMinutes()
+				this.validateNow();
+			}
+
+			override public function validateProperties():void
+			{
+				super.validateProperties();
+
+			}
+
+			public function handleChange():void
+			{
+
+				var selDate:Date = this.date.selectedDate;
+				var date:Date = new Date(
+					selDate.getFullYear(),
+					selDate.getMonth(),
+					selDate.getDate(),
+					hours.value,
+					minutes.value)
+				this.selectedDate = date;
+
+				this.invalidateProperties();
+				this.validateNow();
+				this.dispatchEvent(new Event("change"));
+
+			}
+		]]>
+	</mx:Script>
+	<mx:DateField id="date" change="handleChange()"/>
+	<mx:Spacer width="20"/>
+	<mx:NumericStepper id="hours" minimum="0" maximum="23" stepSize="1" change="handleChange()" valueCommit="handleChange()"
+					   textAlign="center"/>
+	<mx:Label text=":" textAlign="center"/>
+	<mx:NumericStepper id="minutes" minimum="0"  maximum="55" stepSize="{minuteIncrement}" change="handleChange()"
+					   valueCommit="handleChange()" textAlign="center"/>
+</mx:HBox>

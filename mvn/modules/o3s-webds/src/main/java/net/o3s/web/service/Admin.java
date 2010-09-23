@@ -24,23 +24,30 @@
 package net.o3s.web.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import net.o3s.apis.AdminException;
+import net.o3s.apis.AlreadyExistException;
 import net.o3s.apis.IEJBAdminRemote;
 import net.o3s.apis.IEntityCategory;
 import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityEvent;
+import net.o3s.apis.IEntityPerson;
+import net.o3s.apis.RegisteringException;
 import net.o3s.web.common.Util;
 import net.o3s.web.vo.CategoryVO;
 import net.o3s.web.vo.CompetitionVO;
 import net.o3s.web.vo.EventVO;
 import net.o3s.web.vo.FlexException;
+import net.o3s.web.vo.PersonVO;
 
 
 public class Admin {
@@ -85,6 +92,19 @@ public class Admin {
 		return date;
 	}
 
+	public void setStartDate(int competitionId, Date date) {
+
+		setAdminEJB();
+
+		try {
+			date = admin.setStartDateInCompetition(competitionId, date);
+		} catch (AdminException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	public EventVO getDefaultEvent() {
 		setAdminEJB();
 		IEntityEvent event = admin.findDefaultEvent();
@@ -96,6 +116,226 @@ public class Admin {
 		setAdminEJB();
 		admin.setDefaultEvent(id);
 	}
+
+	public EventVO createEvent(EventVO eventVO) {
+		setAdminEJB();
+
+		IEntityEvent event = null;
+		try {
+
+			event = admin.createEvent(eventVO.getName(), eventVO.getDate(), null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+
+		EventVO eVO = Util.createEventVO(event);
+
+		logger.fine("event=" + eVO);
+		return eVO;
+	}
+
+	public CompetitionVO createCompetition(CompetitionVO competitionVO) {
+		setAdminEJB();
+
+		IEntityCompetition competition = null;
+
+		try {
+
+			competition = admin.createCompetition(
+					competitionVO.getName(),
+					competitionVO.getLowerLabelNumber(),
+					competitionVO.getHigherLabelNumber(),
+					competitionVO.getLastLabelNumber(),
+					competitionVO.getEvent().getId(),
+					competitionVO.isTeamed());
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+
+		CompetitionVO cVO = Util.createCompetitionVO(competition);
+
+		logger.fine("competition=" + cVO);
+		return cVO;
+	}
+
+	public CategoryVO createCategory(CategoryVO categoryVO) {
+		setAdminEJB();
+
+		IEntityCategory category = null;
+
+		List<IEntityCompetition> competitions = new ArrayList<IEntityCompetition>();
+		IEntityCompetition[] competitionsArray = null;
+
+		if (categoryVO.getCompetitions() != null) {
+			for (CompetitionVO competitionVO:categoryVO.getCompetitions()) {
+				competitions.add(admin.findCompetitionFromId(competitionVO.getId()));
+			}
+	    	competitionsArray = new IEntityCompetition[categoryVO.getCompetitions().size()];
+		} else {
+	    	competitionsArray = new IEntityCompetition[1];
+		}
+
+		try {
+			category = admin.createCategory(
+					categoryVO.getName(),
+					categoryVO.getMinDate(),
+					categoryVO.getMaxDate(),
+					categoryVO.getSex(),
+					categoryVO.getShortName(),
+					categoryVO.getEvent().getId(),
+					competitions.toArray(competitionsArray));
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+
+		CategoryVO cVO = Util.createCategoryVO(category);
+
+		logger.fine("category=" + cVO);
+		return cVO;
+	}
+
+
+	public EventVO duplicateEvent(int id) {
+		setAdminEJB();
+
+		IEntityEvent event = null;
+		try {
+			event = admin.duplicateEvent(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+
+		EventVO eVO = Util.createEventVO(event);
+
+		logger.fine("event=" + eVO);
+		return eVO;
+	}
+
+	// update event
+	public EventVO updateEvent(EventVO eventVO) {
+		setAdminEJB();
+		IEntityEvent event = null;
+		logger.fine("update event" + eventVO.getId());
+
+		try {
+			event = admin.updateEvent(eventVO.getId(), eventVO.getName(), eventVO.getDate());
+		} catch (AdminException e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+
+		EventVO eVO = Util.createEventVO(event);
+
+		logger.fine("event=" + eVO);
+		return eVO;
+	}
+
+	// update competition
+	public CompetitionVO updateCompetition(CompetitionVO competitionVO) {
+		setAdminEJB();
+		IEntityCompetition competition = null;
+		logger.fine("update competition" + competitionVO.getId());
+
+		try {
+			competition = admin.updateCompetition(
+					competitionVO.getId(),
+					competitionVO.getName(),
+					competitionVO.getHigherLabelNumber(),
+					competitionVO.getLastLabelNumber(),
+					competitionVO.getLowerLabelNumber(),
+					competitionVO.getStartingDate(),
+					competitionVO.isTeamed());
+		} catch (AdminException e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+
+		CompetitionVO cVO = Util.createCompetitionVO(competition);
+
+		logger.fine("competition=" + cVO);
+		return cVO;
+	}
+
+	// update category
+	@SuppressWarnings("unchecked")
+	public CategoryVO updateCategory(CategoryVO categoryVO) {
+		setAdminEJB();
+		IEntityCategory category = null;
+		logger.fine("update category" + categoryVO.getId());
+
+		List<IEntityCompetition> competitions = new ArrayList<IEntityCompetition>();
+		if (categoryVO.getCompetitions() != null) {
+			for (CompetitionVO competitionVO:categoryVO.getCompetitions()) {
+				competitions.add(admin.findCompetitionFromId(competitionVO.getId()));
+			}
+		}
+		try {
+			category = admin.updateCategory(
+					categoryVO.getId(),
+					categoryVO.getName(),
+					categoryVO.getSex(),
+					categoryVO.getShortName(),
+					categoryVO.getMinDate(),
+					categoryVO.getMaxDate(),
+					competitions);
+		} catch (AdminException e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+
+		CategoryVO cVO = Util.createCategoryVO(category);
+
+		logger.fine("category=" + cVO);
+		return cVO;
+	}
+
+
+
+
+	public void removeEvent(int id) {
+		setAdminEJB();
+		try {
+			admin.removeEvent(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+
+	}
+
+	public void removeCompetition(int id) {
+		setAdminEJB();
+		try {
+			admin.removeCompetition(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+
+	}
+
+	public void removeCategory(int id) {
+		setAdminEJB();
+		try {
+			admin.removeCategory(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+
+	}
+
 
 
 	public List<EventVO> getAllEvents() {
@@ -135,6 +375,13 @@ public class Admin {
 		return Util.createCompetitionListVO(competitions);
 	}
 
+	public List<CompetitionVO> getAllCompetitions4Event(int eventId) {
+		setAdminEJB();
+		List<IEntityCompetition> competitions = admin.findAllCompetitionsFromEvent(eventId);
+		logger.fine("competitions=" + competitions);
+		return Util.createCompetitionListVO(competitions);
+	}
+
 
 	// get categories related to the default event
 	public List<CategoryVO> getCategories() {
@@ -149,6 +396,14 @@ public class Admin {
 
 		setAdminEJB();
 		List<IEntityCategory> categories = admin.findAllCategories();
+		logger.fine("categories=" + categories);
+		return Util.createCategoryListVO(categories);
+	}
+
+	public List<CategoryVO> getAllCategories4Event(int eventId) {
+
+		setAdminEJB();
+		List<IEntityCategory> categories = admin.findAllCategoriesFromEvent(eventId);
 		logger.fine("categories=" + categories);
 		return Util.createCategoryListVO(categories);
 	}

@@ -30,22 +30,23 @@
 
 	<mx:Script>
 		<![CDATA[
-			import net.o3s.webflex.bean.Competition;
-			import net.o3s.webflex.bean.Category;
-			import net.o3s.webflex.bean.Registered;
-			import net.o3s.webflex.bean.Person;
-         import net.o3s.webflex.components.Util;
-
-			import mx.rpc.events.ResultEvent;
-			import mx.controls.Alert;
-			import mx.utils.ObjectUtil;
 			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.DateField;
 			import mx.controls.dataGridClasses.DataGridColumn;
-			import mx.utils.URLUtil;
 			import mx.core.Application;
-			import mx.utils.StringUtil;
 			import mx.events.CloseEvent;
-         import mx.controls.DateField;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ObjectUtil;
+			import mx.utils.StringUtil;
+			import mx.utils.URLUtil;
+
+			import net.o3s.webflex.bean.Competition;
+			import net.o3s.webflex.bean.Person;
+			import net.o3s.webflex.bean.Registered;
+			import net.o3s.webflex.components.Util;
+			import net.o3s.webflex.components.ArrivalTimeRegisteredScreen;
 
 			[Bindable]
 			private var registeredList:ArrayCollection= new ArrayCollection([]);
@@ -88,6 +89,8 @@
 
          private var importedRegisteredList:ArrayCollection= new ArrayCollection([]);
 
+         private var arrivalTimeRegisteredScreen:ArrivalTimeRegisteredScreen = null;
+
 			public function onClickRefresh(ev:Event):void {
             resetRegisteredData();
          }
@@ -129,6 +132,9 @@
             importFileRef.addEventListener(Event.COMPLETE, handleImportFileLoadComplete);
             importFileRef.addEventListener(ProgressEvent.PROGRESS, fileRef_progress);
 
+            this.arrivalTimeRegisteredScreen = new ArrivalTimeRegisteredScreen();
+            this.arrivalTimeRegisteredScreen.addEventListener("SaveArrivalTimeRegistered", saveArrivalTimeRegistered);
+            this.arrivalTimeRegisteredScreen.addEventListener("CancelArrivalTimeRegistered", cancelArrivalTimeRegistered);
 			}
 
           private function handleImportFileSelect(event:Event):void {
@@ -401,6 +407,7 @@
 				}
 			}
 
+
 			private function setUpdate4RegisteredEditor():void {
 				MyRegisteredEditor.set4Update(editedRegistered);
 				MyRegisteredEditor.setExitCallback(this.init);
@@ -584,6 +591,43 @@
 				}
 			}
 
+         public function editArrivalTime(id:int):void {
+            var r:Registered = getRegistered(id);
+            if (r == null) {
+               Alert.show("Enregistrement inconnu <" + id + ">");
+            } else {
+               editedRegistered = r;
+               PopUpManager.addPopUp(this.arrivalTimeRegisteredScreen, this, true);
+               PopUpManager.centerPopUp(this.arrivalTimeRegisteredScreen);
+               this.arrivalTimeRegisteredScreen.eventName.text = r.event.name;
+               this.arrivalTimeRegisteredScreen.registeredName.text = r.name;
+               this.arrivalTimeRegisteredScreen.registeredLabel.text = r.label.value;
+			   if (r.arrivalDate == null) {
+				   this.arrivalTimeRegisteredScreen.picker.selectedDate = new Date();
+
+			   } else {
+				   this.arrivalTimeRegisteredScreen.picker.selectedDate = r.arrivalDate;
+				   this.arrivalTimeRegisteredScreen.dispatchEvent(new Event("change"));
+			   }
+
+            }
+         }
+
+         private function cancelArrivalTimeRegistered(e:Event):void {
+            refreshRegisteredData();
+         }
+
+         private function saveArrivalTimeRegistered(e:Event):void {
+            editedRegistered.arrivalDate = this.arrivalTimeRegisteredScreen.arrivalTime;
+            RO_registering.updateArrivalDateRegistered(editedRegistered.id, editedRegistered.arrivalDate);
+            PopUpManager.removePopUp(this.arrivalTimeRegisteredScreen);
+
+         }
+
+      private function resultUpdateRegistered(event:ResultEvent):void {
+            refreshRegisteredData();
+      }
+
 		]]>
 	</mx:Script>
 
@@ -596,6 +640,7 @@
 		<mx:method name="getRegistereds" result="resultGetRegistered(event)"/>
 		<mx:method name="removeRegistered" result="resultRemoveRegistered(event)"/>
       <mx:method name="importRegistered" result="resultImportRegistered(event)"/>
+      <mx:method name="updateArrivalDateRegistered" result="resultUpdateRegistered(event)" fault="Util.handleException(event)"/>
 	</mx:RemoteObject>
 
 	<mx:RemoteObject id="RO_reporting" destination="reporting" showBusyCursor="true" fault="onFault(event)">
@@ -688,7 +733,7 @@
 						<mx:DataGridColumn headerText="Date inscription" dataField="registeringDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
 						<mx:DataGridColumn headerText="Date arrivee" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
 						<mx:DataGridColumn headerText="Temps" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="Util.getElapsedTimeLabel"/>
-						<mx:DataGridColumn width="100" headerText="Actions"
+						<mx:DataGridColumn width="150" headerText="Actions"
 										   itemRenderer="net.o3s.webflex.components.ActionLabelDataGridColumnItemRenderer" />
 					</mx:columns>
 				</mx:DataGrid>

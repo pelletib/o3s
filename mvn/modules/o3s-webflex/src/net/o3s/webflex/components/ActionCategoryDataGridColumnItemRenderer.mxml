@@ -27,8 +27,7 @@
 <mx:HBox
     xmlns:mx="http://www.adobe.com/2006/mxml"
     width="100%"
-    height="100%"
-    dataChange="dataChanged()">
+    height="100%">
 
     <mx:Script>
         <![CDATA[
@@ -65,14 +64,6 @@
 			[Bindable]
 			public var editIcon16:Class;
 
-         /**
-          * Flag icon (16 pixels)
-          */
-         [Embed(source='../images/flag.png')]
-         [Bindable]
-         public var flagIcon16:Class;
-
-
             /**
              * Pause icon (16 pixels)
              */
@@ -80,54 +71,33 @@
             [Bindable]
             public var pauseIcon16:Class;
 
+           /**
+             * copy/past icon (16 pixels)
+             */
+            [Embed(source='../images/copy-icon.png')]
+            [Bindable]
+            public var copyIcon16:Class;
+
             private function confirmRemove():void {
-                Alert.show("Etes-vous sur de vouloir supprimer cet inscrit ?",
+                Alert.show("Etes-vous sur de vouloir supprimer cette categorie ?",
                     "Suppression ?",
                     Alert.OK | Alert.CANCEL,
                     this,
-					removeRegistered,
+					     removeCategory,
                     null,
                     Alert.OK);
             }
 
-            private function removeRegistered(event:CloseEvent):void {
+            private function removeCategory(event:CloseEvent):void {
                 if(event.detail == Alert.OK) {
-					parentDocument.removeRegistered(data.id);
+					parentDocument.removeCategory(data.id);
                 }
             }
 
-			private function getLabel4Printing():void {
-				parentDocument.getLabel4Printing(data.id);
+			private function editCategory():void {
+				parentDocument.editCategory(data.id);
 			}
 
-			private function editRegistered():void {
-				parentDocument.editRegistered(data.id);
-			}
-
-         private function editArrivalTime():void {
-            parentDocument.editArrivalTime(data.id);
-         }
-
-			private function modifySelectItem():void {
-				if (CB_selectItem.selected == true) {
-					parentDocument.addSelectedRegistered(data.id);
-				}
-				else {
-					parentDocument.removeSelectedItem(data.id);
-				}
-			}
-
-            private function dataChanged():void {
-
-				  // reinit if necessary the check box
-               if (parentDocument != null) {
-				     if (parentDocument.getIdxSelectedRegistered(data.id) == -1) {
-					    CB_selectItem.selected = false;
-				     } else {
-					    CB_selectItem.selected = true;
-				     }
-               }
-            }
         ]]>
     </mx:Script>
 
@@ -135,14 +105,6 @@
                click="confirmRemove()" />
 
 	<mx:Button id="B_editItem" icon="{editIcon16}" width="20" height="20" toolTip="Editer"
-			   click="editRegistered()" />
-
-	<mx:Button id="B_printItem" icon="{printerIcon16}" width="20" height="20" toolTip="Imprimer un dossard"
-			   click="getLabel4Printing()" />
-
-   <mx:Button id="B_arrivalItem" icon="{flagIcon16}" width="20" height="20" toolTip="Editer la date d'arrivee"
-            click="editArrivalTime()" />
-
-	<mx:CheckBox id="CB_selectItem" selected="false" click="modifySelectItem()" toolTip="Selectionner l'inscrit"/>
+			   click="editCategory()" />
 
 </mx:HBox>

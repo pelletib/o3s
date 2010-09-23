@@ -43,9 +43,11 @@ import net.o3s.apis.IEJBEventMessageProducerRemote;
 import net.o3s.apis.IEJBInitRemote;
 import net.o3s.apis.IEJBRegisteringRemote;
 import net.o3s.apis.IEntityCompetition;
+import net.o3s.apis.IEntityEvent;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
+import net.o3s.apis.TestData;
 import net.o3s.apis.TrackingMessage;
 
 public class Init {
@@ -135,9 +137,11 @@ public class Init {
 		} catch (AlreadyExistException e) {
 			e.printStackTrace();
 		}
-		IEntityCompetition competition1 = admin.findCompetitionFromId(16);
-		IEntityCompetition competition2 = admin.findCompetitionFromId(11);
-		IEntityCompetition competition3 = admin.findCompetitionFromId(17);
+		IEntityEvent event = admin.findDefaultEvent();
+
+		IEntityCompetition competition1 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_7,event);
+		IEntityCompetition competition2 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_2_2,event);
+		IEntityCompetition competition3 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_8,event);
 
 		vregistered.removeAllElements();
 
@@ -168,7 +172,8 @@ public class Init {
 
 		List<IEntityPerson> team0 = new ArrayList<IEntityPerson>();
 		vregisteredOverflow.removeAllElements();
-		IEntityCompetition competition1 = admin.findCompetitionFromId(16);
+		IEntityEvent event = admin.findDefaultEvent();
+		IEntityCompetition competition1 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_7, event);
 
 		for (int i = 0 ; i < ( (competition1.getHigherLabelNumber() - competition1.getLowerLabelNumber()) + 1) ; i++) {
 
@@ -223,7 +228,8 @@ public class Init {
 
 		logger.fine("Starting date set to:" + startingDate);
 
-		IEntityCompetition competition1 = admin.findCompetitionFromId(16);
+		IEntityEvent event = admin.findDefaultEvent();
+		IEntityCompetition competition1 = admin.findCompetitionFromName(TestData.COMPETITION_NAME_7, event);
 
 		try {
 			admin.setStartDateInCompetition(competition1.getId());

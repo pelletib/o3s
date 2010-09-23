@@ -41,6 +41,7 @@ public interface IEJBRegisteringLocal {
 
 	List<IEntityRegistered> findAllRegistered();
 	List<IEntityRegistered> findAllRegisteredFromDefaultEvent();
+	List<IEntityRegistered> findAllRegisteredFromEvent(int eventId);
 	List<IEntityRegistered> findAllRegisteredFromDefaultEventWhereRegisteringDateIsGreaterThan(Date minDate);
 	IEntityRegistered findRegisteredFromLabel(final String labelValue)  throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByDuration(final int competitionId) throws RegisteringException;
@@ -71,6 +72,12 @@ public interface IEJBRegisteringLocal {
 			final Date arrivalDate,
 			final long elapsedTime) throws AlreadyExistException, RegisteringException;
 
+	void updateArrivalDateRegistered(
+			final int id,
+			final Date arrivalDate) throws RegisteringException;
+
+	void recomputeElapsedTimeRegistereds(
+			final int id) throws RegisteringException;
 
 	int countRegisteredFromCompetition(final int competitionId) throws RegisteringException;
 	int countArrivalFromCompetition(final int competitionId) throws RegisteringException;

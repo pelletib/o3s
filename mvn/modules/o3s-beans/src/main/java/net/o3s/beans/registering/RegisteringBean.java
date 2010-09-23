@@ -55,6 +55,7 @@ import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.RegisteringException;
+import net.o3s.apis.TrackingMessageException;
 import net.o3s.persistence.Label;
 import net.o3s.persistence.Person;
 import net.o3s.persistence.Registered;
@@ -95,8 +96,12 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     	boolean found = false;
     	Set<IEntityCompetition> competitionsInCategory = category.getCompetitions();
+		logger.fine("Check Category <" + category.getName() + "> with Competition <" + competition.getName() + ">");
+
     	for (IEntityCompetition competitionInCategory : competitionsInCategory) {
-    		if (competitionInCategory.equals(competition)) {
+			logger.fine("Check competitionInCategory <" + competitionInCategory.getId() + "> Competition <" + competition.getId() + ">");
+
+    		if (competitionInCategory.getId() == competition.getId()) {
     			logger.fine("Category <" + category.getName() + "> is compatible with Competition <" + competition.getName() + ">");
     			found = true;
     			break;
@@ -656,11 +661,8 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByDuration(final int competitionId) throws RegisteringException {
 
-    	IEntityEvent event = admin.findDefaultEvent();
-
         Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_ETIME");
         query.setParameter("COMPETITION", competitionId);
-        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
@@ -680,11 +682,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      */
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId) throws RegisteringException {
-    	IEntityEvent event = admin.findDefaultEvent();
 
     	Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_CATEGORY_ETIME");
         query.setParameter("COMPETITION", competitionId);
-        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
@@ -704,11 +704,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      */
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByClubAndDuration(final int competitionId) throws RegisteringException {
-    	IEntityEvent event = admin.findDefaultEvent();
 
     	Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_CLUB_ETIME");
         query.setParameter("COMPETITION", competitionId);
-        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
@@ -728,11 +726,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      */
     @SuppressWarnings("unchecked")
     public List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId,  List<Integer> categoriesId) throws RegisteringException {
-    	IEntityEvent event = admin.findDefaultEvent();
 
     	Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_COMPETITION_ORDERBY_CATEGORY_ETIME");
         query.setParameter("COMPETITION", competitionId);
-        query.setParameter("EVENTID", event.getId());
 
         List<IEntityRegistered> registereds = null;
         try {
@@ -900,6 +896,23 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     }
 
     /**
+     * Get all registered on the specified event
+     */
+    @SuppressWarnings("unchecked")
+    public  List<IEntityRegistered> findAllRegisteredFromEvent(int eventId) {
+        Query query = this.entityManager.createNamedQuery("ALL_REGISTERED_FROM_EVENT");
+        query.setParameter("EVENTID", eventId);
+
+        List<IEntityRegistered> registereds = null;
+        try {
+        	registereds = query.getResultList();
+        } catch (javax.persistence.NoResultException e) {
+        	registereds = new ArrayList<IEntityRegistered>();
+        }
+        return registereds;
+    }
+
+    /**
      * Get all registered on default event where registration date is greater than mindate
      */
     @SuppressWarnings("unchecked")
@@ -1040,6 +1053,55 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	}
 
         return registeredsReturn;
+    }
+
+    /**
+     * Update arrival date for a registered
+     */
+    @SuppressWarnings("unchecked")
+	public void updateArrivalDateRegistered(
+			final int id,
+			final Date arrivalDate) throws RegisteringException {
+
+		IEntityRegistered registered = findRegisteredFromId(id);
+		if (registered == null) {
+			throw new RegisteringException ("Impossible de recuperer l'inscrit <" + id + ">");
+		}
+
+		// Set the arrival date
+		registered.setArrivalDate(arrivalDate);
+
+		// Compute the duration
+		if (registered.getCompetition().getStartingDate() == null) {
+			throw new RegisteringException ("Competition pas encore demarree pour l'inscrit :" + id);
+		}
+		registered.setElapsedTime(registered.getArrivalDate().getTime()-registered.getCompetition().getStartingDate().getTime());
+
+    }
+
+    /**
+     * Re-Compute elapsed time for a registered
+     */
+    @SuppressWarnings("unchecked")
+	public void recomputeElapsedTimeRegistereds(
+			final int competitionId) throws RegisteringException {
+
+    	IEntityCompetition competition = admin.findCompetitionFromId(competitionId);
+
+    	if (competition == null) {
+			throw new RegisteringException ("Competition inconnue :" + competitionId);
+    	}
+
+		// Compute the duration
+		if (competition.getStartingDate() == null) {
+			throw new RegisteringException ("Competition pas encore demarree pour l'inscrit :" + competitionId);
+		}
+
+    	List<IEntityRegistered> registereds = findRegisteredFromCompetitionOrderByDuration(competitionId);
+    	for (IEntityRegistered registered:registereds) {
+    		registered.setElapsedTime(registered.getArrivalDate().getTime()-registered.getCompetition().getStartingDate().getTime());
+    	}
+
     }
 
     /**

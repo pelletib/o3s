@@ -89,7 +89,7 @@
 		 <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Tests">
 
           <mx:ControlBar horizontalAlign="center">
-            <mx:Button label="Peupler les donnees 'Admin'" id="B_populateAdminData"
+            <mx:Button label="Peupler les donnees 'Admin' 2010" id="B_populateAdminData"
                          click="onClickPopulateAdminData(event)" enabled="true"/>
             <mx:Button label="Peupler les donnees 'Inscrits'" id="B_populateRegistered"
                          click="onClickPopulateRegistered(event)" enabled="true"/>

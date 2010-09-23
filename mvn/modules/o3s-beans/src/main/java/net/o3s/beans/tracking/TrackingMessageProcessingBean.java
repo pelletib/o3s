@@ -23,6 +23,7 @@
  */
 package net.o3s.beans.tracking;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.ActivationConfigProperty;
@@ -82,16 +83,11 @@ public class TrackingMessageProcessingBean implements MessageListener {
 						throw new TrackingMessageException ("Unable to retrieve a registered related to the event:" + trackingMessage);
 					}
 
-					// Set the arrival date
-					registered.setArrivalDate(trackingMessage.getCreationTime());
-
-					// Compute the duration
-					if (registered.getCompetition().getStartingDate() == null) {
-						throw new TrackingMessageException ("Competition pas encore demarree pour l'inscrit :" + trackingMessage);
+					try {
+						registering.updateArrivalDateRegistered(registered.getId(), trackingMessage.getCreationTime());
+					} catch (RegisteringException e) {
+						throw new TrackingMessageException("Impossible de traiter le message <" + trackingMessage +"> - ", e);
 					}
-					registered.setElapsedTime(registered.getArrivalDate().getTime()-registered.getCompetition().getStartingDate().getTime());
-
-					//registered = this.entityManager.merge(registered);
 
 		            logger.fine("Update:" + registered);
 
@@ -104,11 +100,11 @@ public class TrackingMessageProcessingBean implements MessageListener {
 				}
 
 			} catch (JMSException e) {
-				logger.severe("Unable to process the Event: " + e.getMessage());
+				logger.log(Level.SEVERE, "Unable to process the Event: " + e.getMessage());
 			} catch (TrackingMessageException e) {
-				logger.severe("Unable to process the Event: " + e.getMessage());
+				logger.log(Level.SEVERE, "Unable to process the Event: " + e.getMessage());
 			} catch (RegisteringException e) {
-				logger.severe("Unable to process the Event: " + e.getMessage());
+				logger.log(Level.SEVERE, "Unable to process the Event: " + e.getMessage());
 			}
 		}
 
