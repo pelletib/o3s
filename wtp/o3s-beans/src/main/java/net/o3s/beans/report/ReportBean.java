@@ -279,7 +279,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 			// with more advanced option to adjust the printer configuration
 			PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
 			printRequestAttributeSet.add(MediaSizeName.ISO_A4);
-			printRequestAttributeSet.add(OrientationRequested.LANDSCAPE);
+			printRequestAttributeSet.add(OrientationRequested.PORTRAIT);
 
 			PrintServiceAttributeSet printServiceAttributeSet = new HashPrintServiceAttributeSet();
 			//printServiceAttributeSet.add(new PrinterName("Epson Stylus 820 ESC/P 2", null));
