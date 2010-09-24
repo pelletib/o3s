@@ -28,4 +28,5 @@ public interface IEJBNotificationProducerLocal {
 
 	void sendDepartureNotification(IEntityCompetition competition) throws NotificationMessageException;
 	void sendArrivalNotification(IEntityRegistered registered) throws NotificationMessageException;
+	void sendRegisteringNotification(IEntityRegistered registered) throws NotificationMessageException;
 }

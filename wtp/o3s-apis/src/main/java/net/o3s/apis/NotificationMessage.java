@@ -135,6 +135,9 @@ public class NotificationMessage implements Serializable {
 	public static final String NOTIFICATION_STR_TYPE_ARRIVAL = "Arrivee";
 	public static final int NOTIFICATION_INT_TYPE_DEPARTURE = 1;
 	public static final String NOTIFICATION_STR_TYPE_DEPARTURE = "Depart";
+	public static final int NOTIFICATION_INT_TYPE_REGISTERING = 1;
+	public static final String NOTIFICATION_STR_TYPE_REGISTERING = "Inscription";
+
 
 	private int registeredId;
 	private int competitionId;
@@ -198,6 +201,10 @@ public class NotificationMessage implements Serializable {
 		if (getType() == NotificationMessage.NOTIFICATION_INT_TYPE_DEPARTURE) {
 			return NotificationMessage.NOTIFICATION_STR_TYPE_DEPARTURE;
 		}
+		if (getType() == NotificationMessage.NOTIFICATION_INT_TYPE_REGISTERING) {
+			return NotificationMessage.NOTIFICATION_STR_TYPE_REGISTERING;
+		}
+
 		return "Unknown";
 	}
 

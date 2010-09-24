@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ejb.ApplicationException;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -46,6 +45,7 @@ import javax.persistence.Query;
 
 import net.o3s.apis.AlreadyExistException;
 import net.o3s.apis.IEJBAdminLocal;
+import net.o3s.apis.IEJBNotificationProducerLocal;
 import net.o3s.apis.IEJBRegisteringLocal;
 import net.o3s.apis.IEJBRegisteringRemote;
 import net.o3s.apis.IEntityCategory;
@@ -54,6 +54,7 @@ import net.o3s.apis.IEntityEvent;
 import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
+import net.o3s.apis.NotificationMessageException;
 import net.o3s.apis.RegisteringException;
 import net.o3s.apis.TrackingMessageException;
 import net.o3s.persistence.Label;
@@ -85,6 +86,11 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     @EJB
     private IEJBAdminLocal admin;
 
+    /**
+     * Notification EJB
+     */
+    @EJB
+    private IEJBNotificationProducerLocal notification;
 
     /**
      * Check competition against category
@@ -1050,6 +1056,13 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
                	// exit of the loop (only one iteration)
             	break;
         	}
+
+    		try {
+    			notification.sendRegisteringNotification(registered);
+    		} catch (NotificationMessageException e) {
+    			logger.log(Level.SEVERE, "Unable to send a notification :" + e.getMessage());
+    		}
+
     	}
 
         return registeredsReturn;
