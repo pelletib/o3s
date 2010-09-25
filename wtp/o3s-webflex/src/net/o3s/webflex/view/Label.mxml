@@ -66,6 +66,12 @@
 			[Bindable]
 			public var selectedLabelFilter:String="";
 
+         [Bindable]
+         public var selectedSourceFilter:String="";
+
+         [Bindable]
+         public var selectedClubFilter:String="";
+
 			public var serverUrl:String = "";
 
 			// list of registered that are selected in the datagrid
@@ -109,10 +115,14 @@
             selectedCompetitionFilter=null;
             selectedNameFilter="";
             selectedLabelFilter = "";
+            selectedSourceFilter = "";
+            selectedClubFilter = "";
 
             CB_competition.selectedItem = -1;
             TI_selectedNameFilter.text="";
             TI_selectedLabelFilter.text="";
+            TI_selectedSourceFilter.text="";
+            TI_selectedClubFilter.text="";
             refreshRegisteredData();
          }
 
@@ -438,7 +448,7 @@
 
             //Alert.show("ComF=" + selectedCompetitionFilter + ", NamF=" + selectedNameFilter + ", LabF=" + selectedLabelFilter);
 
-				if (selectedCompetitionFilter != null || selectedNameFilter != "" || selectedLabelFilter != "") {
+				if (selectedCompetitionFilter != null || selectedNameFilter != "" || selectedLabelFilter != "" || selectedSourceFilter != "" || selectedClubFilter != "") {
 					registeredList.filterFunction = processFilters;
 				} else {
 					registeredList.filterFunction = null;
@@ -464,11 +474,23 @@
 				setFilters();
 			}
 
+         private function setFilterByClub(event:Event):void {
+            selectedClubFilter=StringUtil.trim(TI_selectedClubFilter.text);
+            setFilters();
+         }
+
+         private function setFilterBySource(event:Event):void {
+            selectedSourceFilter=StringUtil.trim(TI_selectedSourceFilter.text);
+            setFilters();
+         }
+
 			private function processFilters(item:Object):Boolean {
 
 				var resultCompetitionFilter:Boolean = true;
 				var resultNameFilter:Boolean = true;
-				var resultLabelFilter:Boolean = true;
+            var resultLabelFilter:Boolean = true;
+            var resultSourceFilter:Boolean = true;
+            var resultClubFilter:Boolean = true;
 				var registered:Registered = item as Registered;
 
 				if (selectedCompetitionFilter != null) {
@@ -483,7 +505,15 @@
 					resultLabelFilter = registered.label.value.match(selectedLabelFilter);
 				}
 
-				return (resultCompetitionFilter && resultNameFilter && resultLabelFilter);
+            if (selectedSourceFilter != "") {
+               resultSourceFilter = registered.source.toLowerCase().match(selectedSourceFilter);
+            }
+
+            if (selectedClubFilter != "") {
+               resultClubFilter = registered.club.toLowerCase().match(selectedClubFilter);
+            }
+
+				return (resultCompetitionFilter && resultNameFilter && resultLabelFilter && resultSourceFilter && resultClubFilter);
 			}
 
 			public function addSelectedRegistered(id:int):void {
@@ -677,15 +707,25 @@
 			<mx:Panel width="40%" height="100%" horizontalAlign="center" title="Filtres">
 				<mx:VBox width="100%" height="100%">
 					<mx:Form>
-						<mx:FormItem label="Filtre par competition" >
-							<mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setFilterByCompetition(event)" />
-						</mx:FormItem>
-						<mx:FormItem label="Filtre par nom" >
-							<mx:TextInput id="TI_selectedNameFilter" width="150" change="setFilterByName(event);"/>
-						</mx:FormItem>
-						<mx:FormItem label="Filtre par dossard" >
-							<mx:TextInput id="TI_selectedLabelFilter" width="150" change="setFilterByLabel(event);"/>
-						</mx:FormItem>
+                  <mx:HBox>
+                     <mx:FormItem label="Competition" >
+                        <mx:ComboBox id="CB_competition" dataProvider="{competitionList}" labelField="name" width="200" change="setFilterByCompetition(event)" />
+                     </mx:FormItem>
+						   <mx:FormItem label="Nom" >
+							  <mx:TextInput id="TI_selectedNameFilter" width="150" change="setFilterByName(event);"/>
+						   </mx:FormItem>
+                  </mx:HBox>
+                  <mx:HBox>
+                     <mx:FormItem label="Dossard" >
+                       <mx:TextInput id="TI_selectedLabelFilter" width="50" change="setFilterByLabel(event);"/>
+                     </mx:FormItem>
+                     <mx:FormItem label="Source" >
+                       <mx:TextInput id="TI_selectedSourceFilter" width="100" change="setFilterBySource(event);"/>
+                     </mx:FormItem>
+                     <mx:FormItem label="Club" >
+                       <mx:TextInput id="TI_selectedClubFilter" width="150" change="setFilterByClub(event);"/>
+                     </mx:FormItem>
+                  </mx:HBox>
 					</mx:Form>
 				</mx:VBox>
 			</mx:Panel>
