@@ -40,6 +40,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import net.o3s.apis.IEJBAdminRemote;
+import net.o3s.apis.IEJBNotificationProducerRemote;
 import net.o3s.apis.IEJBRegisteringRemote;
 import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityRegistered;
@@ -62,6 +63,9 @@ public class Notification implements javax.jms.MessageListener {
 
     //@EJB
     private IEJBAdminRemote admin;
+
+    //@EJB
+    private IEJBNotificationProducerRemote notification;
 
     //@Resource(mappedName="NotificationTopic")
     //private Topic topic;
@@ -103,9 +107,34 @@ public class Notification implements javax.jms.MessageListener {
 
 	}
 
+	private void setNotificationEJB() {
+
+		InitialContext context=null;
+
+		if (notification == null) {
+			try {
+				context = new InitialContext();
+				notification = (IEJBNotificationProducerRemote) context.lookup("net.o3s.beans.notification.NotificationProducerBean_net.o3s.apis.IEJBNotificationProducerRemote@Remote");
+
+			} catch (NamingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+	}
+
 
     /* Constructor. Establish JMS publisher and subscriber */
     public Notification( ) throws Exception {
+
+    	//init EJB
+        setRegisteringEJB();
+
+        setAdminEJB();
+
+        setNotificationEJB();
+
 
         InitialContext context = new InitialContext();
 
@@ -119,17 +148,14 @@ public class Notification implements javax.jms.MessageListener {
         session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
 
         // Look up a JMS topic
-        Topic topic = (Topic) context.lookup("NotificationTopic");
+        //Topic topic = (Topic) context.lookup("NotificationTopic");
+        Topic topic = notification.getTopic();
 
         // Create a JMS subscriber
         MessageConsumer mc = session.createConsumer(topic);
 
         // Set a JMS message listener
         mc.setMessageListener(this);
-
-        setRegisteringEJB();
-
-        setAdminEJB();
 
         // Start the JMS connection; allows messages to be delivered
         connection.start( );
@@ -177,9 +203,11 @@ public class Notification implements javax.jms.MessageListener {
     	notification.setCreationTime(new Date());
     	notification.setType(NotificationMessage.NOTIFICATION_STR_TYPE_ARRIVAL);
     	String message = "";
+    	message += registered.getLabel().getNumber() + "-";
+    	message += registered.getName() + "-";
     	message += registered.getCompetition().getName() + "-";
     	message += registered.getCategory().getName() + "-";
-    	message += registered.getName() + " in ";
+    	message += " en ";
 
 
         long timet= registered.getElapsedTime() / 1000;
@@ -189,11 +217,42 @@ public class Notification implements javax.jms.MessageListener {
         long seconds = timet-(minutes*60)-(hours*3600);
         long mseconds = registered.getElapsedTime() - (seconds*1000) - (minutes*60*1000) - (hours*3600*1000);
 
-        message += hours + ":" + minutes + ":" + seconds + ":" + mseconds;
+        if (hours > 0) {
+        	message += hours + "h " + minutes + "m " + seconds + "s " + mseconds + "ms";
+        } else {
+        	if (minutes > 0) {
+            	message += minutes + "m " + seconds + "s " + mseconds + "ms";
+
+        	} else {
+        		if (seconds > 0) {
+                	message += seconds + "s " + mseconds + "ms";
+
+        		} else {
+                	message += mseconds + "ms";
+
+        		}
+        	}
+        }
 
     	//Date dateElapsedTime = new Date(registered.getElapsedTime());
     	//DateFormat df = new SimpleDateFormat("HH:mm:ss:S");
     	//message +=  df.format(dateElapsedTime);
+
+    	notification.setMessage(message);
+
+    	return notification;
+    }
+
+    private NotificationVO formatRegisteringNotification(IEntityRegistered registered) {
+    	NotificationVO notification = new NotificationVO();
+
+    	notification.setCreationTime(new Date());
+    	notification.setType(NotificationMessage.NOTIFICATION_STR_TYPE_REGISTERING);
+    	String message = "";
+    	message += registered.getLabel().getNumber() + "-";
+    	message += registered.getName() + "-";
+    	message += registered.getCompetition().getName() + "-";
+    	message += registered.getCategory().getName();
 
     	notification.setMessage(message);
 
@@ -207,7 +266,7 @@ public class Notification implements javax.jms.MessageListener {
     	notification.setCreationTime(new Date());
     	notification.setType(NotificationMessage.NOTIFICATION_STR_TYPE_DEPARTURE);
     	String message = "";
-    	message += competition.getName() + " at ";
+    	message += competition.getName() + " a ";
     	message += df.format(competition.getStartingDate());
 
     	notification.setMessage(message);
@@ -235,8 +294,20 @@ public class Notification implements javax.jms.MessageListener {
 							throw new NotificationMessageException ("Unable to retrieve a registered related to the event:" + notificationMessage);
 						}
 
-						logger.fine("Notification - registered arrival:" + registered.getId());
+						logger.fine("Notification - arrival:" + registered.getId());
 						sendMessageToClients(formatArrivalNotification(registered));
+					}
+
+					if (notificationMessage.getType() == NotificationMessage.NOTIFICATION_INT_TYPE_REGISTERING) {
+
+						// Find the label in the database
+						IEntityRegistered registered = registering.findRegisteredFromId(notificationMessage.getRegisteredId());
+						if (registered == null) {
+							throw new NotificationMessageException ("Unable to retrieve a registered related to the event:" + notificationMessage);
+						}
+
+						logger.fine("Notification - registering:" + registered.getId());
+						sendMessageToClients(formatRegisteringNotification(registered));
 					}
 
 					if (notificationMessage.getType() == NotificationMessage.NOTIFICATION_INT_TYPE_DEPARTURE) {

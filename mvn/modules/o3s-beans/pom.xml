@@ -120,6 +120,7 @@
   <build>
      <finalName>o3s-beans</finalName>
      <defaultGoal>package</defaultGoal>
+
         <plugins>
           <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -132,9 +133,10 @@
           <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ejb-plugin</artifactId>
-                <version>2.1</version>
+                <version>2.3</version>
                 <configuration>
                   <ejbVersion>3.0</ejbVersion>
+          	  <filterDeploymentDescriptor>true</filterDeploymentDescriptor>
                   <archive>
                     <manifest>
                       <addClasspath>true</addClasspath>

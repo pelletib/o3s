@@ -62,6 +62,10 @@ public class NotificationProducerBean implements IEJBNotificationProducerLocal,I
     @Resource(mappedName="CF")
     private ConnectionFactory connectionFactory;
 
+    public Topic getTopic() {
+    	return topic;
+    }
+
     public void sendDepartureNotification(IEntityCompetition competition) throws NotificationMessageException {
     	try {
             Connection connection = this.connectionFactory.createConnection();
@@ -84,6 +88,30 @@ public class NotificationProducerBean implements IEJBNotificationProducerLocal,I
         	}
 
     }
+
+    public void sendRegisteringNotification(IEntityRegistered registered) throws NotificationMessageException {
+    	try {
+            Connection connection = this.connectionFactory.createConnection();
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageProducer producer = session.createProducer(this.topic);
+            TextMessage message = session.createTextMessage();
+
+            NotificationMessage notification = new NotificationMessage();
+            notification.setRegisteredId(registered.getId());
+            notification.setType(NotificationMessage.NOTIFICATION_INT_TYPE_REGISTERING);
+            message.setText(notification.toXML());
+
+            producer.send(message);
+            producer.close();
+            session.close();
+            connection.close();
+
+    	} catch (Exception e) {
+        		throw new NotificationMessageException("Unable to create an notification [" + registered.getId() + ", " + NotificationMessage.NOTIFICATION_INT_TYPE_ARRIVAL + "]", e);
+    	}
+
+    }
+
 
     public void sendArrivalNotification(IEntityRegistered registered) throws NotificationMessageException {
     	try {

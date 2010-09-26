@@ -43,10 +43,15 @@
       <version>${flex.version}</version>
       <type>pom</type>
     </dependency>
-
-
   </dependencies>
+
   <build>
+    <resources>
+      <resource>
+        <directory>src</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
@@ -88,7 +93,7 @@
 
           <contextRoot>/o3s-webds</contextRoot>
 
-          <sourceFile>o3s.mxml</sourceFile>
+          <sourceFile>${sourceflex}</sourceFile>
 
           <optimize>true</optimize>
 
@@ -98,4 +103,5 @@
     </plugins>
     <finalName>o3s</finalName>
   </build>
+
 </project>

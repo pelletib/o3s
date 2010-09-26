@@ -80,7 +80,7 @@ public class NotificationMessageProcessingBean implements MessageListener {
 						throw new NotificationMessageException ("Unable to retrieve a registered related to the event:" + notificationMessage);
 					}
 
-		            logger.fine("Notification - registered arrival:" + registered);
+		            logger.fine("Notification - arrival:" + registered);
 				}
 
 				if (notificationMessage.getType() == NotificationMessage.NOTIFICATION_INT_TYPE_DEPARTURE) {
@@ -94,6 +94,19 @@ public class NotificationMessageProcessingBean implements MessageListener {
 
 		            logger.fine("Notification - departure:" + competition);
 				}
+
+				if (notificationMessage.getType() == NotificationMessage.NOTIFICATION_INT_TYPE_REGISTERING) {
+
+					// Find the registered in the database
+					IEntityRegistered registered = (IEntityRegistered) registering.findRegisteredFromId(notificationMessage.getRegisteredId());
+
+					if (registered == null) {
+						throw new NotificationMessageException ("Unable to retrieve a registered related to the event:" + notificationMessage);
+					}
+
+		            logger.fine("Notification - registering:" + registered);
+				}
+
 
 
 			} catch (JMSException e) {

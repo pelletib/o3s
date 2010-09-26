@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ejb-jar xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:ejb="http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd" version="3.0">
+  <display-name>o3s-beans</display-name>
+  <enterprise-beans>
+
+    <!-- Stateless Session Bean -->
+    <session>
+      <description>NotificationProducerBean</description>
+      <display-name>NotificationProducerBean</display-name>
+      <ejb-name>NotificationProducerBean</ejb-name>
+      <business-local>net.o3s.apis.IEJBNotificationProducerLocal</business-remote>
+      <business-remote>net.o3s.apis.IEJBNotificationProducerRemote</business-remote>
+      <ejb-class>net.o3s.beans.notification.NotificationProducerBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <resource-ref>
+         <res-ref-name>${notification-topic}</res-ref-name>
+         <res-type>javax.jms.Topic</res-type>
+         <res-auth>Container</res-auth>
+         <res-sharing-scope>Shareable</res-sharing-scope>
+         <injection-target>topic</injection-target>
+      </resource-ref>
+    </session>
+
+    <session>
+      <description>TrackingMessageProducerBean</description>
+      <display-name>TrackingMessageProducerBean</display-name>
+      <ejb-name>TrackingMessageProducerBean</ejb-name>
+      <business-local>net.o3s.apis.IEJBEventMessageProducerLocal</business-remote>
+      <business-remote>net.o3s.apis.IEJBEventMessageProducerRemote</business-remote>
+      <ejb-class>net.o3s.beans.tracking.TrackingMessageProducerBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <resource-ref>
+         <res-ref-name>${tracking-queue}</res-ref-name>
+         <res-type>javax.jms.Queue</res-type>
+         <res-auth>Container</res-auth>
+         <res-sharing-scope>Shareable</res-sharing-scope>
+         <injection-target>queue</injection-target>
+      </resource-ref>
+    </session>
+
+    <!-- Message Driven Bean -->
+    <message-driven>
+      <description>NotificationMessageProcessingBean.</description>
+      <display-name>NotificationMessageProcessingBean</display-name>
+      <ejb-name>NotificationMessageProcessingBean</ejb-name>
+      <ejb-class>net.o3s.beans.notification.NotificationMessageProcessingBean</ejb-class>
+      <message-destination-type>javax.jms.Topic</message-destination-type>
+
+      <!-- Configuration of destination and type -->
+      <activation-config>
+        <activation-config-property>
+          <activation-config-property-name>destination</activation-config-property-name>
+          <activation-config-property-value>${notification-topic}</activation-config-property-value>
+        </activation-config-property>
+        <activation-config-property>
+          <activation-config-property-name>destinationType</activation-config-property-name>
+          <activation-config-property-value>javax.jms.Topic</activation-config-property-value>
+        </activation-config-property>
+      </activation-config>
+    </message-driven>
+
+    <message-driven>
+      <description>TrackingMessageProcessingBean.</description>
+      <display-name>TrackingMessageProcessingBean</display-name>
+      <ejb-name>TrackingMessageProcessingBean</ejb-name>
+      <ejb-class>net.o3s.beans.tracking.TrackingMessageProcessingBean</ejb-class>
+      <message-destination-type>javax.jms.Queue</message-destination-type>
+
+      <!-- Configuration of destination and type -->
+      <activation-config>
+        <activation-config-property>
+          <activation-config-property-name>destination</activation-config-property-name>
+          <activation-config-property-value>${tracking-queue}</activation-config-property-value>
+        </activation-config-property>
+        <activation-config-property>
+          <activation-config-property-name>destinationType</activation-config-property-name>
+          <activation-config-property-value>javax.jms.Queue</activation-config-property-value>
+        </activation-config-property>
+      </activation-config>
+    </message-driven>
+
+  </enterprise-beans>
+
+  <assembly-descriptor>
+      <application-exception>
+      <exception-class>net.o3s.apis.RegisteringException</exception-class>
+      <rollback>true</rollback>
+      </application-exception>
+   </assembly-descriptor>
+</ejb-jar>
+
+
+
