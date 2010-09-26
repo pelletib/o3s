@@ -62,6 +62,10 @@ public class NotificationProducerBean implements IEJBNotificationProducerLocal,I
     @Resource(mappedName="CF")
     private ConnectionFactory connectionFactory;
 
+    public Topic getTopic() {
+    	return topic;
+    }
+
     public void sendDepartureNotification(IEntityCompetition competition) throws NotificationMessageException {
     	try {
             Connection connection = this.connectionFactory.createConnection();

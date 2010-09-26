@@ -40,6 +40,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import net.o3s.apis.IEJBAdminRemote;
+import net.o3s.apis.IEJBNotificationProducerRemote;
 import net.o3s.apis.IEJBRegisteringRemote;
 import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityRegistered;
@@ -62,6 +63,9 @@ public class Notification implements javax.jms.MessageListener {
 
     //@EJB
     private IEJBAdminRemote admin;
+
+    //@EJB
+    private IEJBNotificationProducerRemote notification;
 
     //@Resource(mappedName="NotificationTopic")
     //private Topic topic;
@@ -103,9 +107,34 @@ public class Notification implements javax.jms.MessageListener {
 
 	}
 
+	private void setNotificationEJB() {
+
+		InitialContext context=null;
+
+		if (notification == null) {
+			try {
+				context = new InitialContext();
+				notification = (IEJBNotificationProducerRemote) context.lookup("net.o3s.beans.notification.NotificationProducerBean_net.o3s.apis.IEJBNotificationProducerRemote@Remote");
+
+			} catch (NamingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+	}
+
 
     /* Constructor. Establish JMS publisher and subscriber */
     public Notification( ) throws Exception {
+
+    	//init EJB
+        setRegisteringEJB();
+
+        setAdminEJB();
+
+        setNotificationEJB();
+
 
         InitialContext context = new InitialContext();
 
@@ -119,17 +148,14 @@ public class Notification implements javax.jms.MessageListener {
         session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
 
         // Look up a JMS topic
-        Topic topic = (Topic) context.lookup("NotificationTopic");
+        //Topic topic = (Topic) context.lookup("NotificationTopic");
+        Topic topic = notification.getTopic();
 
         // Create a JMS subscriber
         MessageConsumer mc = session.createConsumer(topic);
 
         // Set a JMS message listener
         mc.setMessageListener(this);
-
-        setRegisteringEJB();
-
-        setAdminEJB();
 
         // Start the JMS connection; allows messages to be delivered
         connection.start( );
