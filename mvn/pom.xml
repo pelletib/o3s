@@ -96,14 +96,21 @@
       <id>install</id>
       <properties>
 
+     	<jta-data-source>jdbc_hsql</jta-data-source>
+
      	<eclipselink.target-database>HSQL</eclipselink.target-database>
 	<eclipselink.ddl-generation>drop-and-create-tables</eclipselink.ddl-generation>
     	<eclipselink.ddl-generation.output-mode>database</eclipselink.ddl-generation.output-mode>
 
-        <sourceflex>o3s.mxml</sourceflex>
+        <sourceflex>o3s_init.mxml</sourceflex>
 
-    	<notification-topic>NotificationTopic</notification-topic>
-    	<tracking-queue>TrackingQueue</tracking-queue>
+    	<notification-topic-mdb>NotificationTopic</notification-topic-mdb>
+    	<tracking-queue-mdb>TrackingQueue</tracking-queue-mdb>
+    	<notification-topic-sender>NotificationTopic</notification-topic-sender>
+    	<tracking-queue-sender>TrackingQueue</tracking-queue-sender>
+
+    	<app-suffix-name>dev</app-suffix-name>
+
       </properties>
       <activation>
           <activeByDefault>true</activeByDefault>
@@ -119,14 +126,21 @@
     <profile>
       <id>server</id>
       <properties>
+     	<jta-data-source>jdbc_pg</jta-data-source>
+
         <eclipselink.target-database>PostgreSQL</eclipselink.target-database>
         <eclipselink.ddl-generation>drop-and-create-tables</eclipselink.ddl-generation>
         <eclipselink.ddl-generation.output-mode>sql-script</eclipselink.ddl-generation.output-mode>
         <sourceflex>o3s.mxml</sourceflex>
 
 
-    	<notification-topic>scn:comp/NotificationTopic</notification-topic>
-    	<tracking-queue>scn:comp/TrackingQueue</tracking-queue>
+    	<notification-topic-mdb>scn:comp/NotificationTopic</notification-topic-mdb>
+    	<tracking-queue-mdb>scn:comp/TrackingQueue</tracking-queue-mdb>
+    	<notification-topic-sender>scn:comp/NotificationTopic</notification-topic-sender>
+    	<tracking-queue-sender>scn:comp/TrackingQueue</tracking-queue-sender>
+
+    	<app-suffix-name>server</app-suffix-name>
+
       </properties>
 
       <build>
@@ -140,14 +154,21 @@
     <profile>
       <id>serverInit</id>
       <properties>
+     	<jta-data-source>jdbc_pg</jta-data-source>
+
         <eclipselink.target-database>PostgreSQL</eclipselink.target-database>
         <eclipselink.ddl-generation>create-tables</eclipselink.ddl-generation>
         <eclipselink.ddl-generation.output-mode>database</eclipselink.ddl-generation.output-mode>
 
         <sourceflex>o3s.mxml</sourceflex>
 
-    	<notification-topic>scn:comp/NotificationTopic</notification-topic>
-    	<tracking-queue>scn:comp/TrackingQueue</tracking-queue>
+    	<notification-topic-mdb>NotificationTopic</notification-topic-mdb>
+    	<tracking-queue-mdb>TrackingQueue</tracking-queue-mdb>
+    	<notification-topic-sender>NotificationTopic</notification-topic-sender>
+    	<tracking-queue-sender>TrackingQueue</tracking-queue-sender>
+
+    	<app-suffix-name>serverinit</app-suffix-name>
+
       </properties>
       <build>
         <defaultGoal>install</defaultGoal>
@@ -160,14 +181,20 @@
     <profile>
       <id>arrival</id>
       <properties>
+     	<jta-data-source>jdbc_hsql</jta-data-source>
+
      	<eclipselink.target-database>HSQL</eclipselink.target-database>
 	<eclipselink.ddl-generation>drop-and-create-tables</eclipselink.ddl-generation>
     	<eclipselink.ddl-generation.output-mode>database</eclipselink.ddl-generation.output-mode>
 
     	<sourceflex>o3s_arrival.mxml</sourceflex>
 
-    	<notification-topic>scn:comp/NotificationTopic</notification-topic>
-    	<tracking-queue>scn:comp/TrackingQueue</tracking-queue>
+    	<notification-topic-mdb>NotificationTopic</notification-topic-mdb>
+    	<tracking-queue-mdb>TrackingQueue</tracking-queue-mdb>
+    	<notification-topic-sender>scn:comp/NotificationTopic</notification-topic-sender>
+    	<tracking-queue-sender>scn:comp/TrackingQueue</tracking-queue-sender>
+
+    	<app-suffix-name>arrival</app-suffix-name>
 
       </properties>
       <build>
