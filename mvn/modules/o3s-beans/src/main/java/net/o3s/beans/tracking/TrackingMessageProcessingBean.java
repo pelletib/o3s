@@ -33,11 +33,15 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import net.o3s.apis.IEJBNotificationProducerLocal;
+import net.o3s.apis.IEJBNotificationProducerRemote;
 import net.o3s.apis.IEJBRegisteringLocal;
+import net.o3s.apis.IEJBRegisteringRemote;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.NotificationMessageException;
 import net.o3s.apis.RegisteringException;
@@ -62,7 +66,38 @@ public class TrackingMessageProcessingBean implements MessageListener {
     @EJB
     private IEJBNotificationProducerLocal notification;
 
+	private void setRegisteringEJB() {
 
+		InitialContext context=null;
+
+		if (registering == null) {
+			try {
+				context = new InitialContext();
+				registering = (IEJBRegisteringLocal) context.lookup("net.o3s.beans.registering.RegisteringBean_net.o3s.apis.IEJBRegisteringLocal@Local");
+
+			} catch (NamingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
+
+	private void setNotificationEJB() {
+
+		InitialContext context=null;
+
+		if (notification == null) {
+			try {
+				context = new InitialContext();
+				notification = (IEJBNotificationProducerLocal) context.lookup("net.o3s.beans.notification.NotificationProducerBean_net.o3s.apis.IEJBNotificationProducerLocal@Local");
+
+			} catch (NamingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+	}
 	/**
 	 * @see MessageListener#onMessage(Message)
 	 */
@@ -77,6 +112,10 @@ public class TrackingMessageProcessingBean implements MessageListener {
 
 				if (trackingMessage.getType() == TrackingMessage.EVENT_INT_TYPE_ARRIVAL) {
 
+					if (registering == null) {
+						setRegisteringEJB();
+					}
+
 					// Find the label in the database
 					IEntityRegistered registered = registering.findRegisteredFromLabel(trackingMessage.getLabelValue());
 					if (registered == null) {
@@ -90,6 +129,11 @@ public class TrackingMessageProcessingBean implements MessageListener {
 					}
 
 		            logger.fine("Update:" + registered);
+
+
+					if (notification == null) {
+						setNotificationEJB();
+					}
 
 		            try {
 		            	notification.sendArrivalNotification(registered);

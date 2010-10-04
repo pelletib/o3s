@@ -41,7 +41,11 @@ MODULES="O3SAPIS_JAVA O3SAPPCLIENTINIT_JAVA O3SBEANS_JAVA O3SBEANS_RESOURCES O3S
 
 suffixList="java mxml jrxml png jpg jar xml"
 
-filters="WebContent"
+filters="WebContent|persistence.xml|ejb-jar.xml"
+
+#cmd="copy"
+cmd="diff"
+
 
 
 syncFiles() {
@@ -55,24 +59,39 @@ syncFiles() {
 
  if [ -f $srcdir ]
  then
-	if [ ! -f $dstdir ]
+	if [ "cmd" = "copy" ]
 	then
-		echo "Ajout du fichier $dstdir -> $dstdir ";
+		if [ ! -f $dstdir ]
+		then
+			echo "Ajout du fichier $dstdir -> $dstdir ";
+		else
+			echo "Copie du fichier $srcdir -> $dstdir ";
+		fi
+		cp -f $dstdir $dstdir;
 	else
-		echo "Copie du fichier $srcdir -> $dstdir ";
+		mydiff="diff -w $dstdir $dstdir"
+		echo $mydiff;
+		$mydiff;
+		
 	fi
-	cp -f $dstdir $dstdir;
  else
  	files=`cd $srcdir; find . -name \*.$suffix | egrep -v $filters`
  	for src in $files
  	do
-		if [ ! -f $dstdir/$src ]
+		if [ "cmd" = "copy" ]
 		then
-			echo "Ajout du fichier $dstdir/$src -> $dstdir/$src ";
+			if [ ! -f $dstdir/$src ]
+			then
+				echo "Ajout du fichier $dstdir/$src -> $dstdir/$src ";
+			else
+				echo "Copie du fichier $srcdir/$src -> $dstdir/$src ";
+			fi
+			$cmd $srcdir/$src $dstdir/$src;
 		else
-			echo "Copie du fichier $srcdir/$src -> $dstdir/$src ";
+			mydiff="diff -w $srcdir/$src $dstdir/$src"
+			echo $mydiff;
+			$mydiff;
 		fi
-		cp -f $srcdir/$src $dstdir/$src;
  	done
  fi
  

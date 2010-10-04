@@ -135,7 +135,7 @@ public class NotificationMessage implements Serializable {
 	public static final String NOTIFICATION_STR_TYPE_ARRIVAL = "Arrivee";
 	public static final int NOTIFICATION_INT_TYPE_DEPARTURE = 1;
 	public static final String NOTIFICATION_STR_TYPE_DEPARTURE = "Depart";
-	public static final int NOTIFICATION_INT_TYPE_REGISTERING = 1;
+	public static final int NOTIFICATION_INT_TYPE_REGISTERING = 2;
 	public static final String NOTIFICATION_STR_TYPE_REGISTERING = "Inscription";
 
 
@@ -285,6 +285,9 @@ public class NotificationMessage implements Serializable {
 				}
 				if (myElement.getValue().equals(NotificationMessage.NOTIFICATION_STR_TYPE_DEPARTURE)) {
 					this.setType(NotificationMessage.NOTIFICATION_INT_TYPE_DEPARTURE);
+				}
+				if (myElement.getValue().equals(NotificationMessage.NOTIFICATION_STR_TYPE_REGISTERING)) {
+					this.setType(NotificationMessage.NOTIFICATION_INT_TYPE_REGISTERING);
 				}
 			}
 

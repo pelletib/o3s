@@ -160,7 +160,7 @@
         <eclipselink.ddl-generation>create-tables</eclipselink.ddl-generation>
         <eclipselink.ddl-generation.output-mode>database</eclipselink.ddl-generation.output-mode>
 
-        <sourceflex>o3s.mxml</sourceflex>
+        <sourceflex>o3s_arrival.mxml</sourceflex>
 
     	<notification-topic-mdb>NotificationTopic</notification-topic-mdb>
     	<tracking-queue-mdb>TrackingQueue</tracking-queue-mdb>
@@ -200,6 +200,9 @@
       <build>
         <defaultGoal>install</defaultGoal>
       </build>
+      <modules>
+        <module>modules</module>
+      </modules>
     </profile>  
   </profiles>
 

@@ -24,6 +24,7 @@
 package net.o3s.beans.tracking;
 
 import java.util.Date;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -75,8 +76,9 @@ public class TrackingMessageProducerBean implements IEJBEventMessageProducerLoca
         event.setLabelValue(labelValue);
         event.setCreationTime(date);
 
-
         message.setText(event.toXML());
+
+        logger.log(Level.FINE,"send event :"+message.getText());
 
         producer.send(message);
         producer.close();

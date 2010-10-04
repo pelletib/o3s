@@ -107,7 +107,7 @@ public class NotificationProducerBean implements IEJBNotificationProducerLocal,I
             connection.close();
 
     	} catch (Exception e) {
-        		throw new NotificationMessageException("Unable to create an notification [" + registered.getId() + ", " + NotificationMessage.NOTIFICATION_INT_TYPE_ARRIVAL + "]", e);
+        		throw new NotificationMessageException("Unable to create an notification [" + registered.getId() + ", " + NotificationMessage.NOTIFICATION_INT_TYPE_REGISTERING + "]", e);
     	}
 
     }
