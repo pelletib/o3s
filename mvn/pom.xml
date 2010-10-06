@@ -191,7 +191,7 @@
 
     	<notification-topic-mdb>NotificationTopic</notification-topic-mdb>
     	<tracking-queue-mdb>TrackingQueue</tracking-queue-mdb>
-    	<notification-topic-sender>scn:comp/NotificationTopic</notification-topic-sender>
+    	<notification-topic-sender>NotificationTopic</notification-topic-sender>
     	<tracking-queue-sender>scn:comp/TrackingQueue</tracking-queue-sender>
 
     	<app-suffix-name>arrival</app-suffix-name>

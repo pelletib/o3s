@@ -203,12 +203,10 @@ public class Notification implements javax.jms.MessageListener {
     	notification.setCreationTime(new Date());
     	notification.setType(NotificationMessage.NOTIFICATION_STR_TYPE_ARRIVAL);
     	String message = "";
-    	message += registered.getLabel().getNumber() + "-";
-    	message += registered.getName() + "-";
-    	message += registered.getCompetition().getName() + "-";
-    	message += registered.getCategory().getName() + "-";
-    	message += " en ";
-
+    	message += registered.getLabel().getNumber() + " - ";
+    	message += registered.getName() + " - ";
+    	message += registered.getCompetition().getName() + " - ";
+    	message += registered.getCategory().getName() + " en ";
 
         long timet= registered.getElapsedTime() / 1000;
 

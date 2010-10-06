@@ -76,7 +76,7 @@
 
             labelList.addItem({value:TI_labelValue.text,creationDate:creationDate});
 
-            L_processing.text = "Numero de dossard <" + TI_labelValue.text + "> emis !" ;
+            L_processing.text = "Dossard <" + TI_labelValue.text + "> emis !" ;
 
             TI_labelValue.text="";
             TI_labelValue.errorString="";
@@ -110,14 +110,14 @@
 		  private function sendEvent(event:Event):void {
 			  if (manualArrivalTime == false) {
 				  if (labelInput != null && labelInput != "") {
-				 	 L_processing.text = "Numero de dossard <" + labelInput + "> en cours d'envoi ..." ;
+				 	 L_processing.text = "Dossard <" + labelInput + "> lu" ;
 				 	 RO_tracking.createArrivalEvent(terminal,labelInput);
 				  } else {
 					  Alert.show("Champ vide","Erreur");
 				  }
 			  } else {
 				  if (labelInput != null && labelInput != "" && timeInput != null) {
-					  L_processing.text = "Numero de dossard <" + labelInput + "> en cours d'envoi ..." ;
+					  L_processing.text = "Dossard <" + labelInput + "> lu" ;
 					  RO_tracking.createArrivalEvent(terminal,labelInput,timeInput);
 				  } else {
 					  Alert.show("Champ vide","Erreur");
@@ -204,6 +204,7 @@
 
       <mx:HBox width="100%" height="10%">
          <mx:Panel title="Lecture Dossard" width="100%" height="100%">
+            <mx:HBox>
             <mx:Form>
 				<mx:FormItem label="Type de saisie de l'heure d'arrivee" visible="{!terminalIsEmpty}" direction="horizontal" >
 					<mx:RadioButtonGroup id="inputtype" selectedValue="auto"  itemClick="modifyInputTypeArrivalTime(event);"/>
@@ -217,8 +218,8 @@
                   <mx:TextInput id="TI_arrivalTime" width="150" enter="setArrivalTime(event);sendEvent(event);" focusOut="setArrivalTime(event);"/>
                </mx:FormItem>
             </mx:Form>
-            <mx:Label id="L_processing" color="blue" text="" textAlign="right"/>
-
+            <mx:Label id="L_processing" color="blue" text="" fontSize="50" fontWeight="bold" textAlign="right"/>
+            </mx:HBox>
          </mx:Panel>
       </mx:HBox>
 
@@ -226,7 +227,7 @@
          <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Dossards lus">
 
             <mx:DataGrid id="DG_labels" dataProvider="{labelList}"
-                      rowCount="10" verticalScrollPolicy="on" resizableColumns="true" >
+                      rowCount="20" verticalScrollPolicy="on" resizableColumns="true" >
 
                <mx:columns>
                   <mx:DataGridColumn headerText="Value" dataField="value" width="100"/>
