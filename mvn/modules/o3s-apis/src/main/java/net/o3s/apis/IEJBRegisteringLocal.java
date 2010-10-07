@@ -84,4 +84,5 @@ public interface IEJBRegisteringLocal {
 	int countRegisteredFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException;
 	int countArrivalFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException;
 
+	void resetAll() throws RegisteringException;
 }

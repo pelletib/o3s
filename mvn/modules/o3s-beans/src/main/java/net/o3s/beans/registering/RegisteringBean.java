@@ -662,6 +662,44 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     }
 
     /**
+     * Reset All
+     */
+    public void resetAll() throws RegisteringException {
+
+    	// remove all registereds
+    	List<IEntityRegistered> registereds = findAllRegisteredFromDefaultEvent();
+    	for (IEntityRegistered registered:registereds) {
+    		removeRegistered(registered.getId());
+    	}
+
+    	// remove all persons who are not registered
+       	List<IEntityPerson> persons = findAllPersons();
+    	for (IEntityPerson person:persons) {
+    		registereds = findRegisteredFromPersonForAllEvent(person.getId());
+    		if (registereds == null || registereds.isEmpty()) {
+        		removePerson(person.getId());
+    		}
+    	}
+
+    	// reinit competition
+    	Boolean descMode = false;
+    	String descLabelAlloc = System.getProperty("o3s.descLabelAlloc");
+    	if (descLabelAlloc != null && ! descLabelAlloc.equalsIgnoreCase("")) {
+    		descMode = Boolean.parseBoolean(descLabelAlloc);
+    	}
+
+       	List<IEntityCompetition> competitions= admin.findAllCompetitionsFromDefaultEvent();
+    	for (IEntityCompetition competition:competitions) {
+    		if (descMode) {
+    			competition.setLastLabelNumber(competition.getHigherLabelNumber());
+    		} else {
+    			competition.setLastLabelNumber(competition.getLowerLabelNumber());
+    		}
+    		competition.setStartingDate(null);
+    	}
+    }
+
+    /**
      * Get registered on a competition order by duration
      */
     @SuppressWarnings("unchecked")

@@ -515,6 +515,17 @@ public class Registering {
 		logger.fine("remove registered=" + id);
 	}
 
+	public void resetAll() {
+		try {
+			registering.resetAll();
+		} catch (RegisteringException e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+		logger.fine("resetAll done!");
+	}
+
     public List<RegisteredStatisticsVO> getStatistics() throws RegisteringException {
 		setAdminEJB();
     	List<IEntityCompetition> competitions = admin.findAllCompetitionsFromDefaultEvent();

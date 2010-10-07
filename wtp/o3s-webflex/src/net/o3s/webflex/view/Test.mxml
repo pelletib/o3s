@@ -43,7 +43,7 @@
 
          public function onClickPopulateRegistered(ev:Event):void {
             RO_init.populateRegistered();
-            this.B_populateRegistered.enabled=false;
+            //this.B_populateRegistered.enabled=false;
          }
 
         public function onClicksimulateDA(ev:Event):void {

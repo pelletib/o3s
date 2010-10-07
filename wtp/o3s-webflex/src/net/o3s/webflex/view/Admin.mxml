@@ -34,6 +34,7 @@
 			import mx.utils.StringUtil;
          import mx.collections.ArrayCollection;
          import mx.managers.PopUpManager;
+         import mx.events.CloseEvent;
 
 			import net.o3s.webflex.bean.Category;
 			import net.o3s.webflex.bean.Competition;
@@ -610,6 +611,28 @@
            }
         }
 
+         private function resultResetAll(event:ResultEvent):void {
+            refreshAdminData();
+         }
+
+         public function onClickReset(event:CloseEvent):void {
+            if(event.detail == Alert.OK) {
+               RO_registering.resetAll();
+            }
+         }
+
+         private function confirmClickReset():void {
+            var msg:String="";
+            msg = "inscrits";
+            Alert.show("Etes-vous sure de vouloir supprimer toutes les inscriptions et reinitialiser les competitions ?",
+               "Reset ?",
+               Alert.OK | Alert.CANCEL,
+               this,
+               onClickReset,
+               null,
+               Alert.OK);
+         }
+
 		]]>
 	</mx:Script>
 
@@ -632,8 +655,11 @@
 
       <mx:method name="exportRegisteredAsFileName" result="resultExportRegisteredAsFileName(event)"/>
       <mx:method name="importRegistered" result="resultImportFileName(event)"/>
-	</mx:RemoteObject>
 
+	</mx:RemoteObject>
+   <mx:RemoteObject id="RO_registering" destination="registering" showBusyCursor="true" fault="onFault(event)">
+      <mx:method name="resetAll" result="resultResetAll(event)"/>
+   </mx:RemoteObject>
 	<mx:VBox width="95%" height="60%">
 
       <mx:HBox width="100%" height="10%">
@@ -644,7 +670,7 @@
             <mx:VBox width="100%" horizontalAlign="left">
                 <mx:Button label="Refresh" id="B_refresh"
                          click="onClickRefresh(event)" enabled="true"/>
-
+                <mx:HBox>
                 <mx:HBox horizontalAlign="left">
                   <mx:Button label="Export" id="B_export"
                          click="onClickExport(event)" enabled="true"/>
@@ -663,7 +689,10 @@
                          click="onClickImport(event)" enabled="${actionImportEnabled}"/>
                   <mx:TextInput id="TI_importFileName" width="400" change="setImportFileName(event);"/>
                 </mx:HBox>
+                </mx:HBox>
 
+                <mx:Button label="RESET TOTAL (inscriptions-courses)" id="B_reset"
+                         click="confirmClickReset()" enabled="true"/>
 
             </mx:VBox>
 

@@ -734,7 +734,7 @@
 					<mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
 
  						<mx:Button label="Reinit/Refresh" id="B_refresh" click="onClickRefresh(event)" enabled="true"/>
-                  <mx:Button id="importFileButton" label="Import CSV" click="importFileRef.browse([importFileFilter]);" enabled="true"/>
+                  <mx:Button id="importFileButton" label="Charger inscriptions depuis CSV" click="importFileRef.browse([importFileFilter]);" enabled="true"/>
                    <!--  <mx:ProgressBar id="progressBar" indeterminate="true" visible="false" /> -->
 					</mx:VBox>
                <mx:VBox paddingTop="2" paddingBottom="2" paddingLeft="2" paddingRight="2">
