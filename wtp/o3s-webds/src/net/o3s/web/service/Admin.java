@@ -24,33 +24,30 @@
 package net.o3s.web.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import net.o3s.apis.AdminException;
-import net.o3s.apis.AlreadyExistException;
 import net.o3s.apis.IEJBAdminRemote;
 import net.o3s.apis.IEntityCategory;
 import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityEvent;
-import net.o3s.apis.IEntityPerson;
-import net.o3s.apis.RegisteringException;
 import net.o3s.web.common.Util;
 import net.o3s.web.vo.CategoryVO;
 import net.o3s.web.vo.CompetitionVO;
 import net.o3s.web.vo.EventVO;
 import net.o3s.web.vo.FlexException;
-import net.o3s.web.vo.PersonVO;
 
 
-public class Admin {
+public class Admin implements AdminMBean {
 
 	/**
 	 * Logger
@@ -59,6 +56,35 @@ public class Admin {
 
 	//@EJB
 	private IEJBAdminRemote admin;
+
+	public Admin() {
+		setAdminEJB();
+		// register the MBean
+        MBeanServer mbs = getServer();
+        try {
+        	ObjectName mBeanName = new ObjectName("o3s:name=admin,type=server");
+
+            mbs.registerMBean(this, mBeanName);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+	}
+
+    /**
+     * @return MBeanServer the MbeanServer where will be register the mbeans
+     */
+    private static MBeanServer getServer() {
+        MBeanServer mbserver = null;
+
+        ArrayList mbservers = MBeanServerFactory.findMBeanServer(null);
+
+        if (mbservers.size() > 0) {
+            mbserver = (MBeanServer) mbservers.get(0);
+        }
+
+        return mbserver;
+    }
 
 	private void setAdminEJB() {
 
@@ -73,6 +99,7 @@ public class Admin {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+
 		}
 
 	}
@@ -420,6 +447,7 @@ public class Admin {
 		return fileName;
 	}
 
+
 	public int importRegistered(final String fileName) {
 		setAdminEJB();
 		int ret;
@@ -430,5 +458,41 @@ public class Admin {
 			throw new FlexException(e.getMessage());
 		}
 		return ret;
+	}
+
+	// for management
+	public String exportRegisteredAsFileName4MBean() {
+
+		ClassLoader cls = this.getClass().getClassLoader();
+
+		ClassLoader old = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(cls);
+
+		try {
+			return exportRegisteredAsFileName(null);
+		} catch (FlexException e) {
+			e.printStackTrace();
+		} finally {
+			Thread.currentThread().setContextClassLoader(old);
+
+		}
+		return null;
+	}
+
+	public int importRegistered4MBean(final String fileName) {
+		ClassLoader cls = this.getClass().getClassLoader();
+
+		ClassLoader old = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(cls);
+
+		try {
+			return importRegistered(fileName);
+		} catch (FlexException e) {
+			e.printStackTrace();
+		} finally {
+			Thread.currentThread().setContextClassLoader(old);
+
+		}
+		return -1;
 	}
 }
