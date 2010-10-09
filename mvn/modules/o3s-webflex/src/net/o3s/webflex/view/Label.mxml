@@ -306,7 +306,7 @@
 
 
             // Change the import button label back
-            importFileButton.label = "Import Data File";
+            importFileButton.label = "Charger inscriptions depuis CSV";
 
             //progressBar.visible = false;
 
