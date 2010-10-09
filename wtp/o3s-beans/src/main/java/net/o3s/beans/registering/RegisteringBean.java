@@ -1292,10 +1292,16 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     			logger.log(Level.FINE, "creation <" + person + ">");
 
     		} catch (AlreadyExistException e) {
-    			logger.log(Level.WARNING, "La personne <" + person + "> existe deja -> update");
 
     			// if exists, update it
         		pClone = findPersonFromLastnameFirstNameBirthDay(person.getLastname(), person.getFirstname(), person.getBirthday());
+    			IEntityRegistered rClone = findRegisteredFromPersonForDefaultEvent(pClone.getId());
+    			if ( rClone != null) {
+            			throw new AlreadyExistException("L'inscrit <" + name + "> existe deja !" + rClone);
+    			}
+
+    			logger.log(Level.WARNING, "La personne <" + person + "> existe deja -> update");
+
         		pClone.setLastname(person.getLastname());
         		pClone.setFirstname(person.getFirstname());
         		pClone.setBirthday(person.getBirthday());
@@ -1307,10 +1313,6 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     		}
     		persistedPersonsList.add(pClone) ;
 
-    		IEntityRegistered rClone = findRegisteredFromPersonForDefaultEvent(person.getId());
-    		if ( rClone != null) {
-            	throw new AlreadyExistException("L'inscrit <" + name + "> existe deja !" + rClone);
-    		}
     	}
 
     	// reach this point means that none person is already registered !
