@@ -770,10 +770,10 @@
                   <mx:DataGridColumn headerText="CM" labelFunction="Util.displayProvidedHealthForm" showDataTips="true" width="30"/>
                   <mx:DataGridColumn headerText="Origine" dataField="source" showDataTips="true" width="50"/>
                   <mx:DataGridColumn headerText="Club" dataField="club" showDataTips="true" width="100"/>
-						<mx:DataGridColumn headerText="Date inscription" dataField="registeringDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
-						<mx:DataGridColumn headerText="Date arrivee" dataField="arrivalDate" showDataTips="true" width="120" labelFunction="Util.getDateLabel"/>
-						<mx:DataGridColumn headerText="Temps" dataField="elapsedTime" showDataTips="true" width="80" labelFunction="Util.getElapsedTimeLabel"/>
-						<mx:DataGridColumn width="150" headerText="Actions"
+						<mx:DataGridColumn headerText="Date inscription" dataField="registeringDate" showDataTips="true" width="100" labelFunction="Util.getDateLabel"/>
+						<mx:DataGridColumn headerText="Date arrivee" dataField="arrivalDate" showDataTips="true" width="100" labelFunction="Util.getDateLabel"/>
+						<mx:DataGridColumn headerText="Temps" dataField="elapsedTime" showDataTips="true" width="70" labelFunction="Util.getElapsedTimeLabel"/>
+						<mx:DataGridColumn width="130" headerText="Actions"
 										   itemRenderer="net.o3s.webflex.components.ActionLabelDataGridColumnItemRenderer" />
 					</mx:columns>
 				</mx:DataGrid>

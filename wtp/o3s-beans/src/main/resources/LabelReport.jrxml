@@ -256,6 +256,20 @@
 			<rectangle>
 				<reportElement mode="Transparent" x="59" y="246" width="212" height="20"/>
 			</rectangle>
+			<staticText>
+				<reportElement x="101" y="291" width="313" height="36"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[J'accepte le règlement de course des Foulées Nature de Saint Etienne de Crossey.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="118" y="327" width="73" height="36"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Signature :]]></text>
+			</staticText>
 		</band>
 	</title>
 	<pageHeader>

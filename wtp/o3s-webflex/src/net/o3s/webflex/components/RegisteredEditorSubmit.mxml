@@ -51,6 +51,7 @@
             else {
                this.parentDocument.paid=false;
             }
+	    this.parentDocument.notifyChangeFromChildComponent();
      }
 
      // print dialog is asked ?
@@ -62,6 +63,7 @@
             else {
                this.parentDocument.providedHealthForm=false;
             }
+	    this.parentDocument.notifyChangeFromChildComponent();
      }
 
       public function clearAll():void {
