@@ -63,6 +63,9 @@ public class Tracking {
 
 		try {
 			dateCreation = tracking.createEvent(origin, labelValue, TrackingMessage.EVENT_INT_TYPE_ARRIVAL);
+			System.out.print("\0007");
+   	        System.out.flush();
+
 		} catch (TrackingMessageException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -80,6 +83,9 @@ public class Tracking {
 
 		try {
 			dateCreation = tracking.createEvent(origin, labelValue, TrackingMessage.EVENT_INT_TYPE_ARRIVAL, date);
+			System.out.print("\0007");
+   	        System.out.flush();
+
 		} catch (TrackingMessageException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
