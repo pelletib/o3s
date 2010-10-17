@@ -279,7 +279,15 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      */
     private IEntityLabel createLabel(IEntityCompetition competition, String labelValue) throws AlreadyExistException, RegisteringException {
 
-    	int labelNumber = Integer.parseInt(labelValue.substring(0, 4));
+    	int labelNumber = 0;
+
+    	// label format is DDDDCCC with d:digit
+    	try {
+    		labelNumber= Integer.parseInt(labelValue.substring(0, labelValue.length() - 3));
+        } catch (NumberFormatException ne1) {
+        		throw new RegisteringException(ne1.getMessage());
+        }
+
     	IEntityLabel label = findLabelFromNumber(labelNumber);
 
     	if (label != null) {
@@ -1017,7 +1025,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	for (IEntityPerson person : persons) {
 
            	if (!isTeamed) {
-           		registeredName = person.getFirstname() + " " + person.getLastname();
+           		registeredName = person.getLastname() + " " + person.getFirstname();
            	} else {
            		if (name == null || name.equals("") == true ) {
                 	throw new RegisteringException("Ce nom n'est pas valide !");
@@ -1180,7 +1188,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
          	for (IEntityPerson person : persons) {
                	if (!isTeamed) {
-               		registeredName = person.getFirstname() + " " + person.getLastname();
+               		registeredName = person.getLastname() + " " + person.getFirstname();
 
                	} else {
                		if (name == null || name.equals("") == true ) {
@@ -1280,6 +1288,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
     	if (registered != null) {
         	throw new AlreadyExistException("L'inscrit <" + name + "> avec le dossard <" + labelValue + "> existe deja !" + registered);
+    	}
+
+    	if (competition == null) {
+        	throw new RegisteringException("Competition inconnue pour le dossard : "  + labelValue);
     	}
 
     	// At first check if the persons are not registered yet

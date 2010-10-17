@@ -670,7 +670,7 @@
                      id="B_getRankingOnline"
                      label="Récupérer les résultats en ligne"
                      click="getOnlineRanking(event);"
-                     enabled="{submitButtonGetRankingPDFEnabled}"
+                     enabled="{submitButtonGetRankingOnlineEnabled}"
                      />
 
                   <mx:Button
