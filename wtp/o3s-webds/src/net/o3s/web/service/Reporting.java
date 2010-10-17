@@ -29,7 +29,11 @@ import java.util.List;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import net.o3s.apis.IEJBAdminRemote;
 import net.o3s.apis.IEJBReportRemote;
+import net.o3s.apis.IEntityCompetition;
+import net.o3s.apis.IEntityEvent;
+import net.o3s.apis.ReportException;
 import net.o3s.web.vo.CategoryVO;
 import net.o3s.web.vo.FlexException;
 
@@ -39,7 +43,24 @@ public class Reporting {
 	//@EJB
 	private IEJBReportRemote report;
 
+	//@EJB
+	private IEJBAdminRemote admin;
 
+	private void setAdminEJB() {
+
+		InitialContext context=null;
+
+		if (admin == null) {
+			try {
+				context = new InitialContext();
+				admin = (IEJBAdminRemote) context.lookup("net.o3s.beans.admin.AdminBean_net.o3s.apis.IEJBAdminRemote@Remote");
+
+			} catch (NamingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
 	private void setReportEJB() {
 
 		InitialContext context=null;
@@ -73,7 +94,7 @@ public class Reporting {
 		setReportEJB();
 		String fileName = null;
 		try  {
-			fileName = report.getCategoryRankingPdfAsFileName(competitionId);
+			fileName = report.getCategoryRankingPdfAsFileName(competitionId, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
@@ -85,7 +106,7 @@ public class Reporting {
 		setReportEJB();
 		String fileName = null;
 		try  {
-			fileName = report.getCategoryRankingCsvAsFileName(competitionId);
+			fileName = report.getCategoryRankingCsvAsFileName(competitionId, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
@@ -97,7 +118,7 @@ public class Reporting {
 		setReportEJB();
 		String fileName = null;
 		try  {
-			fileName = report.getClubRankingPdfAsFileName(competitionId);
+			fileName = report.getClubRankingPdfAsFileName(competitionId, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
@@ -109,7 +130,7 @@ public class Reporting {
 		setReportEJB();
 		String fileName = null;
 		try  {
-			fileName = report.getClubRankingCsvAsFileName(competitionId);
+			fileName = report.getClubRankingCsvAsFileName(competitionId, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
@@ -121,7 +142,7 @@ public class Reporting {
 		setReportEJB();
 		String fileName = null;
 		try  {
-			fileName = report.getScratchRankingPdfAsFileName(competitionId);
+			fileName = report.getScratchRankingPdfAsFileName(competitionId, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
@@ -133,7 +154,7 @@ public class Reporting {
 		setReportEJB();
 		String fileName = null;
 		try  {
-			fileName = report.getScratchRankingCsvAsFileName(competitionId);
+			fileName = report.getScratchRankingCsvAsFileName(competitionId, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FlexException(e.getMessage());
@@ -188,4 +209,39 @@ public class Reporting {
 			throw new FlexException(e.getMessage() + cause);
 		}
 	}
+
+	public String getAll(final int eventId) {
+
+		setAdminEJB();
+		setReportEJB();
+
+    	List<IEntityCompetition> competitions = admin.findAllCompetitionsFromEvent(eventId);
+
+    	String ret = "";
+
+    	for (IEntityCompetition competition:competitions) {
+
+    		try {
+    			if (report.isNotEmptyScratchRanking(competition.getId())) {
+
+					ret += report.getCategoryRankingPdfAsFileName(competition.getId(),true) + "\n";
+					ret += report.getCategoryRankingCsvAsFileName(competition.getId(),true) + "\n";
+					ret += report.getScratchRankingCsvAsFileName(competition.getId(),true) + "\n";
+					ret += report.getScratchRankingPdfAsFileName(competition.getId(),true) + "\n";
+    			}
+
+    			if (report.isNotEmptyClubRanking(competition.getId())) {
+    				ret += report.getClubRankingCsvAsFileName(competition.getId(),true) + "\n";
+    				ret += report.getClubRankingPdfAsFileName(competition.getId(),true) + "\n";
+    			}
+
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    			throw new FlexException(e.getMessage());
+    		}
+    	}
+
+    	return ret;
+	}
 }
+

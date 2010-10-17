@@ -541,6 +541,10 @@
 
          }
 
+         private function generateAll(event:Event):void {
+            RO_reporting.getAll(selectedEvent.id);
+         }
+
          private function generateRankingCsv(event:Event):void {
            this.resultOnServer = true;
            this.rankingType = "CSV";
@@ -631,6 +635,7 @@
       <mx:method name="getClubRankingCsvAsFileName" result="resultGetRankingAsFileName(event)"/>
       <mx:method name="getScratchRankingPdfAsFileName" result="resultGetRankingAsFileName(event)"/>
       <mx:method name="getScratchRankingCsvAsFileName" result="resultGetRankingAsFileName(event)"/>
+      <mx:method name="getAll" result="resultGetRankingAsFileName(event)"/>
    </mx:RemoteObject>
 
    <mx:RemoteObject id="RO_registering" destination="registering" showBusyCursor="true" fault="onFault(event)">
@@ -691,6 +696,13 @@
                      label="Generer le csv sur le serveur"
                      click="generateRankingCsv(event);"
                      enabled="{submitButtonGenerateRankingCsvEnabled}"
+                     />
+
+                  <mx:Button
+                     id="B_generateAll"
+                     label="Generer tout sur le serveur"
+                     click="generateAll(event);"
+                     enabled="true"
                      />
 
                   <mx:Button

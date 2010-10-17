@@ -24,6 +24,7 @@
 package net.o3s.beans.report;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
@@ -378,13 +379,34 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
     }
 
     /**
+     * Build directory name according event name & competition name
+     * @param eventName
+     * @param competitionName
+     * @return
+     */
+    private String buildDirectoryName(final String eventName, final String competitionName) {
+    		String dirName = eventName + File.separator + competitionName;
+    		dirName = dirName.replace(' ', '_');
+    		File dirFile = new File(dirName);
+    		try {
+    		if (!dirFile.exists()) {
+    			dirFile.mkdirs();
+    		}
+    		} catch (Exception e) {
+    			logger.severe("Exception - " + e.getMessage());
+    		}
+    		return dirName;
+
+    }
+
+    /**
      * Generate a pdf report for the scratch ranking
      * @param competitionId competition id
 	 * @return file name
      * @throws ReportException whenever an error occurs (compile, ...)
      */
     @SuppressWarnings("unchecked")
-	public String getScratchRankingPdfAsFileName(final int competitionId) throws ReportException {
+	public String getScratchRankingPdfAsFileName(final int competitionId, final boolean inDirectory) throws ReportException {
 
     	IEntityCompetition competition = null;
 
@@ -418,6 +440,10 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
         String pdfFileName = buildScratchPdfFileName(competitionId);
 
+        if (inDirectory) {
+        	pdfFileName = buildDirectoryName(competition.getEvent().getName(), competition.getName()) + File.separator + pdfFileName;
+        }
+
 		invokeJasperReportPdf(sourceFileName, pdfFileName, parameters, registereds);
 
         return pdfFileName;
@@ -430,7 +456,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
      * @throws ReportException whenever an error occurs (compile, ...)
      */
     @SuppressWarnings("unchecked")
-	public String getScratchRankingCsvAsFileName(final int competitionId) throws ReportException {
+	public String getScratchRankingCsvAsFileName(final int competitionId, final boolean inDirectory) throws ReportException {
 
     	IEntityCompetition competition = null;
 
@@ -462,6 +488,10 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		logger.fine("eventName=" + competition.getEvent().getName());
 		String sourceFileName = SCRATCH_RANKING_REPORT + ".jrxml";
         String csvFileName = buildScratchCsvFileName(competitionId);
+
+        if (inDirectory) {
+        	csvFileName = buildDirectoryName(competition.getEvent().getName(), competition.getName()) + File.separator + csvFileName;
+        }
 
 		invokeJasperReportCsv(sourceFileName, csvFileName, parameters, registereds);
 
@@ -785,7 +815,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
      * @throws ReportException whenever an error occurs (compile, ...)
      */
     @SuppressWarnings("unchecked")
-	public String getCategoryRankingPdfAsFileName(final int competitionId) throws ReportException {
+	public String getCategoryRankingPdfAsFileName(final int competitionId, final boolean inDirectory) throws ReportException {
 
     	IEntityCompetition competition = null;
 
@@ -819,6 +849,11 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
         String pdfFileName = buildCategoryPdfFileName(competitionId);
 
+        if (inDirectory) {
+        	pdfFileName = buildDirectoryName(competition.getEvent().getName(), competition.getName()) + File.separator + pdfFileName;
+        }
+
+
 		invokeJasperReportPdf(sourceFileName, pdfFileName, parameters, registereds);
 
         return pdfFileName;
@@ -831,7 +866,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
      * @throws ReportException whenever an error occurs (compile, ...)
      */
     @SuppressWarnings("unchecked")
-	public String getCategoryRankingCsvAsFileName(final int competitionId) throws ReportException {
+	public String getCategoryRankingCsvAsFileName(final int competitionId, final boolean inDirectory) throws ReportException {
 
     	IEntityCompetition competition = null;
 
@@ -865,6 +900,10 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
         String csvFileName = buildCategoryCsvFileName(competitionId);
 
+        if (inDirectory) {
+        	csvFileName = buildDirectoryName(competition.getEvent().getName(), competition.getName()) + File.separator + csvFileName;
+        }
+
 		invokeJasperReportCsv(sourceFileName, csvFileName, parameters, registereds);
 
         return csvFileName;
@@ -877,7 +916,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
      * @throws ReportException whenever an error occurs (compile, ...)
      */
     @SuppressWarnings("unchecked")
-	public String getClubRankingPdfAsFileName(final int competitionId) throws ReportException {
+	public String getClubRankingPdfAsFileName(final int competitionId, final boolean inDirectory) throws ReportException {
 
     	IEntityCompetition competition = null;
 
@@ -911,6 +950,11 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
         String pdfFileName = buildClubPdfFileName(competitionId);
 
+        if (inDirectory) {
+        	pdfFileName = buildDirectoryName(competition.getEvent().getName(), competition.getName()) + File.separator + pdfFileName;
+        }
+
+
 		invokeJasperReportPdf(sourceFileName, pdfFileName, parameters, registereds);
 
         return pdfFileName;
@@ -923,7 +967,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
      * @throws ReportException whenever an error occurs (compile, ...)
      */
     @SuppressWarnings("unchecked")
-	public String getClubRankingCsvAsFileName(final int competitionId) throws ReportException {
+	public String getClubRankingCsvAsFileName(final int competitionId, final boolean inDirectory) throws ReportException {
 
     	IEntityCompetition competition = null;
 
@@ -956,6 +1000,9 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 		String sourceFileName = CLUB_RANKING_REPORT + ".jrxml";
 
         String csvFileName = buildClubCsvFileName(competitionId);
+        if (inDirectory) {
+        	csvFileName = buildDirectoryName(competition.getEvent().getName(), competition.getName()) + File.separator + csvFileName;
+        }
 
 		invokeJasperReportCsv(sourceFileName, csvFileName, parameters, registereds);
 

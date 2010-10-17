@@ -242,14 +242,14 @@ public class Main {
         }
 
         try {
-			report.getScratchRankingPdfAsFileName(competition1.getId());
+			report.getScratchRankingPdfAsFileName(competition1.getId(), false);
 		} catch (ReportException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
         try {
-			report.getCategoryRankingPdfAsFileName(competition1.getId());
+			report.getCategoryRankingPdfAsFileName(competition1.getId(), false);
 		} catch (ReportException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

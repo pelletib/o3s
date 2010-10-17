@@ -29,24 +29,24 @@ import java.util.List;
 
 public interface IEJBReportLocal {
 
-	String getScratchRankingPdfAsFileName(final int competitionId) throws ReportException ;
-	String getScratchRankingCsvAsFileName(final int competitionId) throws ReportException ;
+	String getScratchRankingPdfAsFileName(final int competitionId,final boolean inDirectory) throws ReportException ;
+	String getScratchRankingCsvAsFileName(final int competitionId,final boolean inDirectory) throws ReportException ;
 	byte[] getScratchRankingPdfAsByteArray(final int competitionId) throws ReportException;
 	void getScratchRankingPdfAsByteArray(final int competitionId, final OutputStream outputStream) throws ReportException;
 	String buildScratchPdfFileName(final int competitionId)  throws ReportException;
 	String buildScratchCsvFileName(final int competitionId)  throws ReportException;
 	Boolean isNotEmptyScratchRanking(final int competitionId);
 
-	String getCategoryRankingPdfAsFileName(final int competitionId) throws ReportException;
-	String getCategoryRankingCsvAsFileName(final int competitionId) throws ReportException;
+	String getCategoryRankingPdfAsFileName(final int competitionId,final boolean inDirectory) throws ReportException;
+	String getCategoryRankingCsvAsFileName(final int competitionId,final boolean inDirectory) throws ReportException;
 	void getCategoryRankingPdfAsByteArray(final int competitionId,  List<Integer> categoriesId, final OutputStream outputStream)  throws ReportException;
 	byte[] getCategoryRankingPdfAsByteArray(final int competitionId, List<Integer> categoriesId) throws ReportException;
 	String buildCategoryPdfFileName(final int competitionId)  throws ReportException;
 	String buildCategoryCsvFileName(final int competitionId)  throws ReportException;
 	Boolean isNotEmptyCategoryRanking(final int competitionId, List<Integer> categoriesId);
 
-	String getClubRankingPdfAsFileName(final int competitionId) throws ReportException;
-	String getClubRankingCsvAsFileName(final int competitionId) throws ReportException;
+	String getClubRankingPdfAsFileName(final int competitionId,final boolean inDirectory) throws ReportException;
+	String getClubRankingCsvAsFileName(final int competitionId,final boolean inDirectory) throws ReportException;
 	void getClubRankingPdfAsByteArray(final int competitionId, final OutputStream outputStream)  throws ReportException;
 	byte[] getClubRankingPdfAsByteArray(final int competitionId) throws ReportException;
 	String buildClubPdfFileName(final int competitionId)  throws ReportException;
