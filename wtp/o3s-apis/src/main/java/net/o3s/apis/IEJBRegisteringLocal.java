@@ -44,6 +44,7 @@ public interface IEJBRegisteringLocal {
 	List<IEntityRegistered> findAllRegisteredFromEvent(int eventId);
 	List<IEntityRegistered> findAllRegisteredFromDefaultEventWhereRegisteringDateIsGreaterThan(Date minDate);
 	IEntityRegistered findRegisteredFromLabel(final String labelValue)  throws RegisteringException;
+	IEntityRegistered findRegisteredFromLabelNumber(final int labelNumber) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByDuration(final int competitionId) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId,  List<Integer> categoriesId) throws RegisteringException;

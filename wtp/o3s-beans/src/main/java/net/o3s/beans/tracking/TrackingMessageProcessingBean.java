@@ -39,9 +39,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import net.o3s.apis.IEJBNotificationProducerLocal;
-import net.o3s.apis.IEJBNotificationProducerRemote;
 import net.o3s.apis.IEJBRegisteringLocal;
-import net.o3s.apis.IEJBRegisteringRemote;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.NotificationMessageException;
 import net.o3s.apis.RegisteringException;
@@ -116,8 +114,17 @@ public class TrackingMessageProcessingBean implements MessageListener {
 						setRegisteringEJB();
 					}
 
-					// Find the label in the database
-					IEntityRegistered registered = registering.findRegisteredFromLabel(trackingMessage.getLabelValue());
+					String labelValue = trackingMessage.getLabelValue();
+					IEntityRegistered registered = null;
+
+					// check if numeric to select the good finder
+			    	try {
+			    		int labelNumber = Integer.parseInt(labelValue);
+			        	registered = registering.findRegisteredFromLabelNumber(labelNumber);
+			        } catch (NumberFormatException ne1) {
+			        	registered = registering.findRegisteredFromLabel(trackingMessage.getLabelValue());
+			        }
+
 					if (registered == null) {
 						throw new TrackingMessageException ("Unable to retrieve a registered related to the event:" + trackingMessage);
 					}

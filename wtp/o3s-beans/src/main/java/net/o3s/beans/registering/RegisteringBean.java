@@ -644,6 +644,32 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     }
 
     /**
+     * Get registered from labelNumber
+     */
+    public IEntityRegistered findRegisteredFromLabelNumber(final int labelNumber) throws RegisteringException {
+        Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_LABELNUMBER");
+        query.setParameter("VALUE", labelNumber);
+
+        IEntityRegistered registered = null;
+        try {
+
+        	registered = (IEntityRegistered) query.getSingleResult();
+        } catch (javax.persistence.NoResultException nre) {
+
+        } catch (NonUniqueResultException nure) {
+        	nure.printStackTrace();
+        	throw new RegisteringException("Impossible de trouver ce dossard [" + labelNumber + "]", nure);
+        } catch (Exception e){
+        	e.printStackTrace();
+        	throw new RegisteringException("Impossible de trouver ce dossard [" + labelNumber + "]", e);
+
+        }
+
+        return registered;
+
+    }
+
+    /**
      * Get registered from id
      */
     public IEntityRegistered findRegisteredFromId(final int id) {
