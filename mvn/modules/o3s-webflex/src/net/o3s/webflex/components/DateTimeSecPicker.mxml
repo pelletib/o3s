@@ -59,7 +59,7 @@
 	<mx:NumericStepper id="hours" minimum="0" maximum="23" stepSize="1" change="handleChange()" valueCommit="handleChange()"
 					   textAlign="center"/>
 	<mx:Label text=":" textAlign="center"/>
-	<mx:NumericStepper id="minutes" minimum="0"  maximum="55" stepSize="1" change="handleChange()"
+	<mx:NumericStepper id="minutes" minimum="0"  maximum="59" stepSize="1" change="handleChange()"
 					   valueCommit="handleChange()" textAlign="center"/>
    <mx:NumericStepper id="seconds" minimum="0"  maximum="59" stepSize="1" change="handleChange()"
                   valueCommit="handleChange()" textAlign="center"/>
