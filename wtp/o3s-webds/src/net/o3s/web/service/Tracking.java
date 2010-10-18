@@ -62,7 +62,7 @@ public class Tracking {
 		Date dateCreation = null;
 
 		try {
-			dateCreation = tracking.createEvent(origin, labelValue, TrackingMessage.EVENT_INT_TYPE_ARRIVAL);
+			dateCreation = tracking.createEvent(origin, labelValue, TrackingMessage.EVENT_INT_TYPE_ARRIVAL_CTIME);
 			System.out.print("\0007");
    	        System.out.flush();
 
@@ -82,7 +82,7 @@ public class Tracking {
 		Date dateCreation = null;
 
 		try {
-			dateCreation = tracking.createEvent(origin, labelValue, TrackingMessage.EVENT_INT_TYPE_ARRIVAL, date);
+			dateCreation = tracking.createEvent(origin, labelValue, TrackingMessage.EVENT_INT_TYPE_ARRIVAL_CTIME, date);
 			System.out.print("\0007");
    	        System.out.flush();
 
@@ -92,6 +92,26 @@ public class Tracking {
 		}
 
 		return dateCreation;
+
+	}
+
+	public int createArrivalEventWithElapsedTime(String origin, String labelValue, int elapsedTime) {
+
+		setTrackingEJB();
+
+		int eTime = 0;
+
+		try {
+			eTime = tracking.createEvent(origin, labelValue, TrackingMessage.EVENT_INT_TYPE_ARRIVAL_ETIME, elapsedTime);
+			System.out.print("\0007");
+   	        System.out.flush();
+
+		} catch (TrackingMessageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return eTime;
 
 	}
 }

@@ -31,4 +31,5 @@ public interface IEJBEventMessageProducerLocal {
 
 	Date createEvent(String origin, String labelValue, int type) throws TrackingMessageException;
 	Date createEvent(String origin, String labelValue, int type, Date date) throws TrackingMessageException;
+	int createEvent(String origin, String labelValue, int type, int elapsedTime) throws TrackingMessageException;
 }

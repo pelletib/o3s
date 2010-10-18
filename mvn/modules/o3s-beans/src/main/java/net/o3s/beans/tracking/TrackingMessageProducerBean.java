@@ -92,6 +92,36 @@ public class TrackingMessageProducerBean implements IEJBEventMessageProducerLoca
 
     }
 
+    public int createEvent(String origin, String labelValue, int type, int elapsedTime) throws TrackingMessageException {
+
+    	try {
+        Connection connection = this.connectionFactory.createConnection();
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        MessageProducer producer = session.createProducer(this.queue);
+        TextMessage message = session.createTextMessage();
+
+        TrackingMessage event = new TrackingMessage();
+        event.setOrigin(origin);
+        event.setType(type);
+        event.setLabelValue(labelValue);
+        event.setElapsedTime(elapsedTime);
+
+        message.setText(event.toXML());
+
+        logger.log(Level.FINE,"send event :"+message.getText());
+
+        producer.send(message);
+        producer.close();
+        session.close();
+        connection.close();
+    	} catch (Exception e) {
+    		throw new TrackingMessageException("Unable to create an event [" + origin + ", " + labelValue + ", " + type + "]", e);
+    	}
+
+    	return elapsedTime;
+
+    }
+
     public Date createEvent(String origin, String labelValue, int type) throws TrackingMessageException {
     	return createEvent(origin, labelValue, type, new Date());
     }

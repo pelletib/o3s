@@ -36,7 +36,8 @@
          import mx.events.ItemClickEvent;
          import mx.rpc.events.ResultEvent;
          import mx.utils.ObjectUtil;
-    	 import mx.events.CollectionEvent;
+    	   import mx.events.CollectionEvent;
+         import net.o3s.webflex.components.Util;
 
          [Bindable]
          private var terminalList:ArrayCollection= new ArrayCollection(
@@ -52,14 +53,18 @@
          [Bindable]
          private var manualArrivalTime:Boolean = false;
 
+         private var inputIsDate:Boolean = false;
+
 		  private var labelInput:String;
 		  private var timeInput:Date;
+        private var elapsedTimeInput:Number;
 
 
          public function init():void {
             refreshAdminData();
             CB_terminal.selectedItem = -1;
             manualArrivalTime = false;
+            inputIsDate = false;
          }
 
          public function refreshAdminData():void {
@@ -87,6 +92,23 @@
 
          }
 
+         private function resultCreateArrivalEventWithElapsedTime(event:ResultEvent):void {
+
+            var elapsedTime:Number = event.result as Number;
+
+            labelList.addItem({value:TI_labelValue.text,eTime:elapsedTime});
+
+            L_processing.text = "Dossard <" + TI_labelValue.text + "> emis !" ;
+
+            TI_labelValue.text="";
+            TI_labelValue.errorString="";
+         TI_arrivalTime.text="";
+         TI_arrivalTime.errorString="";
+         timeInput=null;
+         labelInput=null;
+
+         }
+
          private function setTerminal(event:Event):void {
             terminal=event.currentTarget.selectedItem.name as String;
             terminalIsEmpty = false;
@@ -106,6 +128,15 @@
 			  }
 		  }
 
+        private function modifyTimeTypeArrivalTime(event:ItemClickEvent):void {
+           if (event.currentTarget.selectedValue == "date") {
+              inputIsDate=true;
+           }
+           else {
+              inputIsDate=false;
+           }
+        }
+
 
 		  private function sendEvent(event:Event):void {
 			  if (manualArrivalTime == false) {
@@ -116,12 +147,23 @@
 					  Alert.show("Champ vide","Erreur");
 				  }
 			  } else {
-				  if (labelInput != null && labelInput != "" && timeInput != null) {
-					  L_processing.text = "Dossard <" + labelInput + "> lu" ;
-					  RO_tracking.createArrivalEvent(terminal,labelInput,timeInput);
-				  } else {
-					  Alert.show("Champ vide","Erreur");
-				  }
+
+               if (inputIsDate == true) {
+                  if (labelInput != null && labelInput != "" && timeInput != null) {
+                     L_processing.text = "Dossard <" + labelInput + "> lu" ;
+                     RO_tracking.createArrivalEvent(terminal,labelInput,timeInput);
+                  } else {
+                     Alert.show("Champ vide","Erreur");
+                  }
+               } else {
+                  if (labelInput != null && labelInput != "" && elapsedTimeInput > 0) {
+                     L_processing.text = "Dossard <" + labelInput + "> lu" ;
+                     RO_tracking.createArrivalEventWithElapsedTime(terminal,labelInput,elapsedTimeInput);
+                  } else {
+                     Alert.show("Champ vide","Erreur");
+                  }
+               }
+
 			  }
 
 		  }
@@ -140,7 +182,6 @@
 
 		  private function setArrivalTime(event:Event):void {
             var dateStr:String=TI_arrivalTime.text;
-            var dateValue:Date = new Date();
             var dateArray:Array = dateStr.split(":");
 
 			if (dateArray.length != 3 ) {
@@ -162,8 +203,21 @@
 				if (s < 0 || s > 59) {
 					handleBadFormatArrivalTime();
 				}
-				dateValue.setHours(dateArray[0], dateArray[1], dateArray[2]);
-				timeInput = dateValue;
+            if (inputIsDate == true) {
+              var dateValue:Date = new Date();
+				  dateValue.setHours(dateArray[0], dateArray[1], dateArray[2]);
+              timeInput = dateValue;
+            } else {
+               var d1:Date = new Date();
+               var d2:Date = ObjectUtil.copy(d1) as Date;
+               d1.setHours(0, 0, 0);
+               d2.setHours(dateArray[0], dateArray[1], dateArray[2]);
+               elapsedTimeInput = d2.getTime() - d1.getTime();
+
+              // Alert.show("d1=" + d1 + "\n" + "d2=" + d2 + "\n" + "elapsedTimeInput=" + elapsedTimeInput,"Erreur");
+
+            }
+
 			}
 		 }
 
@@ -187,6 +241,7 @@
 
    <mx:RemoteObject id="RO_tracking" destination="tracking" showBusyCursor="true" fault="onFault(event)">
      <mx:method name="createArrivalEvent" result="resultCreateArrivalEvent(event)"/>
+     <mx:method name="createArrivalEventWithElapsedTime" result="resultCreateArrivalEventWithElapsedTime(event)"/>
    </mx:RemoteObject>
 
 	<mx:ArrayCollection id="labelList"
@@ -215,6 +270,9 @@
                   <mx:TextInput id="TI_labelValue" width="150" enter="setLabelValue(event);sendEvent(event);" focusOut="setLabelValue(event);"/>
                </mx:FormItem>
                 <mx:FormItem label="Heure d'arrivee (HH:MM:SS)" visible="{manualArrivalTime}" >
+                  <mx:RadioButtonGroup id="timetype" selectedValue="date"  itemClick="modifyTimeTypeArrivalTime(event);"/>
+                  <mx:RadioButton groupName="timetype" id="RB_date" label="date" value="date"/>
+                  <mx:RadioButton groupName="timetype" id="RB_time" label="temps ecoule" value="time"/>
                   <mx:TextInput id="TI_arrivalTime" width="150" enter="setArrivalTime(event);sendEvent(event);" focusOut="setArrivalTime(event);"/>
                </mx:FormItem>
             </mx:Form>
@@ -232,6 +290,7 @@
                <mx:columns>
                   <mx:DataGridColumn headerText="Value" dataField="value" width="100"/>
                   <mx:DataGridColumn headerText="Date" dataField="creationDate" width="150" labelFunction="getDateLabel"/>
+                  <mx:DataGridColumn headerText="Temps" dataField="eTime" width="150" labelFunction="Util.getElapsedTimeLabel"/>
                </mx:columns>
 
             </mx:DataGrid>

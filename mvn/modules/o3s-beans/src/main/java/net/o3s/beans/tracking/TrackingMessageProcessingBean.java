@@ -23,6 +23,7 @@
  */
 package net.o3s.beans.tracking;
 
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -108,7 +109,7 @@ public class TrackingMessageProcessingBean implements MessageListener {
 				trackingMessage.parseXml(text.getText());
 				logger.fine("Received Message: " + text.getText());
 
-				if (trackingMessage.getType() == TrackingMessage.EVENT_INT_TYPE_ARRIVAL) {
+				if (trackingMessage.getType() == TrackingMessage.EVENT_INT_TYPE_ARRIVAL_CTIME) {
 
 					if (registering == null) {
 						setRegisteringEJB();
@@ -131,6 +132,54 @@ public class TrackingMessageProcessingBean implements MessageListener {
 
 					try {
 						registering.updateArrivalDateRegistered(registered.getId(), trackingMessage.getCreationTime());
+					} catch (RegisteringException e) {
+						throw new TrackingMessageException("Impossible de traiter le message <" + trackingMessage +"> - ", e);
+					}
+
+		            logger.fine("Update:" + registered);
+
+
+					if (notification == null) {
+						setNotificationEJB();
+					}
+
+		            try {
+		            	notification.sendArrivalNotification(registered);
+					} catch (NotificationMessageException e) {
+						logger.severe("Unable to send a notification :" + e.getMessage());
+					}
+
+				}
+
+				if (trackingMessage.getType() == TrackingMessage.EVENT_INT_TYPE_ARRIVAL_ETIME) {
+
+					if (registering == null) {
+						setRegisteringEJB();
+					}
+
+					String labelValue = trackingMessage.getLabelValue();
+					IEntityRegistered registered = null;
+
+					// check if numeric to select the good finder
+			    	try {
+			    		int labelNumber = Integer.parseInt(labelValue);
+			        	registered = registering.findRegisteredFromLabelNumber(labelNumber);
+			        } catch (NumberFormatException ne1) {
+			        	registered = registering.findRegisteredFromLabel(trackingMessage.getLabelValue());
+			        }
+
+					if (registered == null) {
+						throw new TrackingMessageException ("Unable to retrieve a registered related to the event:" + trackingMessage);
+					}
+
+					// compute arrival date
+					if (registered.getCompetition().getStartingDate() == null) {
+						throw new TrackingMessageException ("Competition not started:" + registered.getCompetition().getName());
+					}
+					Date arrivalDate = new Date(registered.getCompetition().getStartingDate().getTime() + trackingMessage.getElapsedTime());
+
+					try {
+						registering.updateArrivalDateRegistered(registered.getId(), arrivalDate);
 					} catch (RegisteringException e) {
 						throw new TrackingMessageException("Impossible de traiter le message <" + trackingMessage +"> - ", e);
 					}

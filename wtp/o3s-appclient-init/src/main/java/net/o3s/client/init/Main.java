@@ -209,7 +209,7 @@ public class Main {
 			while (! vregistered.isEmpty()) {
 				int index = randomGenerator.nextInt(vregistered.size());
 				Date d = new Date(System.currentTimeMillis() + duration[count]);
-				tracking.createEvent("Arrivee1", vregistered.get(index).getLabel().getValue(), TrackingMessage.EVENT_INT_TYPE_ARRIVAL, d);
+				tracking.createEvent("Arrivee1", vregistered.get(index).getLabel().getValue(), TrackingMessage.EVENT_INT_TYPE_ARRIVAL_CTIME, d);
 				logger.fine("ARRIVAL Label [" + vregistered.get(index).getLabel().getValue() + "] - duration=" + duration[count] + " Date ~" + d);
 				vregistered.removeElementAt(index);
 				count++;

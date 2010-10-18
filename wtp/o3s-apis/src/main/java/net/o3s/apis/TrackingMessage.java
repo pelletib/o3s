@@ -105,6 +105,7 @@ public class TrackingMessage implements Serializable {
 		private Vector<MyElement> vector = new Vector<MyElement>();
 		public static final String EVENT_XML_ELEMENT_LABEL = "label";
 		public static final String EVENT_XML_ELEMENT_CTIME = "creationTime";
+		public static final String EVENT_XML_ELEMENT_ETIME = "elapsedTime";
 		public static final String EVENT_XML_ELEMENT_ORIGIN = "origin";
 		public static final String EVENT_XML_ELEMENT_TYPE = "type";
 
@@ -144,12 +145,16 @@ public class TrackingMessage implements Serializable {
 
 	}
 
-	public static final int EVENT_INT_TYPE_ARRIVAL = 0;
-	public static final String EVENT_STR_TYPE_ARRIVAL = "Arrival";
+	public static final int EVENT_INT_TYPE_ARRIVAL_CTIME = 0;
+	public static final String EVENT_STR_TYPE_ARRIVAL_CTIME = "ArrivalByCreationTime";
+	public static final int EVENT_INT_TYPE_ARRIVAL_ETIME = 1;
+	public static final String EVENT_STR_TYPE_ARRIVAL_ETIME = "ArrivalByElapsedTime";
 
 	private String labelValue;
 
 	private Date creationTime;
+
+	private int elapsedTime;
 
 	// where the event comes from
 	private String origin;
@@ -168,6 +173,14 @@ public class TrackingMessage implements Serializable {
 
 	public void setLabelValue(String labelValue) {
 		this.labelValue = labelValue;
+	}
+
+	public int getElapsedTime() {
+		return elapsedTime;
+	}
+
+	public void setElapsedTime(int elapsedTime) {
+		this.elapsedTime = elapsedTime;
 	}
 
 	public Date getCreationTime() {
@@ -200,6 +213,7 @@ public class TrackingMessage implements Serializable {
 		        this.getLabelValue() + ", " +
 		        this.getOrigin() + ", " +
 		        this.getCreationTime2String() + ", " +
+		        this.getElapsedTime() + ", " +
 		        "]";
 	}
 
@@ -208,9 +222,14 @@ public class TrackingMessage implements Serializable {
 		String xml = "<event>" + "\n" +
 		             "  <" + EventXmlHandler.EVENT_XML_ELEMENT_LABEL + ">" + this.getLabelValue().trim() + "</" + EventXmlHandler.EVENT_XML_ELEMENT_LABEL + ">" + "\n" +
 		             "  <" + EventXmlHandler.EVENT_XML_ELEMENT_ORIGIN + ">" + this.getOrigin().trim() + "</" + EventXmlHandler.EVENT_XML_ELEMENT_ORIGIN + ">" + "\n" +
-		             "  <" + EventXmlHandler.EVENT_XML_ELEMENT_TYPE + ">" + this.getType2String().trim() + "</" + EventXmlHandler.EVENT_XML_ELEMENT_TYPE + ">" + "\n" +
-		             "  <" + EventXmlHandler.EVENT_XML_ELEMENT_CTIME + ">" + this.getCreationTime2String().trim() + "</" + EventXmlHandler.EVENT_XML_ELEMENT_CTIME + ">" + "\n" +
-		             "</event>";
+		             "  <" + EventXmlHandler.EVENT_XML_ELEMENT_TYPE + ">" + this.getType2String().trim() + "</" + EventXmlHandler.EVENT_XML_ELEMENT_TYPE + ">" + "\n";
+		if (this.getCreationTime() != null) {
+			xml += "  <" + EventXmlHandler.EVENT_XML_ELEMENT_CTIME + ">" + this.getCreationTime2String().trim() + "</" + EventXmlHandler.EVENT_XML_ELEMENT_CTIME + ">" + "\n";
+		}
+		if (this.getElapsedTime() > 0) {
+			xml += "  <" + EventXmlHandler.EVENT_XML_ELEMENT_ETIME + ">" + this.getElapsedTime() + "</" + EventXmlHandler.EVENT_XML_ELEMENT_ETIME + ">" + "\n";
+		}
+		xml += "</event>";
 		return xml;
 
 	}
@@ -219,7 +238,11 @@ public class TrackingMessage implements Serializable {
 
 		try {
 			DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
-			return df.format(this.getCreationTime());
+			if (this.getCreationTime() != null) {
+				return df.format(this.getCreationTime());
+			} else {
+				return "";
+			}
 		} catch (Exception e) {
 			logger.severe("error parsing date - " + this.getCreationTime());
 			return "";
@@ -227,8 +250,12 @@ public class TrackingMessage implements Serializable {
 	}
 
 	private String getType2String() {
-		if (getType() == TrackingMessage.EVENT_INT_TYPE_ARRIVAL) {
-			return TrackingMessage.EVENT_STR_TYPE_ARRIVAL;
+		if (getType() == TrackingMessage.EVENT_INT_TYPE_ARRIVAL_CTIME) {
+			return TrackingMessage.EVENT_STR_TYPE_ARRIVAL_CTIME;
+		} else {
+			if (getType() == TrackingMessage.EVENT_INT_TYPE_ARRIVAL_ETIME) {
+				return TrackingMessage.EVENT_STR_TYPE_ARRIVAL_ETIME;
+			}
 		}
 		return "Unknown";
 	}
@@ -308,13 +335,28 @@ public class TrackingMessage implements Serializable {
 				}
 			}
 
+			if (myElement.getQname().equals(EventXmlHandler.EVENT_XML_ELEMENT_ETIME)) {
+
+				try {
+					this.setElapsedTime(Integer.parseInt(myElement.getValue()));
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+					throw new TrackingMessageException("Error when parsing the XML string <"
+							+ xmlString + ">", e);
+				}
+			}
+
 			if (myElement.getQname().equals(EventXmlHandler.EVENT_XML_ELEMENT_ORIGIN)) {
 				this.setOrigin(myElement.getValue());
 			}
 
 			if (myElement.getQname().equals(EventXmlHandler.EVENT_XML_ELEMENT_TYPE)) {
-				if (myElement.getValue().equals(TrackingMessage.EVENT_STR_TYPE_ARRIVAL)) {
-					this.setType(TrackingMessage.EVENT_INT_TYPE_ARRIVAL);
+				if (myElement.getValue().equals(TrackingMessage.EVENT_STR_TYPE_ARRIVAL_CTIME)) {
+					this.setType(TrackingMessage.EVENT_INT_TYPE_ARRIVAL_CTIME);
+				} else {
+					if (myElement.getValue().equals(TrackingMessage.EVENT_STR_TYPE_ARRIVAL_ETIME)) {
+						this.setType(TrackingMessage.EVENT_INT_TYPE_ARRIVAL_ETIME);
+					}
 				}
 			}
 
