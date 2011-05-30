@@ -46,6 +46,7 @@ import net.o3s.apis.IEntityLabel;
 @NamedQueries( {
 	@NamedQuery(name = "LABEL_FROM_NUMBER_AND_EVENT", query = "SELECT l FROM Label l WHERE l.number = :NUMBER AND l.event.id = :EVENTID"),
 	@NamedQuery(name = "LABEL_FROM_VALUE_AND_EVENT", query = "SELECT l FROM Label l WHERE l.event.id = :EVENTID AND l.value LIKE :VALUE"),
+	@NamedQuery(name = "LABEL_FROM_RFID_AND_EVENT", query = "SELECT l FROM Label l WHERE l.event.id = :EVENTID AND l.rfid LIKE :RFID"),
 	@NamedQuery(name = "ALL_LABELS", query = "SELECT l FROM Label l") })
 public class Label implements IEntityLabel, Serializable {
 
@@ -54,6 +55,7 @@ public class Label implements IEntityLabel, Serializable {
 	private int id;
 	private int number;
 	private String value;
+	private String rfid;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH, targetEntity=Event.class)
     private IEntityEvent event;
@@ -98,7 +100,16 @@ public class Label implements IEntityLabel, Serializable {
 		        this.getId() + ", " +
 		        this.getNumber() + ", " +
 		        this.getValue() + ", " +
+		        this.getRfid() + ", " +
 		        this.getEvent() + ", " +
 		        "]";
+	}
+
+	public void setRfid(String rfid) {
+		this.rfid = rfid;
+	}
+
+	public String getRfid() {
+		return rfid;
 	}
 }

@@ -42,6 +42,7 @@ import javax.persistence.PersistenceContext;
 import net.o3s.apis.IEJBNotificationProducerLocal;
 import net.o3s.apis.IEJBRegisteringLocal;
 import net.o3s.apis.IEntityRegistered;
+import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.NotificationMessageException;
 import net.o3s.apis.RegisteringException;
 import net.o3s.apis.TrackingMessage;
@@ -97,6 +98,33 @@ public class TrackingMessageProcessingBean implements MessageListener {
 		}
 
 	}
+
+	/**
+	 * Find a registered according to a label value which can have 3 differents form (number, label string, rfid)
+	 * @param labelValue to find
+	 * @return registered
+	 * @throws TrackingMessageException if not found
+	 */
+	private IEntityRegistered findRegistered(TrackingMessage trackingMessage) throws TrackingMessageException, RegisteringException{
+
+		String labelData = trackingMessage.getLabelValue();
+		IEntityRegistered registered = null;
+
+		try {
+			registered = registering.findRegisteredFromLabelData(labelData);
+
+		} catch (RegisteringException e) {
+			throw new TrackingMessageException ("Unable to retrieve a registered related to the event:" + trackingMessage);
+		}
+
+		if (registered == null) {
+			throw new TrackingMessageException ("Unable to retrieve a registered related to the event:" + trackingMessage);
+		}
+
+		return registered;
+
+	}
+
 	/**
 	 * @see MessageListener#onMessage(Message)
 	 */
@@ -115,20 +143,7 @@ public class TrackingMessageProcessingBean implements MessageListener {
 						setRegisteringEJB();
 					}
 
-					String labelValue = trackingMessage.getLabelValue();
-					IEntityRegistered registered = null;
-
-					// check if numeric to select the good finder
-			    	try {
-			    		int labelNumber = Integer.parseInt(labelValue);
-			        	registered = registering.findRegisteredFromLabelNumber(labelNumber);
-			        } catch (NumberFormatException ne1) {
-			        	registered = registering.findRegisteredFromLabel(trackingMessage.getLabelValue());
-			        }
-
-					if (registered == null) {
-						throw new TrackingMessageException ("Unable to retrieve a registered related to the event:" + trackingMessage);
-					}
+					IEntityRegistered registered = findRegistered(trackingMessage);
 
 					try {
 						registering.updateArrivalDateRegistered(registered.getId(), trackingMessage.getCreationTime());
@@ -137,7 +152,6 @@ public class TrackingMessageProcessingBean implements MessageListener {
 					}
 
 		            logger.fine("Update:" + registered);
-
 
 					if (notification == null) {
 						setNotificationEJB();
@@ -157,20 +171,7 @@ public class TrackingMessageProcessingBean implements MessageListener {
 						setRegisteringEJB();
 					}
 
-					String labelValue = trackingMessage.getLabelValue();
-					IEntityRegistered registered = null;
-
-					// check if numeric to select the good finder
-			    	try {
-			    		int labelNumber = Integer.parseInt(labelValue);
-			        	registered = registering.findRegisteredFromLabelNumber(labelNumber);
-			        } catch (NumberFormatException ne1) {
-			        	registered = registering.findRegisteredFromLabel(trackingMessage.getLabelValue());
-			        }
-
-					if (registered == null) {
-						throw new TrackingMessageException ("Unable to retrieve a registered related to the event:" + trackingMessage);
-					}
+					IEntityRegistered registered = findRegistered(trackingMessage);
 
 					// compute arrival date
 					if (registered.getCompetition().getStartingDate() == null) {
