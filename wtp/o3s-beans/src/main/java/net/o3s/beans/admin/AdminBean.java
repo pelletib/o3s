@@ -60,6 +60,7 @@ import net.o3s.apis.IEJBRegisteringLocal;
 import net.o3s.apis.IEntityCategory;
 import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityEvent;
+import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
 import net.o3s.apis.NotificationMessageException;
@@ -877,6 +878,8 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 			writer.append(',');
 			writer.append("Label");
 			writer.append(',');
+			writer.append("Rfid");
+			writer.append(',');
 			writer.append("Teamed");
 			writer.append(',');
 			writer.append("Paid");
@@ -921,6 +924,10 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
 				// Label
 				writer.append(registered.getLabel().getValue());
+				writer.append(',');
+
+				// Rfid
+				writer.append(registered.getLabel().getRfid());
 				writer.append(',');
 
 				// isTeamed ?
@@ -1054,56 +1061,78 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 					continue;
 				}
 
-				String[] fields = line.split(",", 14);
+				String[] fields = line.split(",", 15);
+				int fieldIndex = 0;
 
 				// Get Event
-				logger.fine("  Event=" + fields[0] + "\n");
-				IEntityEvent event = findEventFromName(fields[0]);
+				logger.fine("  Event=" + fields[fieldIndex] + "\n");
+				IEntityEvent event = findEventFromName(fields[fieldIndex]);
+				fieldIndex++;
 
 				// Get Competition
-				logger.fine("  Competition=" + fields[1]);
+				logger.fine("  Competition=" + fields[fieldIndex]);
 				IEntityCompetition competition = findCompetitionFromName(
-						fields[1], event);
+						fields[fieldIndex], event);
+				fieldIndex++;
 
 				// Get Category
-				logger.fine("  Category=" + fields[2] + "\n");
-				IEntityCategory category = findCategoryFromName(fields[2],
+				logger.fine("  Category=" + fields[fieldIndex] + "\n");
+				IEntityCategory category = findCategoryFromName(fields[fieldIndex],
 						event);
+				fieldIndex++;
 
 				// Name
-				logger.fine("  Name=" + fields[3] + "\n");
-				String name = fields[3];
+				logger.fine("  Name=" + fields[fieldIndex] + "\n");
+				String name = fields[fieldIndex];
+				fieldIndex++;
 
 				// RegisteringDate
-				logger.fine("  RegisteringDate=" + fields[4] + "\n");
+				logger.fine("  RegisteringDate=" + fields[fieldIndex] + "\n");
 				Date registeringDate;
 				try {
-					registeringDate = df.parse(fields[4]);
+					registeringDate = df.parse(fields[fieldIndex]);
 				} catch (ParseException e1) {
 					logger.severe(e1.getMessage());
 					continue;
 				}
+				fieldIndex++;
 
 				// Label
-				logger.fine("  labelValue=" + fields[5] + "\n");
-				String labelValue = fields[5];
+				logger.fine("  labelValue=" + fields[fieldIndex] + "\n");
+				String labelValue = fields[fieldIndex];
+				fieldIndex++;
+
+				String rfid = "";
+				if (fields.length >= 15) { // to be compliant with version wihtout rfid
+					// Rfid
+					logger.fine("  rfid=" + fields[fieldIndex] + "\n");
+					rfid = fields[fieldIndex];
+					if (! registering.isValidRfid(rfid)) {
+						logger.fine("  invalid rfid !" + "\n");
+						rfid = "";
+					}
+					fieldIndex++;
+				}
 
 				// isTeamed
-				logger.fine("  isTeamed=" + fields[6] + "\n");
-				boolean isTeamed = Boolean.parseBoolean(fields[6]);
+				logger.fine("  isTeamed=" + fields[fieldIndex] + "\n");
+				boolean isTeamed = Boolean.parseBoolean(fields[fieldIndex]);
+				fieldIndex++;
 
 				// isPaid
-				logger.fine("  isPaid=" + fields[7] + "\n");
-				boolean isPaid = Boolean.parseBoolean(fields[7]);
+				logger.fine("  isPaid=" + fields[fieldIndex] + "\n");
+				boolean isPaid = Boolean.parseBoolean(fields[fieldIndex]);
+				fieldIndex++;
 
 				// isProvidedHealth
-				logger.fine("  isProvidedHealth=" + fields[8] + "\n");
-				boolean isProvidedHealth = Boolean.parseBoolean(fields[8]);
+				logger.fine("  isProvidedHealth=" + fields[fieldIndex] + "\n");
+				boolean isProvidedHealth = Boolean.parseBoolean(fields[fieldIndex]);
+				fieldIndex++;
 
 				// Persons
-				logger.fine("  Persons=" + fields[9] + "\n");
+				logger.fine("  Persons=" + fields[fieldIndex] + "\n");
 				List<IEntityPerson> personsList = new ArrayList<IEntityPerson>();
-				String persons = fields[9];
+				String persons = fields[fieldIndex];
 				String[] personsArray = persons.split("%");
 
 				try {
@@ -1125,18 +1154,21 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 					logger.severe(e.getMessage());
 					continue;
 				}
+				fieldIndex++;
 
 				// Club
-				logger.fine("  club=" + fields[10] + "\n");
-				String club = fields[10];
+				logger.fine("  club=" + fields[fieldIndex] + "\n");
+				String club = fields[fieldIndex];
+				fieldIndex++;
 
 				// Source
-				logger.fine("  source=" + fields[11] + "\n");
-				String source = fields[11];
+				logger.fine("  source=" + fields[fieldIndex] + "\n");
+				String source = fields[fieldIndex];
+				fieldIndex++;
 
 				// ArrivalDate
-				logger.fine("  ArrivalDate=" + fields[12] + "\n");
-				String arrivalDateField = fields[12];
+				logger.fine("  ArrivalDate=" + fields[fieldIndex] + "\n");
+				String arrivalDateField = fields[fieldIndex];
 				Date arrivalDate = null;
 				if (arrivalDateField != null
 						&& !arrivalDateField.equalsIgnoreCase("")) {
@@ -1147,21 +1179,23 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 						continue;
 					}
 				}
+				fieldIndex++;
 
 				// ElapsedTime
-				logger.fine("  ElapsedTime=" + fields[13] + "\n");
-				String elapsedTimeField = fields[13];
+				logger.fine("  ElapsedTime=" + fields[fieldIndex] + "\n");
+				String elapsedTimeField = fields[fieldIndex];
 				long elapsedTime = 0;
 
 				if (elapsedTimeField != null
 						&& !elapsedTimeField.equalsIgnoreCase("")) {
 					elapsedTime = Long.parseLong(elapsedTimeField);
 				}
+				fieldIndex++;
 
 				// Import
 				try {
 					this.registering.importRegistered(event, competition,
-							category, name, registeringDate, labelValue,
+							category, name, registeringDate, labelValue, rfid,
 							isTeamed, isPaid, isProvidedHealth, personsList,
 							club, source, arrivalDate, elapsedTime);
 				} catch (AlreadyExistException e) {
@@ -1240,4 +1274,6 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     	return cloneEvent;
 
 	}
+
+
 }

@@ -100,6 +100,11 @@ package net.o3s.webflex.components
 		public static function displayLabel(item:Object, col:DataGridColumn):String {
 			return item.label.value;
 		}
+
+      public static function displayRfid(item:Object, col:DataGridColumn):String {
+         return item.label.rfid;
+      }
+
 		public static function displayTeam(item:Object, col:DataGridColumn):String	{
 			if (item.teamed == true) {
 				return "Y";

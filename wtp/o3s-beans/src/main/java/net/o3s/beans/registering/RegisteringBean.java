@@ -317,7 +317,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      * @param labelValue
      * @throws RegisteringException
      */
-    private IEntityLabel createLabel(IEntityCompetition competition, String labelValue) throws AlreadyExistException, RegisteringException {
+    private IEntityLabel createLabel(IEntityCompetition competition, String labelValue, String rfid) throws AlreadyExistException, RegisteringException {
 
     	int labelNumber = 0;
 
@@ -337,6 +337,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 		label = new Label();
 		label.setNumber(labelNumber);
 		label.setValue(labelValue);
+		label.setRfid(rfid);
     	IEntityEvent event = admin.findDefaultEvent();
     	label.setEvent(event);
 		this.entityManager.persist(label);
@@ -714,7 +715,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 	 * @param s String to check
 	 * @return true if the string is numeric
 	 */
-	public static boolean isValidRfid(String s) {
+	public boolean isValidRfid(String s) {
 		if (s == null)
 			return false;
 
@@ -1422,6 +1423,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 			final String name,
 			final Date registeringDate,
 			final String labelValue,
+			final String rfid,
 			final boolean isTeamed,
 			final boolean isPaid,
 			final boolean providedHealthForm,
@@ -1483,7 +1485,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 		registered.setName(name);
 		registered.setRegisteringDate(registeringDate);
 		registered.setPersons(new HashSet(persistedPersonsList));
-		registered.setLabel(createLabel(competition, labelValue));
+		registered.setLabel(createLabel(competition, labelValue, rfid));
 		registered.setIsPaid(isPaid);
 		registered.setIsTeamed(isTeamed);
 		registered.setProvidedHealthForm(providedHealthForm);

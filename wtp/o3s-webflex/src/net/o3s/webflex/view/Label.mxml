@@ -67,6 +67,9 @@
 			public var selectedLabelFilter:String="";
 
          [Bindable]
+         public var selectedRfidFilter:String="";
+
+         [Bindable]
          public var selectedSourceFilter:String="";
 
          [Bindable]
@@ -115,12 +118,14 @@
             selectedCompetitionFilter=null;
             selectedNameFilter="";
             selectedLabelFilter = "";
+            selectedRfidFilter = "";
             selectedSourceFilter = "";
             selectedClubFilter = "";
 
             CB_competition.selectedItem = -1;
             TI_selectedNameFilter.text="";
             TI_selectedLabelFilter.text="";
+            TI_selectedRfidFilter.text="";
             TI_selectedSourceFilter.text="";
             TI_selectedClubFilter.text="";
             refreshRegisteredData();
@@ -448,7 +453,7 @@
 
             //Alert.show("ComF=" + selectedCompetitionFilter + ", NamF=" + selectedNameFilter + ", LabF=" + selectedLabelFilter);
 
-				if (selectedCompetitionFilter != null || selectedNameFilter != "" || selectedLabelFilter != "" || selectedSourceFilter != "" || selectedClubFilter != "") {
+				if (selectedCompetitionFilter != null || selectedNameFilter != "" || selectedLabelFilter != "" || selectedRfidFilter != "" || selectedSourceFilter != "" || selectedClubFilter != "") {
 					registeredList.filterFunction = processFilters;
 				} else {
 					registeredList.filterFunction = null;
@@ -474,6 +479,12 @@
 				setFilters();
 			}
 
+         private function setFilterByRfid(event:Event):void {
+            selectedRfidFilter=StringUtil.trim(TI_selectedRfidFilter.text);
+            setFilters();
+         }
+
+
          private function setFilterByClub(event:Event):void {
             selectedClubFilter=StringUtil.trim(TI_selectedClubFilter.text);
             setFilters();
@@ -489,6 +500,7 @@
 				var resultCompetitionFilter:Boolean = true;
 				var resultNameFilter:Boolean = true;
             var resultLabelFilter:Boolean = true;
+            var resultRfidFilter:Boolean = true;
             var resultSourceFilter:Boolean = true;
             var resultClubFilter:Boolean = true;
 				var registered:Registered = item as Registered;
@@ -505,6 +517,10 @@
 					resultLabelFilter = registered.label.value.match(selectedLabelFilter);
 				}
 
+            if (selectedRfidFilter != "") {
+               resultRfidFilter = registered.label.rfid.match(selectedRfidFilter);
+            }
+
             if (selectedSourceFilter != "") {
                resultSourceFilter = registered.source.toLowerCase().match(selectedSourceFilter);
             }
@@ -513,7 +529,7 @@
                resultClubFilter = registered.club.toLowerCase().match(selectedClubFilter);
             }
 
-				return (resultCompetitionFilter && resultNameFilter && resultLabelFilter && resultSourceFilter && resultClubFilter);
+				return (resultCompetitionFilter && resultNameFilter && resultLabelFilter && resultRfidFilter && resultSourceFilter && resultClubFilter);
 			}
 
 			public function addSelectedRegistered(id:int):void {
@@ -719,6 +735,9 @@
                      <mx:FormItem label="Dossard" >
                        <mx:TextInput id="TI_selectedLabelFilter" width="50" change="setFilterByLabel(event);"/>
                      </mx:FormItem>
+                     <mx:FormItem label="Rfid" >
+                       <mx:TextInput id="TI_selectedRfidFilter" width="50" change="setFilterByRfid(event);"/>
+                     </mx:FormItem>
                      <mx:FormItem label="Source" >
                        <mx:TextInput id="TI_selectedSourceFilter" width="100" change="setFilterBySource(event);"/>
                      </mx:FormItem>
@@ -757,19 +776,20 @@
 				<mx:DataGrid id="DG_registereds" dataProvider="{RO_registering.getRegistereds.lastResult}" dataTipFunction="buildRegisteredTip"
 							 rowCount="20"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
 					<mx:columns>
-						<mx:DataGridColumn headerText="Id" dataField="id" showDataTips="true" width="30"/>
-						<mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="150"/>
-						<mx:DataGridColumn headerText="Competition" labelFunction="Util.displayCompetition" showDataTips="true" width="115"/>
-						<mx:DataGridColumn headerText="Categorie" labelFunction="Util.displayCategory" showDataTips="true" width="115"/>
+						<mx:DataGridColumn headerText="Id" dataField="id" showDataTips="true" width="10"/>
+						<mx:DataGridColumn headerText="Name" dataField="name" showDataTips="true" width="120"/>
+						<mx:DataGridColumn headerText="Competition" labelFunction="Util.displayCompetition" showDataTips="true" width="100"/>
+						<mx:DataGridColumn headerText="Categorie" labelFunction="Util.displayCategory" showDataTips="true" width="100"/>
 						<mx:DataGridColumn headerText="Dossard" labelFunction="Util.displayLabel" showDataTips="true" width="70"/>
+                  <mx:DataGridColumn headerText="Rfid" labelFunction="Util.displayRfid" showDataTips="true" width="120"/>
 
-						<mx:DataGridColumn headerText="Personnes" labelFunction="Util.displayPersonsIdAsString" showDataTips="true" width="80"/>
+						<mx:DataGridColumn headerText="Personnes" labelFunction="Util.displayPersonsIdAsString" showDataTips="true" width="70"/>
 
 						<mx:DataGridColumn headerText="Equipe" labelFunction="Util.displayTeam" showDataTips="true" width="30"/>
 						<mx:DataGridColumn headerText="Paye" labelFunction="Util.displayPaid" showDataTips="true" width="30"/>
                   <mx:DataGridColumn headerText="CM" labelFunction="Util.displayProvidedHealthForm" showDataTips="true" width="30"/>
                   <mx:DataGridColumn headerText="Origine" dataField="source" showDataTips="true" width="50"/>
-                  <mx:DataGridColumn headerText="Club" dataField="club" showDataTips="true" width="100"/>
+                  <mx:DataGridColumn headerText="Club" dataField="club" showDataTips="true" width="90"/>
 						<mx:DataGridColumn headerText="Date inscription" dataField="registeringDate" showDataTips="true" width="100" labelFunction="Util.getDateLabel"/>
 						<mx:DataGridColumn headerText="Date arrivee" dataField="arrivalDate" showDataTips="true" width="100" labelFunction="Util.getDateLabel"/>
 						<mx:DataGridColumn headerText="Temps" dataField="elapsedTime" showDataTips="true" width="70" labelFunction="Util.getElapsedTimeLabel"/>

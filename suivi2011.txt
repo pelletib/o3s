@@ -1,0 +1,37 @@
+source modifiees en 2011
+
+suppression de xalan.jar dans WEB-INF/lib de webds
+
+modif rfid :
+- onglet association
+- rapport coureur + dossard + rfid (liste des inscrits)
+
+Autres:
+- import/export admin
+
+Done :
+- modifier export/import en cons
+- label et access
+- VO classes
+- recherche par rfid + vue de la colonne rfid
+
+classes touchees
+
+M      o3s-persistence/src/main/java/net/o3s/persistence/Label.java
+M      o3s-persistence/src/main/java/net/o3s/persistence/Registered.java
+M      o3s-beans/src/main/java/net/o3s/beans/tracking/TrackingMessageProcessingBean.java
+M      o3s-beans/src/main/java/net/o3s/beans/registering/RegisteringBean.java
+M      o3s-apis/src/main/java/net/o3s/apis/IEntityLabel.java
+M      o3s-apis/src/main/java/net/o3s/apis/IEJBRegisteringLocal.java
+
+M      wtp/o3s-webds/src/net/o3s/web/service/Registering.java
+M      wtp/o3s-webds/src/net/o3s/web/vo/LabelVO.java
+M      wtp/o3s-webds/src/net/o3s/web/common/Util.java
+M      wtp/o3s-beans/src/main/java/net/o3s/beans/admin/AdminBean.java
+M      wtp/o3s-apis/src/main/java/net/o3s/apis/IEJBRegisteringLocal.java
+M      wtp/o3s-webflex/src/o3s.mxml
+M      wtp/o3s-webflex/src/net/o3s/webflex/bean/MyLabel.as
+M      wtp/o3s-webflex/src/net/o3s/webflex/components/Util.as
+A      wtp/o3s-webflex/src/net/o3s/webflex/view/Rfid.mxml
+M      wtp/o3s-webflex/src/net/o3s/webflex/view/Label.mxml
+

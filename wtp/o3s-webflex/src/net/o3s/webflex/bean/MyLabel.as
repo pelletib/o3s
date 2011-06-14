@@ -28,6 +28,7 @@ package net.o3s.webflex.bean
 	public class MyLabel
 	{
 		private var _value:String;
+		private var _rfid:String;
 
 
 		public function MyLabel()
@@ -43,6 +44,15 @@ package net.o3s.webflex.bean
 		public function set value(value:String):void
 		{
 			_value = value;
+		}
+		public function get rfid():String
+		{
+			return _rfid;
+		}
+
+		public function set rfid(value:String):void
+		{
+			_rfid = value;
 		}
 
 	}

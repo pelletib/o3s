@@ -67,6 +67,7 @@ public interface IEJBRegisteringLocal {
 			final String name,
 			final Date registeringDate,
 			final String labelValue,
+			final String rfid,
 			final boolean isTeamed,
 			final boolean isPaid,
 			final boolean providedHealthForm,
@@ -89,4 +90,6 @@ public interface IEJBRegisteringLocal {
 	int countArrivalFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException;
 
 	void resetAll() throws RegisteringException;
+
+    boolean isValidRfid(String s);
 }

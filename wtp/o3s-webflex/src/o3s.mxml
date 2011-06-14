@@ -2,7 +2,7 @@
 <!--
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 - O3S: Open Source Sport Software
-- Copyright (C) 2010 Benoit Pelletier
+- Copyright (C) 2010-2011 Benoit Pelletier
 - Contact: btpelletier@gmail.com
 -
 - This library is free software; you can redistribute it and/or
@@ -221,6 +221,7 @@
 					<view:Registering id="VS_registering" label="Inscriptions" />
                <view:Ranking id="VS_ranking" label="Classement" />
 					<view:Label label="Liste des inscrits" />
+               <view:Rfid label="Gestion RFID" />
                <view:PersonTab label="Liste des personnes" />
 					<view:Departure label="Depart" />
 					<view:Arrival label="Arrivee" />

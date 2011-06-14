@@ -28,6 +28,8 @@ public class LabelVO {
 	private int id;
 	private int number;
 	private String value;
+	private String rfid;
+
 
 	public LabelVO() {
 		super();
@@ -46,6 +48,7 @@ public class LabelVO {
 				this.getId() + ", " +
 				this.getNumber() + ", " +
 				this.getValue() + ", " +
+		        this.getRfid() + ", " +
 				"]";
 	}
 
@@ -65,4 +68,11 @@ public class LabelVO {
 		this.value = value;
 	}
 
+	public void setRfid(String rfid) {
+		this.rfid = rfid;
+	}
+
+	public String getRfid() {
+		return rfid;
+	}
 }

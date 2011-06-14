@@ -141,6 +141,7 @@ public class Util {
 			labelVO.setId(label.getId());
 			labelVO.setNumber(label.getNumber());
 			labelVO.setValue(label.getValue());
+			labelVO.setRfid(label.getRfid());
 		}
 		return labelVO;
 	}
