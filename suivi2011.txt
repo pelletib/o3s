@@ -3,7 +3,7 @@ source modifiees en 2011
 suppression de xalan.jar dans WEB-INF/lib de webds
 
 modif rfid :
-- onglet association
+
 - rapport coureur + dossard + rfid (liste des inscrits)
 
 Autres:
@@ -14,6 +14,7 @@ Done :
 - label et access
 - VO classes
 - recherche par rfid + vue de la colonne rfid
+- onglet association
 
 classes touchees
 

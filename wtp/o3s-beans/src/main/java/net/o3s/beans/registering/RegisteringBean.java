@@ -300,11 +300,15 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	if (labelData.length() > IEntityLabel.LABEL_VALUE_SIZE) {
     		throw new RegisteringException("Numero de dossard invalide <" + labelData + ">");
     	}
-    	IEntityRegistered registered = findRegisteredFromLabelData(labelData);
 
     	if (!isValidRfid(rfid)) {
     		throw new RegisteringException("Numero RFID invalide <" + rfid + ">");
     	}
+    	IEntityRegistered registered = findRegisteredFromLabelData(labelData);
+		if (registered == null) {
+			throw new RegisteringException("Numero de dossard invalide");
+		}
+
     	IEntityLabel label = registered.getLabel();
     	label.setRfid(rfid);
 
