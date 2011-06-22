@@ -318,6 +318,14 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
      * Remove an event
      */
     public void removeEvent(final int id) throws AdminException {
+    	doRemoveEvent(id, false);
+    }
+
+    /**
+     * Remove an event
+     * force will remove even the default one
+     */
+    private void doRemoveEvent(final int id, final boolean force) throws AdminException {
 
     	IEntityEvent event = findEventFromId(id);
     	List<IEntityRegistered> registereds = null;
@@ -326,7 +334,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     		throw new AdminException("event is null");
     	}
     	// no delete if it's the default event
-    	if (event.isTheDefault()) {
+    	if (event.isTheDefault() && !force) {
     		throw new AdminException("Unable to remove the default event");
 
     	}
@@ -489,7 +497,11 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     @SuppressWarnings("unchecked")
     public  List<IEntityCompetition> findAllCompetitionsFromDefaultEvent() {
         IEntityEvent event = findDefaultEvent();
-        return findAllCompetitionsFromEvent(event.getId());
+        if (event != null) {
+        	return findAllCompetitionsFromEvent(event.getId());
+        } else {
+        	return new ArrayList<IEntityCompetition>();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -722,7 +734,11 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     @SuppressWarnings("unchecked")
     public  List<IEntityCategory> findAllCategoriesFromDefaultEvent() {
         IEntityEvent event = findDefaultEvent();
-        return findAllCategoriesFromEvent(event.getId());
+        if (event != null) {
+        	return findAllCategoriesFromEvent(event.getId());
+        } else {
+        	return new ArrayList<IEntityCategory>();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -805,6 +821,69 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         		category.setCompetitions (new HashSet(Arrays.asList(comps)));
         	} else {
         		category.setCompetitions (new HashSet(Arrays.asList(competitions)));
+        	}
+            this.entityManager.persist(category);
+        }
+
+        return category;
+    }
+
+    @SuppressWarnings("unchecked")
+	private IEntityCategory doCreateCategory(
+			final String name,
+			final Date minDate,
+			final Date maxDate,
+			final char sex,
+			final char shortName,
+			final int eventId,
+			final List<IEntityCompetition> competitions) {
+    	IEntityCategory category = null;
+    	category = findCategoryFromNameAndSex(name, sex);
+
+    	IEntityEvent event = findEventFromId(eventId);
+    	if (event == null) {
+        	logger.log(Level.SEVERE, "Unknown event, set default one");
+    		event = findDefaultEvent();
+    	}
+
+        if (category == null) {
+        	logger.fine("Create new category : " + name);
+
+        	category = new Category();
+
+        	// if force, the same name exist, so don't add the sex attribute
+        	category.setName(name);
+
+        	if (minDate == null) {
+        		category.setMinDate(new Date());
+        	} else {
+        		category.setMinDate(minDate);
+        	}
+        	if (maxDate == null) {
+        		category.setMaxDate(new Date());
+        	} else {
+            	category.setMaxDate(maxDate);
+        	}
+        	category.setSex(sex);
+        	if (shortName == 0x0) {
+        		category.setShortName('?');
+        	} else {
+        		category.setShortName(shortName);
+        	}
+        	category.setEvent(event);
+        	if (competitions == null) {
+        		// choose a competition randomly
+        		IEntityCompetition comp = null;
+        		int i = 0;
+        		while (comp == null & i < 99999) {
+            		comp = findCompetitionFromId(i);
+        			i++;
+        		}
+        		List<IEntityCompetition> comps = new ArrayList<IEntityCompetition>();
+        		comps.add(comp);
+        		category.setCompetitions (new HashSet(Arrays.asList(comps)));
+        	} else {
+        		category.setCompetitions (new HashSet((competitions)));
         	}
             this.entityManager.persist(category);
         }
@@ -1086,28 +1165,29 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 
 
 		// event
-    	String eventFileName = newTempDir.getAbsolutePath() + File.pathSeparator +  PREFIX_EXPORT_EVENT_FILENAME + ".csv";
+    	String eventFileName = newTempDir.getAbsolutePath() + File.separator +  PREFIX_EXPORT_EVENT_FILENAME + ".csv";
     	eventFileName = eventFileName.replace(' ', '_');
     	exportEventAsFileName(eventFileName);
 
 		// competition
-    	String competitionFileName = newTempDir.getAbsolutePath() + File.pathSeparator +  PREFIX_EXPORT_COMPETITION_FILENAME + ".csv";
+    	String competitionFileName = newTempDir.getAbsolutePath() + File.separator +  PREFIX_EXPORT_COMPETITION_FILENAME + ".csv";
     	competitionFileName = competitionFileName.replace(' ', '_');
     	exportCompetitionAsFileName(competitionFileName);
 
 		// event
-    	String categoryFileName = newTempDir.getAbsolutePath() + File.pathSeparator +  PREFIX_EXPORT_CATEGORY_FILENAME + ".csv";
+    	String categoryFileName = newTempDir.getAbsolutePath() + File.separator +  PREFIX_EXPORT_CATEGORY_FILENAME + ".csv";
     	categoryFileName = categoryFileName.replace(' ', '_');
     	exportCategoryAsFileName(categoryFileName);
 
 		// zip the directory
 
     	String[] filenames = new String[]{eventFileName, competitionFileName, categoryFileName };
+    	String[] zipentrynames = new String[]{PREFIX_EXPORT_EVENT_FILENAME + ".csv", PREFIX_EXPORT_COMPETITION_FILENAME + ".csv", PREFIX_EXPORT_CATEGORY_FILENAME + ".csv" };
 
     	// Create a buffer for reading the files
     	byte[] buf = new byte[1024];
    	    // Create the ZIP file
-	    String outFilename = PREFIX_EXPORT_ADMIN_FILENAME + "-" + today + ".csv" ;
+	    String outFilename = PREFIX_EXPORT_ADMIN_FILENAME + "-" + today + ".zip" ;
 
 	    ZipOutputStream out = null;
 
@@ -1120,7 +1200,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     	        FileInputStream in = new FileInputStream(filenames[i]);
 
     	        // Add ZIP entry to output stream.
-    	        out.putNextEntry(new ZipEntry(filenames[i]));
+    	        out.putNextEntry(new ZipEntry(zipentrynames[i]));
 
     	        // Transfer bytes from the file to the ZIP file
     	        int len;
@@ -1199,7 +1279,9 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 				writer.append(',');
 
 				// StartingDate
-				writer.append(df.format(competition.getStartingDate()));
+				if (competition.getStartingDate() != null) {
+					writer.append(df.format(competition.getStartingDate()));
+				}
 				writer.append(',');
 
 				// Event
@@ -1263,7 +1345,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 			writer.append('\n');
 
 			// Browse data and export
-			DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
+			DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
 			for (IEntityCategory category : categories) {
 
@@ -1352,7 +1434,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 			writer.append('\n');
 
 			// Browse data and export
-			DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
+			DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
 			for (IEntityEvent event : events) {
 
@@ -1410,12 +1492,13 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         }
 
 		// creates a temp dir to expand the zip
-    	String basename = zipFileName.substring(0, zipFileName.indexOf(".zip"));
+    	String basename = zipFileName.substring(zipFileName.lastIndexOf(File.separator) + 1,  zipFileName.indexOf(".zip"));
 
     	final File sysTempDir = new File(System.getProperty("java.io.tmpdir"));
         File newTempDir = new File(sysTempDir, basename);
 
-        if(!newTempDir.mkdirs()) {
+
+        if(!newTempDir.exists() && !newTempDir.mkdirs()) {
 
             throw new IOException(
                     "Failed to create temp dir named " +
@@ -1645,7 +1728,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 	//@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private int importCategory(String fileName) {
 
-		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 		String line = null;
 		int row = 0;
 		int error = 0;
@@ -1837,7 +1920,11 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 				logger.fine("  StartingDate=" + fields[fieldIndex] + "\n");
 				Date startingDate;
 				try {
-					startingDate = df.parse(fields[fieldIndex]);
+					if (fields[fieldIndex] != null && !fields[fieldIndex].equalsIgnoreCase("")) {
+						startingDate = df.parse(fields[fieldIndex]);
+					} else {
+						startingDate = null;
+					}
 				} catch (ParseException e1) {
 					logger.severe(e1.getMessage());
 					continue;
@@ -1855,6 +1942,16 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 				} catch (AlreadyExistException e) {
 					logger.log(Level.SEVERE, e.getMessage());
 					exists++;
+
+					// update the starting date if needed
+			    	IEntityCompetition competition = findCompetitionFromName(name, event);
+					if (startingDate != null && !startingDate.equals(competition.getStartingDate())) {
+
+				    	competition.setStartingDate(startingDate);
+						logger.log(Level.SEVERE, "Update the starting date for competition " + competition);
+
+					}
+
 					//e.printStackTrace();
 				} catch (AdminException e) {
 					logger.log(Level.SEVERE, e.getMessage());
@@ -1881,7 +1978,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
 	//@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 	private int importEvent(String fileName) {
 
-		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 		String line = null;
 		int row = 0;
 		int error = 0;
@@ -2035,7 +2132,7 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
         	throw new AlreadyExistException("La categorie <" + name + "> existe deja ! - " + category );
     	}
 
-    	category = createCategory(name, minDate, maxDate, sex, shortName, event.getId(), (IEntityCompetition[]) competitions.toArray());
+    	category = doCreateCategory(name, minDate, maxDate, sex, shortName, event.getId(), competitions);
 
 		logger.log(Level.FINE, "creation <" + category + ">");
 
@@ -2096,6 +2193,31 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     	return cloneEvent;
 
 	}
+
+    /**
+     * Reset All admin data and registered data
+     */
+    public void resetAdminAll() throws AdminException {
+
+		// at first, check if there is not any registered associated with this event
+    	List<IEntityEvent> events = findAllEvents();
+    	for (IEntityEvent event:events) {
+
+        	List<IEntityRegistered> registereds = registering.findAllRegisteredFromEvent(event.getId());
+    		if (registereds != null && !registereds.isEmpty()) {
+    			throw new AdminException("There are some registered associated with the event :" + event.getId() + " - " + event.getName());
+    		}
+    	}
+
+    	// if  ok, remove all events
+    	for (IEntityEvent event:events) {
+
+        	// remove the event, cascading removing removes all related objects (competitions/categories)
+        	doRemoveEvent(event.getId(), true);
+
+    	}
+
+    }
 
 
 }

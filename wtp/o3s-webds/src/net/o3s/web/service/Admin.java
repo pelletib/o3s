@@ -460,6 +460,41 @@ public class Admin implements AdminMBean {
 		return ret;
 	}
 
+	public String exportAdminAsFileName() {
+		setAdminEJB();
+		String fileName = null;
+		try  {
+			fileName = admin.exportAdminAsZip();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+		return fileName;
+	}
+
+	public int importAdmin(final String fileName) {
+		setAdminEJB();
+		int ret;
+		try  {
+			ret = admin.importAdminFromZip(fileName);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+		return ret;
+	}
+
+	public void resetAdminAll() {
+		setAdminEJB();
+		try  {
+			admin.resetAdminAll();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new FlexException(e.getMessage());
+		}
+
+	}
+
 	// for management
 	public String exportRegisteredAsFileName4MBean() {
 
@@ -495,4 +530,39 @@ public class Admin implements AdminMBean {
 		}
 		return -1;
 	}
+	public String exportAdminAsFileName4MBean() {
+
+		ClassLoader cls = this.getClass().getClassLoader();
+
+		ClassLoader old = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(cls);
+
+		try {
+			return exportAdminAsFileName();
+		} catch (FlexException e) {
+			e.printStackTrace();
+		} finally {
+			Thread.currentThread().setContextClassLoader(old);
+
+		}
+		return null;
+	}
+
+	public int importAdmin4MBean(final String fileName) {
+		ClassLoader cls = this.getClass().getClassLoader();
+
+		ClassLoader old = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(cls);
+
+		try {
+			return importAdmin(fileName);
+		} catch (FlexException e) {
+			e.printStackTrace();
+		} finally {
+			Thread.currentThread().setContextClassLoader(old);
+
+		}
+		return -1;
+	}
+
 }

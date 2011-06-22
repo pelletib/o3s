@@ -23,7 +23,6 @@
  */
 package net.o3s.web.service;
 
-import java.util.Date;
 
 public interface AdminMBean {
 	/**
@@ -40,4 +39,16 @@ public interface AdminMBean {
 	 */
 	String exportRegisteredAsFileName4MBean();
 
+	/**
+	 * export admin data
+	 * @return the filename
+	 */
+	String exportAdminAsFileName4MBean();
+
+	/**
+	 * import admin data
+	 * @param file name
+	 * @return the number imported admin data
+	 */
+	int importAdmin4MBean(final String fileName);
 }

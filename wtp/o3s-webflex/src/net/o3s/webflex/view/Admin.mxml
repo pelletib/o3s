@@ -49,7 +49,13 @@
          public var importFileName:String="";
 
          [Bindable]
+         public var importAdminFileName:String="";
+
+         [Bindable]
          public var actionImportEnabled:Boolean = false;
+
+         [Bindable]
+         public var actionImportAdminEnabled:Boolean = false;
 
 			[Bindable]
 			private var editedEvent:MyEvent= null;
@@ -215,6 +221,10 @@
             RO_admin.exportRegisteredAsFileName(DF_export.selectedDate);
          }
 
+         public function onClickExportAdmin(ev:Event):void {
+            RO_admin.exportAdminAsFileName();
+         }
+
         public function onClickImport(ev:Event):void {
             RO_admin.importRegistered(importFileName);
             actionImportEnabled = false;
@@ -223,7 +233,15 @@
 
          }
 
-        private function resultExportRegisteredAsFileName(event:ResultEvent):void {
+        public function onClickImportAdmin(ev:Event):void {
+            RO_admin.importAdmin(importAdminFileName);
+            actionImportAdminEnabled = false;
+            importAdminFileName="";
+            TI_importAdminFileName.text="";
+
+         }
+
+        private function resultExportAsFileName(event:ResultEvent):void {
            var fileName:String = event.result as String;
            Alert.show("Le fichier <" + fileName + "> est disponible sur le serveur.");
         }
@@ -231,6 +249,11 @@
          private function setImportFileName(event:Event):void {
             importFileName=StringUtil.trim(TI_importFileName.text);
             actionImportEnabled = true;
+         }
+
+         private function setImportAdminFileName(event:Event):void {
+            importAdminFileName=StringUtil.trim(TI_importAdminFileName.text);
+            actionImportAdminEnabled = true;
          }
 
         private function resultImportFileName(event:ResultEvent):void {
@@ -621,6 +644,12 @@
             }
          }
 
+         public function onClickAdminReset(event:CloseEvent):void {
+            if(event.detail == Alert.OK) {
+               RO_admin.resetAdminAll();
+            }
+         }
+
          private function confirmClickReset():void {
             var msg:String="";
             msg = "inscrits";
@@ -629,6 +658,18 @@
                Alert.OK | Alert.CANCEL,
                this,
                onClickReset,
+               null,
+               Alert.OK);
+         }
+
+         private function confirmClickAdminReset():void {
+            var msg:String="";
+            msg = "inscrits";
+            Alert.show("Etes-vous sure de vouloir supprimer toutes les donnees admin ?",
+               "Reset ?",
+               Alert.OK | Alert.CANCEL,
+               this,
+               onClickAdminReset,
                null,
                Alert.OK);
          }
@@ -653,8 +694,12 @@
       <mx:method name="createCategory" result="resultCreateCategory(event)" fault="Util.handleException(event)"/>
       <mx:method name="removeCategory" result="resultRemoveCategory(event)" fault="Util.handleException(event)"/>
 
-      <mx:method name="exportRegisteredAsFileName" result="resultExportRegisteredAsFileName(event)"/>
+      <mx:method name="exportRegisteredAsFileName" result="resultExportAsFileName(event)"/>
       <mx:method name="importRegistered" result="resultImportFileName(event)"/>
+
+      <mx:method name="exportAdminAsFileName" result="resultExportAsFileName(event)" fault="Util.handleException(event)"/>
+      <mx:method name="importAdmin" result="resultImportFileName(event)" fault="Util.handleException(event)"/>
+     <mx:method name="resetAdminAll" result="resultResetAll(event)" fault="Util.handleException(event)"/>
 
 	</mx:RemoteObject>
    <mx:RemoteObject id="RO_registering" destination="registering" showBusyCursor="true" fault="onFault(event)">
@@ -664,34 +709,33 @@
 
       <mx:HBox width="100%" height="10%">
 
-		 <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Action">
+		 <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Action sur les donnees inscrits">
 
           <mx:ControlBar horizontalAlign="center">
             <mx:VBox width="100%" horizontalAlign="left">
-                <mx:Button label="Refresh" id="B_refresh"
-                         click="onClickRefresh(event)" enabled="true"/>
-                <mx:HBox>
-                <mx:HBox horizontalAlign="left">
-                  <mx:Button label="Export" id="B_export"
-                         click="onClickExport(event)" enabled="true"/>
-                  <mx:DateField id="DF_export"
-                    yearNavigationEnabled="true"
-                    editable="true"
-                    formatString="DD/MM/YYYY"
-                    textAlign="center"
-                    fontSize="9"
-                    selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date()}}"/>
 
-                </mx:HBox>
+                  <mx:HBox horizontalAlign="left">
+                     <mx:Button label="Export des inscrits" id="B_export"
+                           click="onClickExport(event)" enabled="true"/>
+                     <mx:DateField id="DF_export"
+                      yearNavigationEnabled="true"
+                      editable="true"
+                       formatString="DD/MM/YYYY"
+                       textAlign="center"
+                       fontSize="9"
+                      selectableRange="{{rangeStart : new Date(1900,0,1), rangeEnd : new Date()}}"/>
 
-                <mx:HBox horizontalAlign="left">
-                  <mx:Button label="Import" id="B_import"
+                  </mx:HBox>
+
+                  <mx:HBox horizontalAlign="left">
+                     <mx:Button label="Import des inscrits" id="B_import"
                          click="onClickImport(event)" enabled="${actionImportEnabled}"/>
-                  <mx:TextInput id="TI_importFileName" width="400" change="setImportFileName(event);"/>
-                </mx:HBox>
-                </mx:HBox>
+                  </mx:HBox>
+                  <mx:HBox horizontalAlign="left">
+                     <mx:TextInput id="TI_importFileName" width="400" change="setImportFileName(event);"/>
+                  </mx:HBox>
 
-                <mx:Button label="RESET TOTAL (inscriptions-courses)" id="B_reset"
+                  <mx:Button label="RESET TOTAL (inscriptions-courses)" id="B_reset"
                          click="confirmClickReset()" enabled="true"/>
 
             </mx:VBox>
@@ -699,6 +743,34 @@
           </mx:ControlBar>
 
 		 </mx:Panel>
+
+       <mx:Panel width="100%" height="100%" horizontalAlign="center" title="Action sur les donnees admin">
+
+          <mx:ControlBar horizontalAlign="center">
+            <mx:VBox width="100%" horizontalAlign="left">
+                <mx:Button label="Refresh" id="B_refresh"
+                         click="onClickRefresh(event)" enabled="true"/>
+                <mx:HBox horizontalAlign="left">
+                  <mx:Button label="Export des donnees admin" id="B_exportAdmin"
+                         click="onClickExportAdmin(event)" enabled="true"/>
+                </mx:HBox>
+
+                <mx:HBox horizontalAlign="left">
+                  <mx:Button label="Import des donnees admin" id="B_importAdmin"
+                         click="onClickImportAdmin(event)" enabled="${actionImportAdminEnabled}"/>
+                </mx:HBox>
+                <mx:HBox horizontalAlign="left">
+                  <mx:TextInput id="TI_importAdminFileName" width="400" change="setImportAdminFileName(event);"/>
+                </mx:HBox>
+
+                <mx:Button label="RESET TOTAL (admin)" id="B_resetAdmin"
+                         click="confirmClickAdminReset()" enabled="true"/>
+
+            </mx:VBox>
+
+          </mx:ControlBar>
+
+       </mx:Panel>
       </mx:HBox>
 
       <mx:HBox width="100%" height="20%">
