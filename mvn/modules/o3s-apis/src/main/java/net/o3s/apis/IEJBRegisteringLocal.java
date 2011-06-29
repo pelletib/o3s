@@ -45,6 +45,9 @@ public interface IEJBRegisteringLocal {
 	List<IEntityRegistered> findAllRegisteredFromDefaultEventWhereRegisteringDateIsGreaterThan(Date minDate);
 	IEntityRegistered findRegisteredFromLabel(final String labelValue)  throws RegisteringException;
 	IEntityRegistered findRegisteredFromLabelNumber(final int labelNumber) throws RegisteringException;
+	IEntityRegistered findRegisteredFromRfid(final String rfid) throws RegisteringException;
+	IEntityRegistered findRegisteredFromLabelData(final String labelData) throws RegisteringException;
+	void setRfidToLabel(String labelData, String rfid) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByDuration(final int competitionId) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId,  List<Integer> categoriesId) throws RegisteringException;
@@ -64,6 +67,7 @@ public interface IEJBRegisteringLocal {
 			final String name,
 			final Date registeringDate,
 			final String labelValue,
+			final String rfid,
 			final boolean isTeamed,
 			final boolean isPaid,
 			final boolean providedHealthForm,
@@ -86,4 +90,6 @@ public interface IEJBRegisteringLocal {
 	int countArrivalFromCompetitionAndCategory(final int competitionId, final int categoryId) throws RegisteringException;
 
 	void resetAll() throws RegisteringException;
+
+    boolean isValidRfid(String s);
 }

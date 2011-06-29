@@ -450,6 +450,32 @@ public class Registering {
 
 	}
 
+	// register a rfid with a label
+	public RegisteredVO setRfidToLabel(String labelValue, String rfid) {
+		setRegisteringEJB();
+		try {
+			registering.setRfidToLabel(labelValue, rfid);
+		} catch (RegisteringException e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+		IEntityRegistered registered = null;
+
+		try {
+			registered = registering.findRegisteredFromLabel(labelValue);
+		} catch (RegisteringException e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
+		}
+
+		RegisteredVO rVO = Util.createRegisteredVO(registered, this);
+
+		logger.fine("registered=" + rVO);
+		return rVO;
+	}
+
 
 	// update registered with arrival date
 	public void updateArrivalDateRegistered(int id, Date arrivalDate) {

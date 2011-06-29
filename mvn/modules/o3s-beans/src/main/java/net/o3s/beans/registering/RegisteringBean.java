@@ -142,6 +142,28 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     }
 
     /**
+     * Get label from rfid
+     * @param value
+     * @return
+     */
+    private IEntityLabel findLabelFromRfid(final String rfid) {
+    	IEntityEvent event = admin.findDefaultEvent();
+    	Query query = this.entityManager.createNamedQuery("LABEL_FROM_RFID_AND_EVENT");
+        query.setParameter("RFID", rfid);
+        query.setParameter("EVENTID", event.getId());
+
+        IEntityLabel label = null;
+        try {
+
+        	label = (IEntityLabel) query.getSingleResult();
+        } catch (javax.persistence.NoResultException e) {
+        }
+
+        return label;
+
+    }
+
+    /**
      * Get label from number
      * @param number
      * @return
@@ -265,6 +287,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      	label = new Label();
     	label.setNumber(labelNumber);
     	label.setValue(labelValue);
+    	label.setRfid("");
     	IEntityEvent event = admin.findDefaultEvent();
     	label.setEvent(event);
     	this.entityManager.persist(label);
@@ -272,12 +295,38 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	return label;
     }
 
+    public void setRfidToLabel(String labelData, String rfidOrg) throws RegisteringException {
+    	// check if label already exists
+    	if (labelData.length() > IEntityLabel.LABEL_VALUE_SIZE) {
+    		throw new RegisteringException("Numero de dossard invalide <" + labelData + ">");
+    	}
+    	String rfid = rfidOrg;
+
+    	if (!isValidRfid(rfid)) {
+    		// try to convert from us keyboard input to fr
+    		//rfid=convertStringDigitFromUs2Fr(rfid);
+    		//if (!isValidRfid(rfid)) {
+    		throw new RegisteringException("Numero RFID invalide <" + rfid + ">");
+    		//}
+    	}
+    	IEntityRegistered registered = findRegisteredFromLabelData(labelData);
+		if (registered == null) {
+			throw new RegisteringException("Numero de dossard invalide");
+		}
+
+    	IEntityLabel label = registered.getLabel();
+    	label.setRfid(rfid);
+
+		logger.fine("Label '" + labelData + "' associated with rfid '" + rfid + "'");
+
+    }
+
     /**
      * Create new label
      * @param labelValue
      * @throws RegisteringException
      */
-    private IEntityLabel createLabel(IEntityCompetition competition, String labelValue) throws AlreadyExistException, RegisteringException {
+    private IEntityLabel createLabel(IEntityCompetition competition, String labelValue, String rfid) throws AlreadyExistException, RegisteringException {
 
     	int labelNumber = 0;
 
@@ -297,6 +346,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 		label = new Label();
 		label.setNumber(labelNumber);
 		label.setValue(labelValue);
+		label.setRfid(rfid);
     	IEntityEvent event = admin.findDefaultEvent();
     	label.setEvent(event);
 		this.entityManager.persist(label);
@@ -641,6 +691,145 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
         return registered;
 
+    }
+
+    /**
+     * Get registered from rfid tag
+     */
+    public IEntityRegistered findRegisteredFromRfid(final String rfid) throws RegisteringException {
+        Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_RFID");
+        query.setParameter("RFID", rfid);
+
+        IEntityRegistered registered = null;
+        try {
+
+        	registered = (IEntityRegistered) query.getSingleResult();
+        } catch (javax.persistence.NoResultException nre) {
+
+        } catch (NonUniqueResultException nure) {
+        	nure.printStackTrace();
+        	throw new RegisteringException("Impossible de trouver ce dossard avec pour tag rfid [" + rfid + "]", nure);
+        } catch (Exception e){
+        	e.printStackTrace();
+        	throw new RegisteringException("Impossible de trouver ce dossard avec pour tag rfid  [" + rfid + "]", e);
+
+        }
+
+        return registered;
+
+    }
+
+	/**
+	 * Check if a the string is a valid rfid
+	 * @param s String to check
+	 * @return true if the string is numeric
+	 */
+	public boolean isValidRfid(String s) {
+		if (s == null)
+			return false;
+
+		if (s.length() == 0) {
+			return false;
+		}
+
+		if (s.length() <= IEntityLabel.LABEL_VALUE_SIZE) {
+			return false;
+		}
+
+		for (int i = 0; i < s.length(); i++) {
+			if (!Character.isDigit(s.charAt(i))) {
+					return false;
+			}
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * convert us digits serie to fr one
+	 * @param s String to convert
+	 * @return new string
+	 */
+	public String convertStringDigitFromUs2Fr(String s) {
+		if (s == null)
+			return null;
+
+		if (s.length() == 0) {
+			return "";
+		}
+
+		if (s.length() <= IEntityLabel.LABEL_VALUE_SIZE) {
+			return "";
+		}
+
+		String newString = "";
+		for (int i = 0; i < s.length(); i++) {
+			newString += convertDigitFromUs2Fr( s.charAt(i));
+		}
+
+		return newString;
+
+	}
+
+	private char convertDigitFromUs2Fr(char c) {
+
+			switch (c) {
+			case '&':
+				return '1';
+			case 'é':
+				return '2';
+			case '\"':
+				return '3';
+			case '\'':
+				return '4';
+			case '(':
+				return '5';
+			case '-':
+				return '6';
+			case 'è':
+				return '7';
+			case '_':
+				return '8';
+			case 'ç':
+				return '9';
+			case 'à':
+				return '0';
+			default:
+					return c;
+			}
+	}
+
+    /**
+     * Get registered from rfid tag
+     */
+    public IEntityRegistered findRegisteredFromLabelData(final String labelData) throws RegisteringException {
+
+		IEntityRegistered registered = null;
+
+		// first check if size if greater than 8c and is composed of only digits -> rfid
+		//String rfid=convertStringDigitFromUs2Fr(labelData);
+		String rfid=labelData;
+
+		if (isValidRfid(rfid)) {
+			logger.fine("RFID detected: " + rfid);
+			registered = findRegisteredFromRfid(rfid);
+
+		} else  {
+			// first check if num -> only the label number is provided
+			// else it's a full label value
+
+			try {
+				int labelNumber = Integer.parseInt(labelData);
+				logger.fine("Label number detected: " + labelNumber);
+				registered = findRegisteredFromLabelNumber(labelNumber);
+			} catch (NumberFormatException ne1) {
+				logger.fine("Label (full) detected: " + labelData);
+				registered = findRegisteredFromLabel(labelData);
+			}
+		}
+
+		return registered;
     }
 
     /**
@@ -1300,6 +1489,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 			final String name,
 			final Date registeringDate,
 			final String labelValue,
+			final String rfid,
 			final boolean isTeamed,
 			final boolean isPaid,
 			final boolean providedHealthForm,
@@ -1361,7 +1551,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 		registered.setName(name);
 		registered.setRegisteringDate(registeringDate);
 		registered.setPersons(new HashSet(persistedPersonsList));
-		registered.setLabel(createLabel(competition, labelValue));
+		registered.setLabel(createLabel(competition, labelValue, rfid));
 		registered.setIsPaid(isPaid);
 		registered.setIsTeamed(isTeamed);
 		registered.setProvidedHealthForm(providedHealthForm);

@@ -23,6 +23,7 @@
  */
 package net.o3s.apis;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -78,4 +79,7 @@ public interface IEJBAdminLocal {
 
 	String exportRegisteredAsFileName(final Date from);
 	int importRegistered(String fileName);
+	int importAdminFromZip(String zipFileName) throws IOException, AdminException;
+	String exportAdminAsZip() throws IOException;
+	void resetAdminAll() throws AdminException;
 }

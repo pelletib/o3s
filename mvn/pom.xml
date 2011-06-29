@@ -23,10 +23,10 @@
     <licence.flexbuilder3>${env.FLEX_LICENSE}</licence.flexbuilder3>
     <ow2.spec.version>1.0.3</ow2.spec.version>
     <ow2-bundles.version>1.0.21</ow2-bundles.version>
-    <easybeans.version>1.2.0-M2</easybeans.version>
+    <easybeans.version>1.2.0</easybeans.version>
     <carol.version>3.0.8</carol.version>
     <tomcat.version>6.0.29</tomcat.version>
-    <jonas.version>5.2.0-M2</jonas.version>
+    <jonas.version>5.2.0</jonas.version>
 
   </properties>
 

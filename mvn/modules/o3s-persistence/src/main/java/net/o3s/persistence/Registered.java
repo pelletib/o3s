@@ -68,6 +68,7 @@ import net.o3s.apis.IEntityRegistered;
 	@NamedQuery(name = "REGISTERED_FROM_PERSONID", query = "SELECT r FROM Registered r INNER JOIN r.persons p WHERE p.id = :PERSONID AND r.event.id = :EVENTID"),
     @NamedQuery(name = "REGISTERED_FROM_LABEL", query = "SELECT r FROM Registered r WHERE r.label.value LIKE :VALUE"),
     @NamedQuery(name = "REGISTERED_FROM_LABELNUMBER", query = "SELECT r FROM Registered r WHERE r.label.number = :VALUE"),
+    @NamedQuery(name = "REGISTERED_FROM_RFID", query = "SELECT r FROM Registered r WHERE r.label.rfid LIKE :RFID"),
     @NamedQuery(name = "REGISTERED_FROM_COMPETITION_ORDERBY_ETIME",
 		    query = "SELECT r FROM Registered r WHERE r.competition.id = :COMPETITION AND r.arrivalDate IS NOT NULL ORDER BY r.elapsedTime"),
 	@NamedQuery(name = "REGISTERED_FROM_COMPETITION_ORDERBY_CATEGORY_ETIME",

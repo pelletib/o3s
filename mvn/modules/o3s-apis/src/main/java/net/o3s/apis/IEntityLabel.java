@@ -25,11 +25,15 @@ package net.o3s.apis;
 
 public interface IEntityLabel {
 
+	public static int LABEL_VALUE_SIZE = 8;
+
 	int getId();
 	//void setId(int id);
 
 	String getValue();
 	void setValue(final String value);
+	String getRfid();
+	void setRfid(final String rfid);
 	int getNumber();
 	void setNumber(final int number);
 	IEntityEvent getEvent();
