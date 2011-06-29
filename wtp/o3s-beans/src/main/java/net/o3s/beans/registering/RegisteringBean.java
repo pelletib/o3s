@@ -295,14 +295,19 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	return label;
     }
 
-    public void setRfidToLabel(String labelData, String rfid) throws RegisteringException {
+    public void setRfidToLabel(String labelData, String rfidOrg) throws RegisteringException {
     	// check if label already exists
     	if (labelData.length() > IEntityLabel.LABEL_VALUE_SIZE) {
     		throw new RegisteringException("Numero de dossard invalide <" + labelData + ">");
     	}
+    	String rfid = rfidOrg;
 
     	if (!isValidRfid(rfid)) {
+    		// try to convert from us keyboard input to fr
+    		//rfid=convertStringDigitFromUs2Fr(rfid);
+    		//if (!isValidRfid(rfid)) {
     		throw new RegisteringException("Numero RFID invalide <" + rfid + ">");
+    		//}
     	}
     	IEntityRegistered registered = findRegisteredFromLabelData(labelData);
 		if (registered == null) {
@@ -741,6 +746,60 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
 	}
 
+	/**
+	 * convert us digits serie to fr one
+	 * @param s String to convert
+	 * @return new string
+	 */
+	public String convertStringDigitFromUs2Fr(String s) {
+		if (s == null)
+			return null;
+
+		if (s.length() == 0) {
+			return "";
+		}
+
+		if (s.length() <= IEntityLabel.LABEL_VALUE_SIZE) {
+			return "";
+		}
+
+		String newString = "";
+		for (int i = 0; i < s.length(); i++) {
+			newString += convertDigitFromUs2Fr( s.charAt(i));
+		}
+
+		return newString;
+
+	}
+
+	private char convertDigitFromUs2Fr(char c) {
+
+			switch (c) {
+			case '&':
+				return '1';
+			case 'é':
+				return '2';
+			case '\"':
+				return '3';
+			case '\'':
+				return '4';
+			case '(':
+				return '5';
+			case '-':
+				return '6';
+			case 'è':
+				return '7';
+			case '_':
+				return '8';
+			case 'ç':
+				return '9';
+			case 'à':
+				return '0';
+			default:
+					return c;
+			}
+	}
+
     /**
      * Get registered from rfid tag
      */
@@ -749,9 +808,12 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 		IEntityRegistered registered = null;
 
 		// first check if size if greater than 8c and is composed of only digits -> rfid
-		if (isValidRfid(labelData)) {
-			logger.fine("RFID detected: " + labelData);
-			registered = findRegisteredFromRfid(labelData);
+		//String rfid=convertStringDigitFromUs2Fr(labelData);
+		String rfid=labelData;
+
+		if (isValidRfid(rfid)) {
+			logger.fine("RFID detected: " + rfid);
+			registered = findRegisteredFromRfid(rfid);
 
 		} else  {
 			// first check if num -> only the label number is provided

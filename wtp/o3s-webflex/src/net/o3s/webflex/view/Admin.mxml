@@ -114,6 +114,10 @@
             competitionFilterCatEventList.filterFunction = competitionFilter4Category;
             competitionFilterCatEventList.refresh();
 
+            competitionList.filterFunction = null;
+            categoryList.filterFunction = null;
+
+
          }
 
          public function onClickRefresh(ev:Event):void {
@@ -248,12 +252,16 @@
 
          private function setImportFileName(event:Event):void {
             importFileName=StringUtil.trim(TI_importFileName.text);
-            actionImportEnabled = true;
+            if (importFileName != null && importFileName != "") {
+               actionImportEnabled = true;
+            }
          }
 
          private function setImportAdminFileName(event:Event):void {
             importAdminFileName=StringUtil.trim(TI_importAdminFileName.text);
-            actionImportAdminEnabled = true;
+            if (importAdminFileName != null && importAdminFileName != "") {
+               actionImportAdminEnabled = true;
+            }
          }
 
         private function resultImportFileName(event:ResultEvent):void {
@@ -674,6 +682,37 @@
                Alert.OK);
          }
 
+         private function modifySelectCompetitionDefautEvent(event:Event):void {
+
+            if (CB_selectCompetitionDefautEvent.selected == true) {
+               competitionList.filterFunction = processCompetitionFilters;
+            } else {
+               competitionList.filterFunction = null;
+            }
+
+            competitionList.refresh();
+         }
+
+         private function processCompetitionFilters(item:Object):Boolean {
+            var competition:Competition = item as Competition;
+            return (competition.event.theDefault == true);
+         }
+
+         private function modifySelectCategoryDefautEvent(event:Event):void {
+
+            if (CB_selectCategoryDefautEvent.selected == true) {
+               categoryList.filterFunction = processCategoryFilters;
+            } else {
+               categoryList.filterFunction = null;
+            }
+
+            categoryList.refresh();
+         }
+         private function processCategoryFilters(item:Object):Boolean {
+            var category:Category = item as Category;
+            return (category.event.theDefault == true);
+         }
+
 		]]>
 	</mx:Script>
 
@@ -715,7 +754,7 @@
             <mx:VBox width="100%" horizontalAlign="left">
 
                   <mx:HBox horizontalAlign="left">
-                     <mx:Button label="Export des inscrits" id="B_export"
+                     <mx:Button label="Export des inscrits (csv)" id="B_export"
                            click="onClickExport(event)" enabled="true"/>
                      <mx:DateField id="DF_export"
                       yearNavigationEnabled="true"
@@ -728,7 +767,7 @@
                   </mx:HBox>
 
                   <mx:HBox horizontalAlign="left">
-                     <mx:Button label="Import des inscrits" id="B_import"
+                     <mx:Button label="Import des inscrits (csv)" id="B_import"
                          click="onClickImport(event)" enabled="${actionImportEnabled}"/>
                   </mx:HBox>
                   <mx:HBox horizontalAlign="left">
@@ -751,12 +790,12 @@
                 <mx:Button label="Refresh" id="B_refresh"
                          click="onClickRefresh(event)" enabled="true"/>
                 <mx:HBox horizontalAlign="left">
-                  <mx:Button label="Export des donnees admin" id="B_exportAdmin"
+                  <mx:Button label="Export des donnees admin (zip)" id="B_exportAdmin"
                          click="onClickExportAdmin(event)" enabled="true"/>
                 </mx:HBox>
 
                 <mx:HBox horizontalAlign="left">
-                  <mx:Button label="Import des donnees admin" id="B_importAdmin"
+                  <mx:Button label="Import des donnees admin (zip)" id="B_importAdmin"
                          click="onClickImportAdmin(event)" enabled="${actionImportAdminEnabled}"/>
                 </mx:HBox>
                 <mx:HBox horizontalAlign="left">
@@ -794,6 +833,11 @@
 
 	   <mx:HBox width="100%" height="30%">
 		<mx:Panel width="100%" height="100%" horizontalAlign="center" title="Competition">
+
+         <mx:HBox width="100%" horizontalAlign="center">
+                 <mx:CheckBox id="CB_selectCompetitionDefautEvent" label="Selectionner les competitions associees a l'evenement par defaut" selected="false" click="modifySelectCompetitionDefautEvent(event)"/>
+          </mx:HBox>
+
 			<mx:DataGrid id="DG_competitions" dataProvider="{RO_admin.getAllCompetitions.lastResult}" dataTipFunction="buildCompetitionTip"
                       rowCount="5"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
 				<mx:columns>
@@ -820,6 +864,11 @@
 
 		<mx:HBox width="100%" height="40%">
 		<mx:Panel width="100%" height="100%" horizontalAlign="center" title="Category">
+
+        <mx:HBox width="100%" horizontalAlign="center">
+                 <mx:CheckBox id="CB_selectCategoryDefautEvent" label="Selectionner les categories associees a l'evenement par defaut" selected="false" click="modifySelectCategoryDefautEvent(event)"/>
+          </mx:HBox>
+
 			<mx:DataGrid id="DG_categories" dataProvider="{RO_admin.getAllCategories.lastResult}" dataTipFunction="buildCategoryTip"
                       rowCount="5"  horizontalScrollPolicy="on" verticalScrollPolicy="on" resizableColumns="true" >
 				<mx:columns>
