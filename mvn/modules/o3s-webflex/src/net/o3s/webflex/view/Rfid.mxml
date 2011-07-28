@@ -153,7 +153,7 @@
             <mx:Form id="F_label" color="blue" fontSize="40">
 
                <mx:FormItem label="Dossard" >
-                  <mx:TextInput id="TI_labelValue" color="blue" fontSize="40" width="500" enter="setLabelValue(event);" focusOut="reinitLabel();" change="reinitLabel();"/>
+                  <mx:TextInput id="TI_labelValue" restrict="A-Za-z0-9" color="blue" fontSize="40" width="500" enter="setLabelValue(event);" focusOut="reinitLabel();" change="reinitLabel();"/>
                </mx:FormItem>
 
             </mx:Form>
@@ -168,7 +168,7 @@
             <mx:Form id ="F_rfid" color="blue" fontSize="40">
 
                <mx:FormItem label="Rfid" >
-                  <mx:TextInput id="TI_rfidValue" color="blue" fontSize="40" width="500" enter="setRfidValue(event);sendEvent(event);" focusOut=""/>
+                  <mx:TextInput id="TI_rfidValue" restrict="0-9" color="blue" fontSize="40" width="500" enter="setRfidValue(event);sendEvent(event);" focusOut=""/>
                </mx:FormItem>
 
             </mx:Form>

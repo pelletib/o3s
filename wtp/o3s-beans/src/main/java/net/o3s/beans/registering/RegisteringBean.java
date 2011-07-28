@@ -319,6 +319,12 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
 		logger.fine("Label '" + labelData + "' associated with rfid '" + rfid + "'");
 
+		try {
+			notification.sendRegisteringNotification(registered);
+		} catch (NotificationMessageException e) {
+			logger.log(Level.SEVERE, "Unable to send a notification :" + e.getMessage());
+		}
+
     }
 
     /**

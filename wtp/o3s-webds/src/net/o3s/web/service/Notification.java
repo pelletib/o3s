@@ -248,6 +248,10 @@ public class Notification implements javax.jms.MessageListener {
     	notification.setType(NotificationMessage.NOTIFICATION_STR_TYPE_REGISTERING);
     	String message = "";
     	message += registered.getLabel().getNumber() + "-";
+    	if (registered.getLabel().getRfid() != null && !registered.getLabel().getRfid().equals("")) {
+    		message += registered.getLabel().getRfid() + "-";
+    	}
+
     	message += registered.getName() + "-";
     	message += registered.getCompetition().getName() + "-";
     	message += registered.getCategory().getName();
@@ -271,6 +275,21 @@ public class Notification implements javax.jms.MessageListener {
 
     	return notification;
     }
+
+    private NotificationVO formatErrorNotification(String msg) {
+    	NotificationVO notification = new NotificationVO();
+    	DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+    	notification.setCreationTime(new Date());
+    	notification.setType(NotificationMessage.NOTIFICATION_STR_TYPE_ERROR);
+    	String message = msg;
+
+    	notification.setMessage(message);
+
+    	return notification;
+    }
+
+
 
     /* Receive message from topic subscriber */
     public synchronized void  onMessage(Message message) {
@@ -319,6 +338,12 @@ public class Notification implements javax.jms.MessageListener {
 
 			            logger.fine("Notification - departure:" + competition.getId());
 						sendMessageToClients(formatDepartureNotification(competition));
+
+					}
+
+					if (notificationMessage.getType() == NotificationMessage.NOTIFICATION_INT_TYPE_ERROR) {
+			            logger.fine("Notification - error:" + notificationMessage.getMessage());
+						sendMessageToClients(formatErrorNotification(notificationMessage.getMessage()));
 
 					}
 

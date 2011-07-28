@@ -107,6 +107,11 @@ public class NotificationMessageProcessingBean implements MessageListener {
 		            logger.fine("Notification - registering:" + registered);
 				}
 
+				if (notificationMessage.getType() == NotificationMessage.NOTIFICATION_INT_TYPE_ERROR) {
+
+		            logger.fine("Notification - error:" + notificationMessage.getMessage());
+				}
+
 
 
 			} catch (JMSException e) {

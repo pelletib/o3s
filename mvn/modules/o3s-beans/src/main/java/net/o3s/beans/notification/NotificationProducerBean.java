@@ -23,7 +23,6 @@
  */
 package net.o3s.beans.notification;
 
-import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -133,6 +132,29 @@ public class NotificationProducerBean implements IEJBNotificationProducerLocal,I
     	} catch (Exception e) {
         		throw new NotificationMessageException("Unable to create an notification [" + registered.getId() + ", " + NotificationMessage.NOTIFICATION_INT_TYPE_ARRIVAL + "]", e);
     	}
+
+    }
+
+    public void sendErrorNotification(String msg) throws NotificationMessageException {
+    	try {
+            Connection connection = this.connectionFactory.createConnection();
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageProducer producer = session.createProducer(this.topic);
+            TextMessage message = session.createTextMessage();
+
+            NotificationMessage notification = new NotificationMessage();
+            notification.setType(NotificationMessage.NOTIFICATION_INT_TYPE_ERROR);
+            notification.setMessage(msg);
+            message.setText(notification.toXML());
+
+            producer.send(message);
+            producer.close();
+            session.close();
+            connection.close();
+
+        	} catch (Exception e) {
+        		throw new NotificationMessageException("Unable to create an notification [" + msg + ", " + NotificationMessage.NOTIFICATION_INT_TYPE_ERROR + "]", e);
+        	}
 
     }
 

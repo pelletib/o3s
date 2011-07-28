@@ -93,6 +93,7 @@ public class NotificationMessage implements Serializable {
 		private Vector<MyElement> vector = new Vector<MyElement>();
 		public static final String NOTIFICATION_XML_ELEMENT_REGISTEREDID = "registeredId";
 		public static final String NOTIFICATION_XML_ELEMENT_COMPETITIONID = "competitionId";
+		public static final String NOTIFICATION_XML_ELEMENT_MESSAGE = "message";
 		public static final String NOTIFICATION_XML_ELEMENT_TYPE = "type";
 
 		public NotificationXmlHandler() {
@@ -137,10 +138,21 @@ public class NotificationMessage implements Serializable {
 	public static final String NOTIFICATION_STR_TYPE_DEPARTURE = "Depart";
 	public static final int NOTIFICATION_INT_TYPE_REGISTERING = 2;
 	public static final String NOTIFICATION_STR_TYPE_REGISTERING = "Inscription";
+	public static final int NOTIFICATION_INT_TYPE_ERROR = 3;
+	public static final String NOTIFICATION_STR_TYPE_ERROR = "Error";
 
 
 	private int registeredId;
 	private int competitionId;
+	private String message;
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
 
 	public int getCompetitionId() {
 		return competitionId;
@@ -179,6 +191,7 @@ public class NotificationMessage implements Serializable {
 		        this.getType2String() + ", " +
 		        this.getRegisteredId() + ", " +
 		        this.getCompetitionId() + ", " +
+		        this.getMessage() + ", " +
 		        "]";
 	}
 
@@ -187,6 +200,7 @@ public class NotificationMessage implements Serializable {
 		String xml = "<notification>" + "\n" +
 		             "  <" + NotificationXmlHandler.NOTIFICATION_XML_ELEMENT_REGISTEREDID + ">" + this.getRegisteredId() + "</" + NotificationXmlHandler.NOTIFICATION_XML_ELEMENT_REGISTEREDID + ">" + "\n" +
 		             "  <" + NotificationXmlHandler.NOTIFICATION_XML_ELEMENT_COMPETITIONID + ">" + this.getCompetitionId() + "</" + NotificationXmlHandler.NOTIFICATION_XML_ELEMENT_COMPETITIONID + ">" + "\n" +
+		             "  <" + NotificationXmlHandler.NOTIFICATION_XML_ELEMENT_MESSAGE + ">" + this.getMessage() + "</" + NotificationXmlHandler.NOTIFICATION_XML_ELEMENT_MESSAGE + ">" + "\n" +
 		             "  <" + NotificationXmlHandler.NOTIFICATION_XML_ELEMENT_TYPE + ">" + this.getType2String().trim() + "</" + NotificationXmlHandler.NOTIFICATION_XML_ELEMENT_TYPE + ">" + "\n" +
 		             "</notification>";
 		return xml;
@@ -203,6 +217,9 @@ public class NotificationMessage implements Serializable {
 		}
 		if (getType() == NotificationMessage.NOTIFICATION_INT_TYPE_REGISTERING) {
 			return NotificationMessage.NOTIFICATION_STR_TYPE_REGISTERING;
+		}
+		if (getType() == NotificationMessage.NOTIFICATION_INT_TYPE_ERROR) {
+			return NotificationMessage.NOTIFICATION_STR_TYPE_ERROR;
 		}
 
 		return "Unknown";
@@ -236,6 +253,7 @@ public class NotificationMessage implements Serializable {
 			throw new NotificationMessageException("Error when parsing the XML string <" + xmlString + ">", e1);
 
 		}
+		
 
 		// set handler
 		xmlHandler.init();
@@ -279,6 +297,10 @@ public class NotificationMessage implements Serializable {
 				this.setCompetitionId(Integer.valueOf(myElement.getValue()).intValue());
 			}
 
+			if (myElement.getQname().equals(NotificationXmlHandler.NOTIFICATION_XML_ELEMENT_MESSAGE)) {
+				this.setMessage(myElement.getValue());
+			}
+
 			if (myElement.getQname().equals(NotificationXmlHandler.NOTIFICATION_XML_ELEMENT_TYPE)) {
 				if (myElement.getValue().equals(NotificationMessage.NOTIFICATION_STR_TYPE_ARRIVAL)) {
 					this.setType(NotificationMessage.NOTIFICATION_INT_TYPE_ARRIVAL);
@@ -288,6 +310,9 @@ public class NotificationMessage implements Serializable {
 				}
 				if (myElement.getValue().equals(NotificationMessage.NOTIFICATION_STR_TYPE_REGISTERING)) {
 					this.setType(NotificationMessage.NOTIFICATION_INT_TYPE_REGISTERING);
+				}
+				if (myElement.getValue().equals(NotificationMessage.NOTIFICATION_STR_TYPE_ERROR)) {
+					this.setType(NotificationMessage.NOTIFICATION_INT_TYPE_ERROR);
 				}
 			}
 
