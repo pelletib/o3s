@@ -535,6 +535,6 @@
 		</mx:FormItem>
       <mx:Label id="L_mandatoryFields" textAlign="right" text="(*) champs obligatoires."/>
       <mx:Label id="L_msg" color="blue" textAlign="right"/>
-      <mx:Label id="L_rules" color="blue" textAlign="right" text="Voir conditions de participation sur le site http://www.fouleesdecrossey.com (reglement)."/>
+      <mx:Label id="L_rules" color="blue" textAlign="right" text="Voir conditions de participation sur le site http://www.soudecrossey.fr (reglement)."/>
 	</mx:Form>
 </mx:Canvas>

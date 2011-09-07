@@ -225,7 +225,7 @@
 
             msg = msg + "Vous pourrez retirer votre dossard au stand 'Pre-inscription' le jour de la course apres paiement et presentation de votre certificat medical ou licence.";
             msg = msg + "\n\n";
-            msg = msg + "Vous pouvez consulter les conditions de participation sur notre site www.fouleesdecrossey.com rubrique reglement.";
+            msg = msg + "Vous pouvez consulter les conditions de participation sur notre site www.soudecrossey.fr rubrique reglement.";
          }
 
 			myAlert = Alert.show(msg, "Inscription ok");
