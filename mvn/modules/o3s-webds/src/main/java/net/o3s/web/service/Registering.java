@@ -39,6 +39,7 @@ import net.o3s.apis.IEntityCategory;
 import net.o3s.apis.IEntityCompetition;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
+import net.o3s.apis.InvalidException;
 import net.o3s.apis.RegisteringException;
 import net.o3s.apis.ReportException;
 import net.o3s.web.common.Util;
@@ -464,10 +465,11 @@ public class Registering {
 
 		try {
 			registered = registering.findRegisteredFromLabel(labelValue);
-		} catch (RegisteringException e) {
+		} catch (InvalidException e) {
 			e.printStackTrace();
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			throw new FlexException(e.getMessage());
+
 		}
 
 		RegisteredVO rVO = Util.createRegisteredVO(registered, this);
@@ -482,10 +484,15 @@ public class Registering {
 		setRegisteringEJB();
 		try {
 			registering.updateArrivalDateRegistered(id, arrivalDate);
+		} catch (InvalidException e) {
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new FlexException(e.getMessage());
 		} catch (RegisteringException e) {
 			e.printStackTrace();
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			throw new FlexException(e.getMessage());
+
 		}
 	}
 
@@ -661,6 +668,10 @@ public class Registering {
    				} catch (AlreadyExistException e) {
    					logger.log(Level.WARNING, "La personne <" + personVO + "> existe deja!");
    					IEntityPerson person = registering.findPersonFromLastnameFirstNameBirthDay(personVO.getLastname(),personVO.getFirstname(), personVO.getBirthday());
+   					person.setClub(personVO.getClub());
+   					person.setEmail(personVO.getEmail());
+   					person.setLicense(personVO.getLicense());
+   					person = registering.updatePerson(person);
    					persons.add(person);
    					logger.log(Level.INFO, "import Personne <" + person + ">");
 

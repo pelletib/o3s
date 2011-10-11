@@ -108,6 +108,9 @@
         private function editStartingDate():void {
             parentDocument.editStartingDate(data.id);
         }
+        private function removeStartingDate():void {
+            parentDocument.removeStartingDate(data.id);
+        }
 
 
         ]]>
@@ -121,6 +124,9 @@
 
    <mx:Button id="B_startingItem" icon="{flagIcon16}" width="20" height="20" toolTip="Editer la date de depart"
             click="editStartingDate()" />
+
+   <mx:Button id="B_removeStartingItem" icon="{pauseIcon16}" width="20" height="20" toolTip="Supprimer la date de depart"
+            click="removeStartingDate()" />
 
 
 </mx:HBox>

@@ -23,6 +23,8 @@
  */
 package net.o3s.beans.notification;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
 
 import javax.ejb.ActivationConfigProperty;
@@ -63,6 +65,7 @@ public class NotificationMessageProcessingBean implements MessageListener {
 	 * @see MessageListener#onMessage(Message)
 	 */
 	public void onMessage(final Message message) {
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
 
 		if (message instanceof TextMessage) {
 			TextMessage text = (TextMessage) message;
@@ -80,7 +83,14 @@ public class NotificationMessageProcessingBean implements MessageListener {
 						throw new NotificationMessageException ("Unable to retrieve a registered related to the event:" + notificationMessage);
 					}
 
-		            logger.fine("Notification - arrival:" + registered);
+		            logger.info("Notification - arrival: <" +
+		            		registered.getLabel().getValue() + "," +
+		            		registered.getLabel().getRfid() + "," +
+		            		registered.getName() + "," +
+		            		registered.getCompetition().getName() + "," +
+		            		registered.getCategory().getName() + "," +
+		            		df.format(registered.getArrivalDate()) + "," +
+		            		registered.getElapsedTime());
 				}
 
 				if (notificationMessage.getType() == NotificationMessage.NOTIFICATION_INT_TYPE_DEPARTURE) {
@@ -92,7 +102,9 @@ public class NotificationMessageProcessingBean implements MessageListener {
 						throw new NotificationMessageException ("Unable to retrieve a competition related to the event:" + notificationMessage);
 					}
 
-		            logger.fine("Notification - departure:" + competition);
+		            logger.info("Notification - departure:" +
+		            		competition.getName() + "," +
+		            		df.format(competition.getStartingDate()));
 				}
 
 				if (notificationMessage.getType() == NotificationMessage.NOTIFICATION_INT_TYPE_REGISTERING) {
@@ -104,12 +116,17 @@ public class NotificationMessageProcessingBean implements MessageListener {
 						throw new NotificationMessageException ("Unable to retrieve a registered related to the event:" + notificationMessage);
 					}
 
-		            logger.fine("Notification - registering:" + registered);
+		            logger.info("Notification - registering: <" +
+		            		registered.getLabel().getValue() + "," +
+		            		registered.getLabel().getRfid() + "," +
+		            		registered.getName() + "," +
+		            		registered.getCompetition().getName() + "," +
+		            		registered.getCategory().getName());
 				}
 
 				if (notificationMessage.getType() == NotificationMessage.NOTIFICATION_INT_TYPE_ERROR) {
 
-		            logger.fine("Notification - error:" + notificationMessage.getMessage());
+		            logger.info("Notification - error:" + notificationMessage.getMessage());
 				}
 
 

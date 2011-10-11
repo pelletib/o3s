@@ -54,6 +54,7 @@ import net.o3s.apis.IEntityEvent;
 import net.o3s.apis.IEntityLabel;
 import net.o3s.apis.IEntityPerson;
 import net.o3s.apis.IEntityRegistered;
+import net.o3s.apis.InvalidException;
 import net.o3s.apis.NotificationMessageException;
 import net.o3s.apis.RegisteringException;
 import net.o3s.apis.TrackingMessageException;
@@ -309,7 +310,13 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     		throw new RegisteringException("Numero RFID invalide <" + rfid + ">");
     		//}
     	}
-    	IEntityRegistered registered = findRegisteredFromLabelData(labelData);
+    	IEntityRegistered registered = null;
+		try {
+			registered = findRegisteredFromLabelData(labelData);
+		} catch (InvalidException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		if (registered == null) {
 			throw new RegisteringException("Numero de dossard invalide");
 		}
@@ -676,8 +683,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     /**
      * Get registered from label
      */
-    public IEntityRegistered findRegisteredFromLabel(final String labelValue) throws RegisteringException {
+    public IEntityRegistered findRegisteredFromLabel(final String labelValue) throws InvalidException {
         Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_LABEL");
+    	IEntityEvent event = admin.findDefaultEvent();
+        query.setParameter("EVENTID", event.getId());
         query.setParameter("VALUE", labelValue);
 
         IEntityRegistered registered = null;
@@ -688,10 +697,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
         } catch (NonUniqueResultException nure) {
         	nure.printStackTrace();
-        	throw new RegisteringException("Impossible de trouver ce dossard [" + labelValue + "]", nure);
+        	throw new InvalidException("Impossible de trouver ce dossard [" + labelValue + "]", nure);
         } catch (Exception e){
         	e.printStackTrace();
-        	throw new RegisteringException("Impossible de trouver ce dossard [" + labelValue + "]", e);
+        	throw new InvalidException("Impossible de trouver ce dossard [" + labelValue + "]", e);
 
         }
 
@@ -702,9 +711,12 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     /**
      * Get registered from rfid tag
      */
-    public IEntityRegistered findRegisteredFromRfid(final String rfid) throws RegisteringException {
+    public IEntityRegistered findRegisteredFromRfid(final String rfid) throws InvalidException {
         Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_RFID");
         query.setParameter("RFID", rfid);
+    	IEntityEvent event = admin.findDefaultEvent();
+        query.setParameter("EVENTID", event.getId());
+
 
         IEntityRegistered registered = null;
         try {
@@ -714,10 +726,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
         } catch (NonUniqueResultException nure) {
         	nure.printStackTrace();
-        	throw new RegisteringException("Impossible de trouver ce dossard avec pour tag rfid [" + rfid + "]", nure);
+        	throw new InvalidException("Impossible de trouver ce dossard avec pour tag rfid [" + rfid + "]", nure);
         } catch (Exception e){
         	e.printStackTrace();
-        	throw new RegisteringException("Impossible de trouver ce dossard avec pour tag rfid  [" + rfid + "]", e);
+        	throw new InvalidException("Impossible de trouver ce dossard avec pour tag rfid  [" + rfid + "]", e);
 
         }
 
@@ -809,7 +821,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     /**
      * Get registered from rfid tag
      */
-    public IEntityRegistered findRegisteredFromLabelData(final String labelData) throws RegisteringException {
+    public IEntityRegistered findRegisteredFromLabelData(final String labelData) throws InvalidException {
 
 		IEntityRegistered registered = null;
 
@@ -841,8 +853,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     /**
      * Get registered from labelNumber
      */
-    public IEntityRegistered findRegisteredFromLabelNumber(final int labelNumber) throws RegisteringException {
+    public IEntityRegistered findRegisteredFromLabelNumber(final int labelNumber) throws InvalidException {
         Query query = this.entityManager.createNamedQuery("REGISTERED_FROM_LABELNUMBER");
+    	IEntityEvent event = admin.findDefaultEvent();
+        query.setParameter("EVENTID", event.getId());
         query.setParameter("VALUE", labelNumber);
 
         IEntityRegistered registered = null;
@@ -853,10 +867,10 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
         } catch (NonUniqueResultException nure) {
         	nure.printStackTrace();
-        	throw new RegisteringException("Impossible de trouver ce dossard [" + labelNumber + "]", nure);
+        	throw new InvalidException("Impossible de trouver ce dossard [" + labelNumber + "]", nure);
         } catch (Exception e){
         	e.printStackTrace();
-        	throw new RegisteringException("Impossible de trouver ce dossard [" + labelNumber + "]", e);
+        	throw new InvalidException("Impossible de trouver ce dossard [" + labelNumber + "]", e);
 
         }
 
@@ -1341,7 +1355,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     @SuppressWarnings("unchecked")
 	public void updateArrivalDateRegistered(
 			final int id,
-			final Date arrivalDate) throws RegisteringException {
+			final Date arrivalDate) throws RegisteringException,InvalidException {
 
 		IEntityRegistered registered = findRegisteredFromId(id);
 		if (registered == null) {
@@ -1353,7 +1367,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 
 		// Compute the duration
 		if (registered.getCompetition().getStartingDate() == null) {
-			throw new RegisteringException ("Competition pas encore demarree pour l'inscrit :" + id);
+			throw new InvalidException ("Competition pas encore demarree pour l'inscrit :" + registered.getName());
 		}
 		registered.setElapsedTime(registered.getArrivalDate().getTime()-registered.getCompetition().getStartingDate().getTime());
 
@@ -1372,15 +1386,23 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 			throw new RegisteringException ("Competition inconnue :" + competitionId);
     	}
 
-		// Compute the duration
-		if (competition.getStartingDate() == null) {
-			throw new RegisteringException ("Competition pas encore demarree pour l'inscrit :" + competitionId);
-		}
-
     	List<IEntityRegistered> registereds = findRegisteredFromCompetitionOrderByDuration(competitionId);
-    	for (IEntityRegistered registered:registereds) {
-    		registered.setElapsedTime(registered.getArrivalDate().getTime()-registered.getCompetition().getStartingDate().getTime());
-    	}
+
+    	// Compute the duration
+		if (competition.getStartingDate() == null) {
+			// reinit elapsed time
+			for (IEntityRegistered registered:registereds) {
+	    		registered.setElapsedTime(0);
+	    		//registered.setArrivalDate(null);
+				logger.fine("Competition pas encore demarree pour l'inscrit :" + registered);
+	    	}
+		} else {
+
+			for (IEntityRegistered registered:registereds) {
+				registered.setElapsedTime(registered.getArrivalDate().getTime()-registered.getCompetition().getStartingDate().getTime());
+				logger.fine("Date d'arrivee recalculee pour l'inscrit :" + registered);
+			}
+		}
 
     }
 
@@ -1506,7 +1528,13 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 			final long elapsedTime) throws AlreadyExistException, RegisteringException {
 
     	// Check if the registered already exists
-    	IEntityRegistered registered = findRegisteredFromLabel(labelValue);
+    	IEntityRegistered registered = null;
+		try {
+			registered = findRegisteredFromLabel(labelValue);
+		} catch (InvalidException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
     	if (registered != null) {
         	throw new AlreadyExistException("L'inscrit <" + name + "> avec le dossard <" + labelValue + "> existe deja !" + registered);

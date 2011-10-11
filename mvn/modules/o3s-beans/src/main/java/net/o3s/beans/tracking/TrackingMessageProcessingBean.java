@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -42,6 +44,7 @@ import javax.persistence.PersistenceContext;
 import net.o3s.apis.IEJBNotificationProducerLocal;
 import net.o3s.apis.IEJBRegisteringLocal;
 import net.o3s.apis.IEntityRegistered;
+import net.o3s.apis.InvalidException;
 import net.o3s.apis.NotificationMessageException;
 import net.o3s.apis.RegisteringException;
 import net.o3s.apis.TrackingMessage;
@@ -55,9 +58,6 @@ import net.o3s.apis.TrackingMessageException;
 public class TrackingMessageProcessingBean implements MessageListener {
 
     private static Logger logger = Logger.getLogger(TrackingMessageProcessingBean.class.getName());
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @EJB
     private IEJBRegisteringLocal registering;
@@ -104,7 +104,7 @@ public class TrackingMessageProcessingBean implements MessageListener {
 	 * @return registered
 	 * @throws TrackingMessageException if not found
 	 */
-	private IEntityRegistered findRegistered(TrackingMessage trackingMessage) throws TrackingMessageException, RegisteringException{
+	private IEntityRegistered findRegistered(TrackingMessage trackingMessage) throws TrackingMessageException{
 
 		String labelData = trackingMessage.getLabelValue();
 		IEntityRegistered registered = null;
@@ -112,7 +112,7 @@ public class TrackingMessageProcessingBean implements MessageListener {
 		try {
 			registered = registering.findRegisteredFromLabelData(labelData);
 
-		} catch (RegisteringException e) {
+		} catch (InvalidException e) {
 			throw new TrackingMessageException ("Unable to retrieve a registered related to the event:" + trackingMessage);
 		}
 
@@ -121,6 +121,18 @@ public class TrackingMessageProcessingBean implements MessageListener {
 		}
 
 		return registered;
+
+	}
+
+	private void updateArrivalDateRegistered(int id, Date date) throws TrackingMessageException {
+
+		try {
+			registering.updateArrivalDateRegistered(id, date);
+		} catch (InvalidException e) {
+			throw new TrackingMessageException("Impossible de mettre a jour la date d'arrivee ' id=" + id + ", date=" + date, e);
+		} catch (RegisteringException e) {
+			throw new TrackingMessageException("Impossible de mettre a jour la date d'arrivee ' id=" + id + ", date=" + date, e);
+		}
 
 	}
 
@@ -138,7 +150,8 @@ public class TrackingMessageProcessingBean implements MessageListener {
 			try {
 				TrackingMessage trackingMessage = new TrackingMessage();
 				trackingMessage.parseXml(text.getText());
-				logger.fine("Received Message: " + text.getText());
+
+				logger.info("Received Message: " + text.getText());
 
 				if (trackingMessage.getType() == TrackingMessage.EVENT_INT_TYPE_ARRIVAL_CTIME) {
 
@@ -153,11 +166,7 @@ public class TrackingMessageProcessingBean implements MessageListener {
 						throw new TrackingMessageException("Impossible de trouver une personne associee a la valeur '" + trackingMessage.getLabelValue() + "'", e);
 					}
 
-					try {
-						registering.updateArrivalDateRegistered(registered.getId(), trackingMessage.getCreationTime());
-					} catch (RegisteringException e) {
-						throw new TrackingMessageException("Impossible de traiter le message '" + trackingMessage +"' - ", e);
-					}
+					updateArrivalDateRegistered(registered.getId(), trackingMessage.getCreationTime());
 
 		            logger.fine("Update:" + registered);
 
@@ -189,11 +198,7 @@ public class TrackingMessageProcessingBean implements MessageListener {
 					}
 					Date arrivalDate = new Date(registered.getCompetition().getStartingDate().getTime() + trackingMessage.getElapsedTime());
 
-					try {
-						registering.updateArrivalDateRegistered(registered.getId(), arrivalDate);
-					} catch (RegisteringException e) {
-						throw new TrackingMessageException("Impossible de traiter le message '" + trackingMessage +"' - ", e);
-					}
+					updateArrivalDateRegistered(registered.getId(), arrivalDate);
 
 		            logger.fine("Update:" + registered);
 
@@ -207,11 +212,17 @@ public class TrackingMessageProcessingBean implements MessageListener {
 				}
 
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Unable to process the Event: " + e.getMessage());
+
+				String cause = "";
+				if (e.getCause() != null) {
+					cause = ", " + e.getCause().getMessage();
+				}
+
+				logger.log(Level.SEVERE, "Unable to process the Event: " + e.getMessage() + cause, e);
 
 				try {
-					notification.sendErrorNotification(e.getMessage());
-				} catch (NotificationMessageException e1) {
+					notification.sendErrorNotification(e.getMessage() + cause);
+				} catch (Exception e1) {
 					logger.severe("Unable to send a notification :"
 							+ e1.getMessage());
 				}
