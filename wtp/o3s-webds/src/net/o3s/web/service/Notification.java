@@ -269,7 +269,9 @@ public class Notification implements javax.jms.MessageListener {
     	notification.setType(NotificationMessage.NOTIFICATION_STR_TYPE_DEPARTURE);
     	String message = "";
     	message += competition.getName() + " a ";
-    	message += df.format(competition.getStartingDate());
+    	if (competition.getStartingDate() != null) {
+    		message += df.format(competition.getStartingDate());
+    	}
 
     	notification.setMessage(message);
 

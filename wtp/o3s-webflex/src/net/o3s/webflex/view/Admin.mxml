@@ -490,6 +490,17 @@
             }
          }
 
+         public function removeStartingDate(id:int):void {
+            var c:Competition = getCompetition(id);
+            if (c == null) {
+               Alert.show("Enregistrement inconnu <" + id + ">");
+            } else {
+
+               RO_admin.setStartDate(c.id, null);
+
+            }
+         }
+
          private function cancelStartingDate(e:Event):void {
             refreshAdminData();
          }
@@ -849,7 +860,7 @@
 					<mx:DataGridColumn headerText="Last Label" dataField="lastLabelNumber" showDataTips="true" width="100"/>
                <mx:DataGridColumn headerText="Teamed" dataField="teamed" showDataTips="true" width="100"/>
 					<mx:DataGridColumn headerText="Starting Date" dataField="startingDate" showDataTips="true" width="200" labelFunction="Util.getDateLabel"/>
-               <mx:DataGridColumn width="100" headerText="Actions"
+               <mx:DataGridColumn width="150" headerText="Actions"
                            itemRenderer="net.o3s.webflex.components.ActionCompetitionDataGridColumnItemRenderer" />
 
 				</mx:columns>
@@ -881,7 +892,7 @@
 					<mx:DataGridColumn headerText="Max Date" dataField="maxDate" showDataTips="true" width="200" labelFunction="Util.getDateDDMMYYLabel"/>
 
 					<mx:DataGridColumn headerText="Competitions" labelFunction="displayCompetitions" showDataTips="true" width="200"/>
-               <mx:DataGridColumn width="100" headerText="Actions"
+               <mx:DataGridColumn width="150" headerText="Actions"
                            itemRenderer="net.o3s.webflex.components.ActionCategoryDataGridColumnItemRenderer" />
 
 

@@ -620,12 +620,13 @@ public class AdminBean implements IEJBAdminLocal,IEJBAdminRemote {
     	} else {
     		competition.setStartingDate(date);
 
-    		try {
-    			notification.sendDepartureNotification(competition);
-    		} catch (NotificationMessageException e) {
-    			logger.log(Level.SEVERE, "Unable to send a notification :" + e.getMessage());
+    		if (date != null) {
+    			try {
+    				notification.sendDepartureNotification(competition);
+    			} catch (NotificationMessageException e) {
+    				logger.log(Level.SEVERE, "Unable to send a notification :" + e.getMessage());
+    			}
     		}
-
     		// recompute elapsed time for related registereds
     		try {
 				registering.recomputeElapsedTimeRegistereds(id);
