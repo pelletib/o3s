@@ -43,12 +43,17 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.attribute.Attribute;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.HashPrintServiceAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.MediaSizeName;
 import javax.print.attribute.standard.OrientationRequested;
+import javax.print.attribute.standard.PrinterIsAcceptingJobs;
+import javax.print.attribute.standard.PrinterName;
 
 import net.o3s.apis.IEJBAdminLocal;
 import net.o3s.apis.IEJBRegisteringLocal;
@@ -277,10 +282,28 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 			// Jasper native method
 			//JasperPrintManager.printReport(jasperPrint, withPrintDialog);
 
+			/*
+			  PrintService[] serv = PrintServiceLookup.lookupPrintServices(null, null);
+			  if (serv.length==0) {
+				  logger.fine("no PrintService  found");
+			  } else {
+				  logger.fine("number of Services "+serv.length);
+			     }
+
+
+			     for (int i = 0; i<serv.length ;i++) {
+			         PrintServiceAttributeSet psa = serv[i].getAttributes();
+			         logger.fine("printer name "+(i+1)+" "+psa.get(PrinterName.class));
+			         logger.fine("accepting "+psa.get(PrinterIsAcceptingJobs.class));
+			     }
+
+			 */
+
+
 			// with more advanced option to adjust the printer configuration
 			PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
-			printRequestAttributeSet.add(MediaSizeName.ISO_A4);
-			printRequestAttributeSet.add(OrientationRequested.PORTRAIT);
+			//printRequestAttributeSet.add(MediaSizeName.ISO_A4);
+			//printRequestAttributeSet.add(OrientationRequested.PORTRAIT);
 
 			PrintServiceAttributeSet printServiceAttributeSet = new HashPrintServiceAttributeSet();
 			//printServiceAttributeSet.add(new PrinterName("Epson Stylus 820 ESC/P 2", null));
