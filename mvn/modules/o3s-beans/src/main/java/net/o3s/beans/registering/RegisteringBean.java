@@ -303,7 +303,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	}
     	String rfid = rfidOrg;
 
-    	if (!isValidRfid(rfid)) {
+    	if (!rfid.equals("EMPTY") && !isValidRfid(rfid)) {
     		// try to convert from us keyboard input to fr
     		//rfid=convertStringDigitFromUs2Fr(rfid);
     		//if (!isValidRfid(rfid)) {
@@ -322,7 +322,29 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 		}
 
     	IEntityLabel label = registered.getLabel();
-    	label.setRfid(rfid);
+		if (!label.getRfid().equals("") && !rfid.equals("EMPTY")) {
+			throw new RegisteringException("Dossard deja associe avec le RFID '" + label.getRfid() + "'");
+		}
+
+    	if (rfid.equals("EMPTY")) {
+    		label.setRfid("");
+    	} else {
+
+    		// check if the rfid is available
+    		IEntityRegistered rl = null;
+    		try {
+    			rl = findRegisteredFromLabelData(rfid);
+    		} catch (InvalidException e1) {
+    			// TODO Auto-generated catch block
+    			e1.printStackTrace();
+    		}
+    		if (rl!=null) {
+    			throw new RegisteringException("Numero rfid '" + rfid + "' deja associe avec le dossard '" + rl.getLabel().getValue() + "'");
+    		}
+
+    		// rfid available, can be set
+    		label.setRfid(rfid);
+    	}
 
 		logger.fine("Label '" + labelData + "' associated with rfid '" + rfid + "'");
 
@@ -331,7 +353,6 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 		} catch (NotificationMessageException e) {
 			logger.log(Level.SEVERE, "Unable to send a notification :" + e.getMessage());
 		}
-
     }
 
     /**

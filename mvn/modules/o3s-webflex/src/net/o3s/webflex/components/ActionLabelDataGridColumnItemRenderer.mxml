@@ -108,6 +108,10 @@
             parentDocument.editArrivalTime(data.id);
          }
 
+         private function removeRfid():void {
+            parentDocument.removeRfid(data.id);
+         }
+
 			private function modifySelectItem():void {
 				if (CB_selectItem.selected == true) {
 					parentDocument.addSelectedRegistered(data.id);
@@ -142,6 +146,9 @@
 
    <mx:Button id="B_arrivalItem" icon="{flagIcon16}" width="20" height="20" toolTip="Editer la date d'arrivee"
             click="editArrivalTime()" />
+
+   <mx:Button id="B_rfidItem" icon="{pauseIcon16}" width="20" height="20" toolTip="Supprimer rfid"
+            click="removeRfid()" />
 
 	<mx:CheckBox id="CB_selectItem" selected="false" click="modifySelectItem()" toolTip="Selectionner l'inscrit"/>
 
