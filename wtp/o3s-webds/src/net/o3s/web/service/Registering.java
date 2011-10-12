@@ -464,7 +464,7 @@ public class Registering {
 		IEntityRegistered registered = null;
 
 		try {
-			registered = registering.findRegisteredFromLabel(labelValue);
+			registered = registering.findRegisteredFromLabelData(labelValue);
 		} catch (InvalidException e) {
 			e.printStackTrace();
 			logger.log(Level.SEVERE, e.getMessage(), e);

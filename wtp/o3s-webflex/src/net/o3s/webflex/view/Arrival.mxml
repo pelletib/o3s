@@ -79,9 +79,9 @@
 
             var creationDate:Date = event.result as Date;
 
-            labelList.addItem({value:TI_labelValue.text,creationDate:creationDate});
+            labelList.addItem({value:labelInput,creationDate:creationDate});
 
-            L_processing.text = "Dossard <" + TI_labelValue.text + "> emis !" ;
+            L_processing.text = "Dossard <" + labelInput + "> emis !" ;
 
             TI_labelValue.text="";
             TI_labelValue.errorString="";
@@ -96,9 +96,9 @@
 
             var elapsedTime:Number = event.result as Number;
 
-            labelList.addItem({value:TI_labelValue.text,eTime:elapsedTime});
+            labelList.addItem({value:labelInput,eTime:elapsedTime});
 
-            L_processing.text = "Dossard <" + TI_labelValue.text + "> emis !" ;
+            L_processing.text = "Dossard <" + labelInput + "> emis !" ;
 
             TI_labelValue.text="";
             TI_labelValue.errorString="";
@@ -170,6 +170,7 @@
 
 		  private function setLabelValue(event:Event):void {
 			 labelInput = TI_labelValue.text;
+          labelInput = Util.normalizeRfid(labelInput);
 
           }
 
@@ -266,7 +267,7 @@
 					<mx:RadioButton groupName="inputtype" id="RB_manual" label="manuelle" value="manual"/>
 				</mx:FormItem>
                <mx:FormItem label="Dossard" visible="{!terminalIsEmpty}" >
-                  <mx:TextInput id="TI_labelValue" width="150" restrict="A-Za-z0-9" enter="setLabelValue(event);sendEvent(event);" focusOut="setLabelValue(event);"/>
+                  <mx:TextInput id="TI_labelValue" width="150" enter="setLabelValue(event);sendEvent(event);" focusOut="setLabelValue(event);"/>
                </mx:FormItem>
                 <mx:FormItem label="Heure d'arrivee (HH:MM:SS)" visible="{manualArrivalTime}" >
                   <mx:RadioButtonGroup id="timetype" selectedValue="date"  itemClick="modifyTimeTypeArrivalTime(event);"/>

@@ -304,11 +304,13 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	String rfid = rfidOrg;
 
     	if (!rfid.equals("EMPTY") && !isValidRfid(rfid)) {
-    		// try to convert from us keyboard input to fr
-    		//rfid=convertStringDigitFromUs2Fr(rfid);
-    		//if (!isValidRfid(rfid)) {
-    		throw new RegisteringException("Numero RFID invalide <" + rfid + ">");
-    		//}
+    		//try to convert from us keyboard input to fr
+    		logger.fine("Avant convert, rfid=" + rfid);
+    		rfid=convertStringDigitFromUs2Fr(rfid);
+    		logger.fine("Apres convert, rfid=" + rfid);
+    		if (!isValidRfid(rfid)) {
+    			throw new RegisteringException("Numero RFID invalide - avant conversion <" + rfidOrg + "> - apres conversion <" + rfid + ">");
+    		}
     	}
     	IEntityRegistered registered = null;
 		try {

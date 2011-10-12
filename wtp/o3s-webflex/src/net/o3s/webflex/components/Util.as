@@ -227,6 +227,42 @@ package net.o3s.webflex.components
 			}
 		}
 
+      public static function normalizeRfid(item:Object):String
+      {
 
-	}
+         var rfid:String = item as String;
+
+		 var myPattern:RegExp = /&/g;
+		 rfid = rfid.replace(myPattern,"1");
+
+		 myPattern = /é/g;
+		 rfid = rfid.replace(myPattern,"2")
+
+		 myPattern = /\"/g;
+		 rfid = rfid.replace(myPattern,"3");
+
+		 myPattern = /\'/g;
+		 rfid = rfid.replace(myPattern,"4");
+
+		 myPattern = /\(/g;
+		 rfid = rfid.replace(myPattern,"5");
+
+		 myPattern = /-/g;
+		 rfid = rfid.replace(myPattern,"6");
+
+		 myPattern = /è/g;
+		 rfid = rfid.replace(myPattern,"7");
+
+		 myPattern = /_/g;
+		 rfid = rfid.replace(myPattern,"8");
+
+		 myPattern = /ç/g;
+		 rfid = rfid.replace(myPattern,"9");
+
+		 myPattern = /à/g;
+		 rfid = rfid.replace(myPattern,"0");
+
+         return rfid;
+	   }
+   }
 }

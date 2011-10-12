@@ -72,10 +72,11 @@
          private function resultSetRfidToLabel(event:ResultEvent):void {
 
             var registered:Registered = event.result as Registered;
+            var rfidValue:String = registered.label.rfid as String;
 
-            labelList.addItem({value:TI_labelValue.text,rfid:TI_rfidValue.text});
+            labelList.addItem({value:TI_labelValue.text,rfid:rfidValue});
 
-            L_processing.text = "Association <" + labelInput + " / " + rfidInput + "> OK !" ;
+            L_processing.text = "Association <" + labelInput + " / " + rfidValue + "> OK !" ;
             TI_labelValue.text="";
             TI_labelValue.errorString="";
             TI_rfidValue.text="";
@@ -91,7 +92,7 @@
 
 		  private function sendEvent(event:Event):void {
 				  if (labelInput != null && labelInput != "" && rfidInput != null && rfidInput != "") {
-				 	 L_processing.text = "Association  <" + labelInput + " / " + rfidInput + "> en cours ..." ;
+				 	 L_processing.text = "Association en cours ..." ;
 				 	 RO_registering.setRfidToLabel(labelInput,rfidInput);
 				  } else {
 					  Alert.show("Champ vide","Erreur");
@@ -168,7 +169,7 @@
             <mx:Form id ="F_rfid" color="blue" fontSize="40">
 
                <mx:FormItem label="Rfid" >
-                  <mx:TextInput id="TI_rfidValue" restrict="0-9" color="blue" fontSize="40" width="500" enter="setRfidValue(event);sendEvent(event);" focusOut=""/>
+                  <mx:TextInput id="TI_rfidValue" color="blue" fontSize="40" width="500" enter="setRfidValue(event);sendEvent(event);" focusOut=""/>
                </mx:FormItem>
 
             </mx:Form>
@@ -211,8 +212,8 @@
                       rowCount="20" verticalScrollPolicy="on" resizableColumns="true" >
 
                <mx:columns>
-                  <mx:DataGridColumn headerText="Value" dataField="value" width="100"/>
-                  <mx:DataGridColumn headerText="Date" dataField="rfid" width="150" />
+                  <mx:DataGridColumn headerText="Dossard" dataField="value" width="100"/>
+                  <mx:DataGridColumn headerText="Rfid" dataField="rfid" width="150" />
                </mx:columns>
 
             </mx:DataGrid>
