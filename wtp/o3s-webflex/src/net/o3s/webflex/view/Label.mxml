@@ -611,12 +611,6 @@
 
 			public function onClickPrintSelection(event:Event):void {
 
-				//for(var count:int = 0; count < selectedItems.length; count++) {
-				//	var id:int = selectedItems.getItemAt(count, 0) as int;
-				//	RO_reporting.printLabel(id, printDialog);
-				//}
-
-
             var sortedRegisteredList:ArrayCollection= new ArrayCollection([]);
 
             for(var count:int = 0; count < selectedItems.length; count++) {
@@ -645,21 +639,29 @@
             sortedRegisteredList.refresh();
 
             // print the list
+            var msg:String="Dossards[";
             for(var i:int = 0; i < sortedRegisteredList.length; i++) {
                var r:Registered = sortedRegisteredList.getItemAt(i, 0) as Registered;
+               if (i == 0) {
+                  msg=msg + r.label.value;
+               } else {
+                  msg=msg + ", " + r.label.value;
+               }
                RO_reporting.printLabel(r.id, printDialog);
                //Alert.show(i + " - r=" + r.id + ", " + r.name);
             }
-
+            msg=msg +"]";
 
 				selectedItems.removeAll();
 				actionSelectionEnabled = false;
 				selectAll=false;
 
+            Alert.show("Lancement de l'impression de " + sortedRegisteredList.length + " dossards OK - " + msg)
+
 			}
 
 			private function resultPrintLabel(event:ResultEvent):void {
-				RO_registering.getRegistereds();
+				//RO_registering.getRegistereds();
 			}
 
 			// Set the scratch when change
@@ -726,6 +728,19 @@
             }
          }
 
+         public function removeRfid(id:int):void {
+            var r:Registered = getRegistered(id);
+            if (r == null) {
+               Alert.show("Enregistrement inconnu <" + id + ">");
+            } else {
+                RO_registering.setRfidToLabel(r.label.value,"EMPTY");
+            }
+         }
+
+         private function resultSetRfidToLabel(event:ResultEvent):void {
+            refreshRegisteredData();
+         }
+
          private function cancelArrivalTimeRegistered(e:Event):void {
             refreshRegisteredData();
          }
@@ -754,6 +769,7 @@
 		<mx:method name="removeRegistered" result="resultRemoveRegistered(event)"/>
       <mx:method name="importRegistered" result="resultImportRegistered(event)"/>
       <mx:method name="updateArrivalDateRegistered" result="resultUpdateRegistered(event)" fault="Util.handleException(event)"/>
+      <mx:method name="setRfidToLabel" result="resultSetRfidToLabel(event)" fault="Util.handleException(event);"/>
 	</mx:RemoteObject>
 
 	<mx:RemoteObject id="RO_reporting" destination="reporting" showBusyCursor="true" fault="onFault(event)">
@@ -863,7 +879,7 @@
 						<mx:DataGridColumn headerText="Date inscription" dataField="registeringDate" showDataTips="true" width="100" labelFunction="Util.getDateLabel"/>
 						<mx:DataGridColumn headerText="Date arrivee" dataField="arrivalDate" showDataTips="true" width="100" labelFunction="Util.getDateLabel"/>
 						<mx:DataGridColumn headerText="Temps" dataField="elapsedTime" showDataTips="true" width="70" labelFunction="Util.getElapsedTimeLabel"/>
-						<mx:DataGridColumn width="130" headerText="Actions"
+						<mx:DataGridColumn width="150" headerText="Actions"
 										   itemRenderer="net.o3s.webflex.components.ActionLabelDataGridColumnItemRenderer" />
 					</mx:columns>
 				</mx:DataGrid>
