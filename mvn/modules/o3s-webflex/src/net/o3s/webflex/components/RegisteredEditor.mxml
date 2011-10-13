@@ -76,6 +76,9 @@
       public var paid:Boolean=false;
       public var providedHealthForm:Boolean=false;
 
+      [Bindable]
+      public var rfidEditable:Boolean=true;
+
 		public function refreshAdminData():void {
 
 			RO_admin.getCompetitions();
@@ -189,18 +192,21 @@
 					msg = msg + "Vous etes inscrit a la competition" +
 						"'" + r.competition.name + "'." + "\n";
 				}
+            var msgRfid:String = "";
 
-
+            if (r.label.rfid != null && r.label.rfid != "") {
+               msgRfid = " et le rfid '" + r.label.rfid + "'";
+            }
             if (r.teamed == true) {
                msg = msg + "Votre equipe '" + r.name + "'";
                msg = msg + " a le dossard " +
-                  "'" + r.label.value + "'." ;
+                  "'" + r.label.value + "'" + msgRfid + "." ;
             } else {
                msg = msg + "'" + r.name + "'";
                msg = msg + " est dans la categorie " +
                   "'" + r.category.name + "'" +
                   " avec le dossard " +
-                  "'" + r.label.value + "'." ;
+                  "'" + r.label.value + "'" + msgRfid + "." ;
             }
 
             if (ask4print == true) {
@@ -241,13 +247,19 @@
 
 			var msg:String = "";
 
+         var msgRfid:String = "";
+
+         if (registered.label.rfid != null && registered.label.rfid != "") {
+           msgRfid = " et le rfid '" + registered.label.rfid + "'";
+         }
+
 			msg = msg + "Competition " +
 						"'" + registered.competition.name + "'" + "\n";
 			msg = msg + "'" + registered.name + "'";
 			msg = msg + " est dans la categorie " +
 					"'" + registered.category.name + "'" +
 					" avec le dossard " +
-					"'" + registered.label.value + "'.";
+					"'" + registered.label.value + "'" + msgRfid + ".";
 
          if (ask4print == true) {
            msg = msg + "Impression du dossard en cours.\n";
@@ -299,7 +311,14 @@
 
          for(var count:int = 0; count < MyPersonsEditor.personList.length; count++) {
                var p:Person = MyPersonsEditor.personList.list.getItemAt(count, 0) as Person;
-               msg = msg + " <" + p.lastname + " " + p.firstname + "> -> <"  + p.computedCategory + ">";
+
+               var msgRfid:String = "";
+
+               if (p.rfid != null && p.rfid != "") {
+                  msgRfid = " Rfid[" + p.rfid + "] ";
+               }
+
+               msg = msg + " <" + p.lastname + " " + p.firstname + msgRfid + "> -> <"  + p.computedCategory + ">";
                msg = msg + "\n" ;
          }
          var myAlert:Alert;
@@ -325,7 +344,12 @@
 
          for(var count:int = 0; count < MyPersonsEditor.personList.length; count++) {
                var p:Person = MyPersonsEditor.personList.list.getItemAt(count, 0) as Person;
-               msg = msg + " <" + p.lastname + " " + p.firstname + "> -> <"  + p.computedCategory + ">";
+                var msgRfid:String = "";
+
+               if (p.rfid != null && p.rfid != "") {
+                  msgRfid = " Rfid[" + p.rfid + "] ";
+               }
+              msg = msg + " <" + p.lastname + " " + p.firstname + msgRfid + "> -> <"  + p.computedCategory + ">";
                msg = msg + "\n" ;
          }
          var myAlert:Alert;
@@ -445,6 +469,7 @@
 		public function set4Update(registered:Registered):void {
 
 			mode="update";
+         rfidEditable=false;
 			selectedCompetition=null;
 			updateRegistered = registered;
 
@@ -494,7 +519,7 @@
 		<mx:State name="individual" enterState="completeState(event)">
 			<mx:AddChild relativeTo="{HB_Competition}" position="after">
 				<mx:HBox id="HB_Persons" width="100%" height="50%">
-					<components:PersonsEditor id="MyPersonsEditor"/>
+					<components:PersonsEditor id="MyPersonsEditor" rfidEditable="{rfidEditable}"/>
 				</mx:HBox>
 			</mx:AddChild>
 		</mx:State>

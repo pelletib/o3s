@@ -67,6 +67,7 @@
 		private var personSexValidator:StringValidator;
 		private var personClubValidator:StringValidator;
       private var personLicenseValidator:StringValidator;
+      private var personRfidValidator:StringValidator;
 		private var personEmailValidator:EmailValidator;
 		private var personBirthdayValidator:DateValidator;
 
@@ -96,6 +97,9 @@
       private var healthFormMsg:String;
       private var licenseMsg:String;
 
+      [Bindable]
+     public var rfidEditable:Boolean = false;
+
 		public function get person():Person	{
 			_person.firstname = StringUtil.trim(TI_personFirstname.text);
 			_person.lastname = StringUtil.trim(TI_personLastname.text);
@@ -104,6 +108,7 @@
 			_person.email = StringUtil.trim(TI_personEmail.text);
 			_person.club = StringUtil.trim(TI_personClub.text);
          _person.license = StringUtil.trim(TI_personLicense.text);
+         _person.rfid = StringUtil.trim(TI_rfid.text);
 			return _person;
 		}
 
@@ -117,7 +122,7 @@
 			TI_personEmail.text = _person.email;
 			TI_personClub.text = _person.club;
          TI_personLicense.text = _person.license;
-
+         TI_rfid.text = _person.rfid;
 		}
 
 		private function refreshPredictList():void {
@@ -196,6 +201,12 @@
          personEmailValidator.property = "text";
          personEmailValidator.required=false;
 
+         personRfidValidator = new StringValidator();
+         personRfidValidator.source = TI_rfid;
+         personRfidValidator.property = "text";
+         personRfidValidator.minLength = 10;
+         personRfidValidator.required=false;
+
          removeDisplayList();
 			refreshPredictList();
 
@@ -222,7 +233,7 @@
 			DF_personBirthday.selectedDate = null;
 			CB_personSex.selectedIndex=-1;
 			L_age.text = "Age: N/A";
-
+         TI_rfid.text = "";
 
 			// Clear validation error messages.
 			TI_personFirstname.errorString = "";
@@ -232,6 +243,7 @@
          TI_personLicense.errorString = "";
 			DF_personBirthday.errorString = "";
 			CB_personSex.errorString = "";
+         TI_rfid.errorString = "";
 
 			// Flag that the form is now clear
 			formIsEmpty = true;
@@ -270,6 +282,7 @@
 			validatePerson(personEmailValidator);
 			validatePerson(personClubValidator);
          validatePerson(personLicenseValidator);
+         validatePerson(personRfidValidator);
 
 			this.parentDocument.resultValidatePersonForm(formIsValid);
 
@@ -466,6 +479,15 @@
 			}
 		}
 
+      // normalize rfid
+      private function setRfid():void {
+         TI_rfid.text = Util.normalizeRfid(TI_rfid.text);
+      }
+      // if rfid is available
+      private function checkIfRfidExist():void {
+         // TODO
+      }
+
 		// if the person exist, edit it
 		private function resultGetPerson(event:ResultEvent):void {
 			var person:Person = event.result as Person;
@@ -523,6 +545,10 @@
 			<mx:Label id="L_age" text="Age: N/A" textAlign="right"/>
          </mx:HBox>
 		</mx:FormItem>
+
+      <mx:FormItem label="Rfid" visible="{StaticVars.isLogged}" enabled="{rfidEditable}">
+         <mx:TextInput id="TI_rfid" width="150" enabled="{rfidEditable}" change="removeDisplayList();validateForm(event);" enter="removeDisplayList();setRfid();" focusOut="removeDisplayList();setRfid();checkIfRfidExist()"/>
+      </mx:FormItem>
 
 		<mx:FormItem label="Club" direction="horizontal" >
 			<mx:TextInput id="TI_personClub" width="150" change="removeDisplayList();validateForm(event);"/>

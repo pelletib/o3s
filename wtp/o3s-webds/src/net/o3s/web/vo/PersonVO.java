@@ -40,6 +40,7 @@ public class PersonVO {
 	private String computedCategory;
 
 	private boolean registered;
+	private String rfid;
 
 	public PersonVO() {
 		super();
@@ -66,7 +67,8 @@ public class PersonVO {
         		this.getSex() + ", " +
         		this.getComputedCategory() + ", " +
         		this.isRegistered() + ", " +
-        		"]";
+        		this.getRfid() + ", " +
+      		"]";
 	}
 
 	public String getLastname() {
@@ -141,4 +143,11 @@ public class PersonVO {
 		this.registered = registered;
 	}
 
+	public String getRfid() {
+		return rfid;
+	}
+
+	public void setRfid(String rfid) {
+		this.rfid = rfid;
+	}
 }

@@ -114,6 +114,8 @@
 
         private function setRfidValue(event:Event):void {
           rfidInput = TI_rfidValue.text;
+          rfidInput = Util.normalizeRfid(rfidInput);
+
           }
 
 		  private function arrColl_collectionChange(evt:CollectionEvent):void {

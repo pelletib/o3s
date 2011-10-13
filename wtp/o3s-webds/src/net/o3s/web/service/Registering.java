@@ -108,7 +108,7 @@ public class Registering {
 		setRegisteringEJB();
 		List<IEntityPerson> persons = registering.findAllPersons();
 		logger.fine("persons=" + persons);
-		return Util.createPersonListVO(persons, this);
+		return Util.createPersonListVO(persons, "", this);
 	}
 
 	// get arrivals order by duration
@@ -276,7 +276,7 @@ public class Registering {
 			}
 		}
 
-		PersonVO pVO = Util.createPersonVO(person, this);
+		PersonVO pVO = Util.createPersonVO(person, personVO.getRfid(), this);
 
 		logger.fine("person=" + pVO);
 		return pVO;
@@ -295,7 +295,7 @@ public class Registering {
 			throw new FlexException(e.getMessage());
 		}
 
-		PersonVO pVO = Util.createPersonVO(person, this);
+		PersonVO pVO = Util.createPersonVO(person, personVO.getRfid(), this);
 
 		// get the related category
 		try {
@@ -306,6 +306,7 @@ public class Registering {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			throw new FlexException(e.getMessage());
 		}
+
 
 		logger.fine("person=" + pVO);
 		return pVO;
@@ -347,10 +348,18 @@ public class Registering {
 
 		person = registering.findPersonFromLastnameFirstNameBirthDay(lastname, firstname, birthday);
 
+		// get rfid if person exist
+		String rfid="";
+		if (person != null) {
+			IEntityRegistered registered = registering.findRegisteredFromPersonForDefaultEvent(person.getId());
+			if (registered != null) {
+				rfid=registered.getLabel().getRfid();
+			}
+		}
 		PersonVO pVO = null;
 
 		if (person != null) {
-			pVO = Util.createPersonVO(person, this);
+			pVO = Util.createPersonVO(person, rfid, this);
 		}
 		logger.fine("person=" + pVO);
 		return pVO;
@@ -371,7 +380,14 @@ public class Registering {
 			// retrieve the first one
 			IEntityPerson person = persons.get(0);
 			if (person != null) {
-				pVO = Util.createPersonVO(person, this);
+
+				IEntityRegistered registered = registering.findRegisteredFromPersonForDefaultEvent(person.getId());
+				String rfid="";
+				if (registered != null) {
+					rfid=registered.getLabel().getRfid();
+				}
+
+				pVO = Util.createPersonVO(person, rfid, this);
 			}
 		}
 
@@ -443,6 +459,39 @@ public class Registering {
 				e.printStackTrace();
 				logger.log(Level.SEVERE, e.getMessage(), e);
 				throw new FlexException(e.getMessage());
+		}
+
+		// set rfid if needed
+		for (IEntityRegistered r:registereds) {
+			// get the related Person
+			boolean found = false;
+			String rfid="";
+			for (IEntityPerson p:r.getPersons()) {
+
+				for (PersonVO pVO:personsVO) {
+					if (pVO.getId() == p.getId()) {
+						found = true;
+						rfid=pVO.getRfid();
+						break;
+					}
+				}
+				if (found) {
+					// set rfid
+					if (rfid != null && !rfid.equals("")) {
+						try {
+							registering.setRfidToLabel(r.getLabel().getValue(), rfid);
+						} catch (RegisteringException e) {
+							e.printStackTrace();
+							logger.log(Level.SEVERE, e.getMessage(), e);
+							throw new FlexException(e.getMessage());
+						}
+						r.getLabel().setRfid(rfid);
+						if (r.isTeamed()) {
+							break; // only one rfid in this case
+						}
+					}
+				}
+			}
 		}
 
 		logger.fine("registereds=" + registereds);
@@ -530,6 +579,8 @@ public class Registering {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			throw new FlexException(e.getMessage());
 		}
+
+		// no update of rfid here (use rfid mngt tab)
 
 		RegisteredVO rVO = Util.createRegisteredVO(registered, this);
 

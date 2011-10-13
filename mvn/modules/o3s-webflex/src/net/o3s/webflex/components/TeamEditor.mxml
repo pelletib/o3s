@@ -61,7 +61,6 @@
 		[Bindable]
 		public var teamName:String = "";
 
-
 		// Holds a reference to the currently focussed
 		// control on the form.
 		private var focussedFormControl:DisplayObject;
@@ -169,8 +168,6 @@
 			TI_teamName.text=tn ;
 
 		}
-
-
 
 
 	]]>

@@ -46,6 +46,8 @@ package net.o3s.webflex.bean
 
 		private var _computedCategory:String;
 
+		private var _rfid:String;
+
 		private var _registered:Boolean;
 
 
@@ -152,6 +154,15 @@ package net.o3s.webflex.bean
 		public function set registered(value:Boolean):void
 		{
 			_registered = value;
+		}
+		public function get rfid():String
+		{
+			return _rfid;
+		}
+
+		public function set rfid(value:String):void
+		{
+			_rfid = value;
 		}
 
 	}

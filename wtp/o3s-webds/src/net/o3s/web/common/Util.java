@@ -146,7 +146,7 @@ public class Util {
 		return labelVO;
 	}
 
-	public static PersonVO createPersonVO(IEntityPerson person, Registering service) {
+	public static PersonVO createPersonVO(IEntityPerson person, String rfid, Registering service) {
 		PersonVO personVO = new PersonVO();
 		if (person != null) {
 			personVO.setId(person.getId());
@@ -176,26 +176,29 @@ public class Util {
 				e.printStackTrace();
 				throw new FlexException(e.getMessage());
 			}
+
+			// set rfid
+			personVO.setRfid(rfid);
 		}
 		return personVO;
 	}
 
 
 
-	public static List<PersonVO> createPersonListVO(Set<IEntityPerson> persons, Registering service) {
+	public static List<PersonVO> createPersonListVO(Set<IEntityPerson> persons, String rfid, Registering service) {
 		List<PersonVO> personsVO = new ArrayList<PersonVO>();
 
 		for(IEntityPerson person:persons) {
-			personsVO.add(createPersonVO(person, service));
+			personsVO.add(createPersonVO(person, rfid, service));
 		}
 		return personsVO;
 	}
 
-	public static List<PersonVO> createPersonListVO(List<IEntityPerson> persons, Registering service) {
+	public static List<PersonVO> createPersonListVO(List<IEntityPerson> persons, String rfid, Registering service) {
 		List<PersonVO> personsVO = new ArrayList<PersonVO>();
 
 		for(IEntityPerson person:persons) {
-			personsVO.add(createPersonVO(person, service));
+			personsVO.add(createPersonVO(person, rfid, service));
 		}
 		logger.fine("personsVO=" + personsVO);
 
@@ -218,7 +221,7 @@ public class Util {
 			registeredVO.setEvent(createEventVO(registered.getEvent()));
 			registeredVO.setLabel(createLabelVO(registered.getLabel()));
 			registeredVO.setPaid(registered.isPaid());
-			registeredVO.setPersons(createPersonListVO(registered.getPersons(), service));
+			registeredVO.setPersons(createPersonListVO(registered.getPersons(), registered.getLabel().getRfid(), service));
 			registeredVO.setRegisteringDate(registered.getRegisteringDate());
 			registeredVO.setTeamed(registered.isTeamed());
 			registeredVO.setRank(-1);
