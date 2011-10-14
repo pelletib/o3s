@@ -441,6 +441,19 @@ public class Registering {
 			return null;
 		}
 
+		// check if rfid are valid
+		for (PersonVO pVO:personsVO) {
+			if (pVO.getRfid() != null && !pVO.getRfid().equals("")) {
+				try {
+					registering.checkRfid(pVO.getRfid());
+				} catch (RegisteringException e) {
+					e.printStackTrace();
+					logger.log(Level.SEVERE, e.getMessage(), e);
+					throw new FlexException(e.getMessage());
+				}
+			}
+		}
+
 		List<IEntityRegistered> registereds = null;
 		try {
 			registereds = registering.createRegistered(

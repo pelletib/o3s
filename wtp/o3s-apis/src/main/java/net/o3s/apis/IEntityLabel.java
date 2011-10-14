@@ -26,6 +26,7 @@ package net.o3s.apis;
 public interface IEntityLabel {
 
 	public static int LABEL_VALUE_SIZE = 8;
+	public static int RFID_SIZE = 10;
 
 	int getId();
 	//void setId(int id);

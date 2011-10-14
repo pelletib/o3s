@@ -47,6 +47,7 @@ public interface IEJBRegisteringLocal {
 	IEntityRegistered findRegisteredFromLabelNumber(final int labelNumber) throws InvalidException;
 	IEntityRegistered findRegisteredFromRfid(final String rfid) throws InvalidException;
 	IEntityRegistered findRegisteredFromLabelData(final String labelData) throws InvalidException;
+	void checkRfid(String rfidOrg) throws RegisteringException;
 	void setRfidToLabel(String labelData, String rfid) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByDuration(final int competitionId) throws RegisteringException;
 	List<IEntityRegistered> findRegisteredFromCompetitionOrderByCategoryAndDuration(final int competitionId) throws RegisteringException;

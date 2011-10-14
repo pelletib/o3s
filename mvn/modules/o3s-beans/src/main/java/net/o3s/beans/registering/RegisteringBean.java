@@ -296,6 +296,20 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
     	return label;
     }
 
+    public void checkRfid(String rfidOrg) throws RegisteringException {
+    	String rfid = rfidOrg;
+
+    	if (!rfid.equals("EMPTY") && !isValidRfid(rfid)) {
+    		//try to convert from us keyboard input to fr
+    		logger.fine("Avant convert, rfid=" + rfid);
+    		rfid=convertStringDigitFromUs2Fr(rfid);
+    		logger.fine("Apres convert, rfid=" + rfid);
+    		if (!isValidRfid(rfid)) {
+    			throw new RegisteringException("Numero RFID invalide - avant conversion <" + rfidOrg + "> - apres conversion <" + rfid + ">");
+    		}
+    	}
+    }
+
     public void setRfidToLabel(String labelData, String rfidOrg) throws RegisteringException {
     	// check if label already exists
     	if (labelData.length() > IEntityLabel.LABEL_VALUE_SIZE) {
@@ -773,7 +787,7 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
 			return false;
 		}
 
-		if (s.length() <= IEntityLabel.LABEL_VALUE_SIZE) {
+		if (s.length() != IEntityLabel.RFID_SIZE) {
 			return false;
 		}
 
