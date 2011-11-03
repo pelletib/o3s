@@ -546,10 +546,6 @@
          </mx:HBox>
 		</mx:FormItem>
 
-      <mx:FormItem label="Rfid" visible="{StaticVars.isLogged}" enabled="{rfidEditable}">
-         <mx:TextInput id="TI_rfid" width="150" enabled="{rfidEditable}" change="removeDisplayList();validateForm(event);" enter="removeDisplayList();setRfid();" focusOut="removeDisplayList();setRfid();checkIfRfidExist()"/>
-      </mx:FormItem>
-
 		<mx:FormItem label="Club" direction="horizontal" >
 			<mx:TextInput id="TI_personClub" width="150" change="removeDisplayList();validateForm(event);"/>
 		</mx:FormItem>
@@ -559,6 +555,10 @@
 		<mx:FormItem label="Email" direction="horizontal" >
 			<mx:TextInput id="TI_personEmail" width="150" restrict="A-Za-z0-9\-_@." change="removeDisplayList();validateForm(event);"/>
 		</mx:FormItem>
+      <mx:FormItem label="Rfid" visible="{StaticVars.isLogged}" enabled="{rfidEditable}">
+         <mx:TextInput id="TI_rfid" width="150" enabled="{rfidEditable}" change="removeDisplayList();validateForm(event);" enter="removeDisplayList();setRfid();" focusOut="removeDisplayList();setRfid();checkIfRfidExist()"/>
+      </mx:FormItem>
+
       <mx:Label id="L_mandatoryFields" textAlign="right" text="(*) champs obligatoires."/>
       <mx:Label id="L_msg" color="blue" textAlign="right"/>
       <mx:Label id="L_rules" color="blue" textAlign="right" text="Voir conditions de participation sur le site http://www.soudecrossey.fr (reglement)."/>
