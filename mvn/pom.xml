@@ -33,12 +33,6 @@
 
   </properties>
 
-  <scm>
-    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/jasmine/kerneos/trunk</connection>
-    <developerConnection>scm:svn:svn+ssh://${maven.username}@svn.forge.objectweb.org/svnroot/jasmine/kerneos/trunk</developerConnection>
-    <url>http://fisheye.jasmine.objectweb.org/browse/JASMINe/kerneos/trunk</url>
-  </scm>
-
   <repositories>
 
     <repository>
@@ -244,6 +238,12 @@
           <artifactId>maven-resources-plugin</artifactId>
           <version>2.5</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-scm-plugin</artifactId>
+          <version>1.4</version>
+        </plugin>
+
       </plugins>
     </pluginManagement>
 
@@ -262,5 +262,11 @@
       </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <connection>scm:svn:https://o3s.googlecode.com/svn/trunk/mvn</connection>
+    <developerConnection>scm:svn:https://o3s.googlecode.com/svn/trunk/mvn</developerConnection>
+    <url>http://code.google.com/p/o3s/source/browse/</url>
+  </scm>
 
 </project>
