@@ -1,4 +1,0 @@
-export JONAS_ROOT=~/JOnAS_5.1.0
-export JONAS_BASE=~/wks_fdc/jb
-export PATH=$JONAS_ROOT/bin:$PATH
-
