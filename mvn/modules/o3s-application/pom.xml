@@ -2,12 +2,12 @@
   <parent>
     <artifactId>o3s-modules</artifactId>
     <groupId>net.o3s</groupId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>o3s-application</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>ear</packaging>
   <name>o3s :: o3s-application</name>
   <description />
