@@ -6,11 +6,11 @@
   <parent>
     <artifactId>o3s-modules</artifactId>
     <groupId>net.o3s</groupId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
 
   <artifactId>o3s-webflex</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>o3s :: o3s-webflex</name>
 
   <packaging>swf</packaging>

@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.o3s</groupId>
   <artifactId>o3s</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
 
   <name>o3s</name>
   <packaging>pom</packaging>
@@ -342,9 +342,9 @@
 
 
   <scm>
-    <connection>scm:svn:https://o3s.googlecode.com/svn/tags/o3s-1.0.0</connection>
-    <developerConnection>scm:svn:https://o3s.googlecode.com/svn/tags/o3s-1.0.0</developerConnection>
-    <url>http://code.google.com/p/o3s/source/browse/tags/o3s-1.0.0</url>
+    <connection>scm:svn:https://o3s.googlecode.com/svn/tags/o3s-1.0.1</connection>
+    <developerConnection>scm:svn:https://o3s.googlecode.com/svn/tags/o3s-1.0.1</developerConnection>
+    <url>http://code.google.com/p/o3s/source/browse/tags/o3s-1.0.1</url>
   </scm>
 
 </project>
