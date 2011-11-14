@@ -102,7 +102,7 @@
             <configuration>
               <tasks>
                 <echo>${project.build.directory}/${project.build.finalName}-${app-suffix-name}.ear</echo>
-                <move file="${project.build.directory}/${project.build.finalName}.ear" tofile="${project.build.directory}/${project.build.finalName}-${app-suffix-name}.ear" />
+                <copy file="${project.build.directory}/${project.build.finalName}.ear" tofile="${project.build.directory}/${project.build.finalName}-${app-suffix-name}.ear" />
               </tasks>
             </configuration>
           </execution>
