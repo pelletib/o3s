@@ -118,6 +118,23 @@
   <profiles>
     <profile>
       <id>install</id>
+      <distributionManagement>
+
+        <repository>
+            <id>maven-o3s-repo</id>
+            <name>Maven Repo for O3S (releases)</name>
+            <url>svn:https://o3s.googlecode.com/svn/maven-repo/releases</url>
+            <uniqueVersion>false</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+            <id>maven-o3s-snapshot</id>
+            <name>Maven Repo O3S (snapshots)</name>
+            <url>svn:https://o3s.googlecode.com/svn/maven-repo/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+
+      </distributionManagement>
+
       <properties>
 
      	<jta-data-source>jdbc_hsql</jta-data-source>
@@ -149,6 +166,22 @@
 
     <profile>
       <id>server</id>
+      <distributionManagement>
+
+        <repository>
+            <id>maven-o3s-repo</id>
+            <name>Maven Repo for O3S (releases)</name>
+            <url>svn:https://o3s.googlecode.com/svn/maven-repo/releases</url>
+            <uniqueVersion>false</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+            <id>maven-o3s-snapshot</id>
+            <name>Maven Repo O3S (snapshots)</name>
+            <url>svn:https://o3s.googlecode.com/svn/maven-repo/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+
+      </distributionManagement>
       <properties>
      	<jta-data-source>jdbc_pg</jta-data-source>
 
@@ -177,6 +210,23 @@
 
     <profile>
       <id>serverInit</id>
+      <distributionManagement>
+
+        <repository>
+            <id>maven-o3s-repo</id>
+            <name>Maven Repo for O3S (releases)</name>
+            <url>svn:https://o3s.googlecode.com/svn/maven-repo/releases</url>
+            <uniqueVersion>false</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+            <id>maven-o3s-snapshot</id>
+            <name>Maven Repo O3S (snapshots)</name>
+            <url>svn:https://o3s.googlecode.com/svn/maven-repo/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+
+      </distributionManagement>
+
       <properties>
      	<jta-data-source>jdbc_pg</jta-data-source>
 
@@ -204,6 +254,23 @@
 
     <profile>
       <id>arrival</id>
+      <distributionManagement>
+
+        <repository>
+            <id>maven-o3s-repo</id>
+            <name>Maven Repo for O3S (releases)</name>
+            <url>svn:https://o3s.googlecode.com/svn/maven-repo/releases</url>
+            <uniqueVersion>false</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+            <id>maven-o3s-snapshot</id>
+            <name>Maven Repo O3S (snapshots)</name>
+            <url>svn:https://o3s.googlecode.com/svn/maven-repo/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+
+      </distributionManagement>
+
       <properties>
      	<jta-data-source>jdbc_hsql</jta-data-source>
 
@@ -272,22 +339,6 @@
 
 
   </build>
-
-  <distributionManagement>
-    <repository>
-        <id>maven-o3s-repo</id>
-        <name>Maven Repo for O3S (releases)</name>
-        <url>svn:https://o3s.googlecode.com/svn/maven-repo/releases</url>
-        <uniqueVersion>false</uniqueVersion>
-    </repository>
-    <snapshotRepository>
-        <id>maven-o3s-snapshot</id>
-        <name>Maven Repo O3S (snapshots)</name>
-        <url>svn:https://o3s.googlecode.com/svn/maven-repo/snapshots</url>
-        <uniqueVersion>false</uniqueVersion>
-    </snapshotRepository>
-  </distributionManagement>
-
 
 
   <scm>
