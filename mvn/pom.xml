@@ -342,9 +342,9 @@
 
 
   <scm>
-    <connection>scm:svn:https://o3s.googlecode.com/svn/trunk</connection>
-    <developerConnection>scm:svn:https://o3s.googlecode.com/svn/trunk</developerConnection>
-    <url>http://code.google.com/p/o3s/source/browse/trunk</url>
+    <connection>scm:svn:https://o3s.googlecode.com/svn/trunk/mvn</connection>
+    <developerConnection>scm:svn:https://o3s.googlecode.com/svn/trunk/mvn</developerConnection>
+    <url>http://code.google.com/p/o3s/source/browse/trunk/mvn</url>
   </scm>
 
 </project>
