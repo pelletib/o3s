@@ -5,6 +5,7 @@
   <parent>
     <groupId>net.o3s</groupId>
     <artifactId>o3s</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
 
   <groupId>net.o3s</groupId>
