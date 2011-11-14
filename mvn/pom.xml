@@ -123,13 +123,16 @@
         <repository>
             <id>maven-o3s-repo</id>
             <name>Maven Repo for O3S (releases)</name>
-            <url>svn:https://o3s.googlecode.com/svn/maven-repo/releases</url>
+
+            <url>file:///home/pelletib/wks_fdc/maven-repo/releases</url>
+             <!--svn:https://o3s.googlecode.com/svn/maven-repo/releases-->
             <uniqueVersion>false</uniqueVersion>
         </repository>
         <snapshotRepository>
             <id>maven-o3s-snapshot</id>
             <name>Maven Repo O3S (snapshots)</name>
-            <url>svn:https://o3s.googlecode.com/svn/maven-repo/snapshots</url>
+            <url>file:///home/pelletib/wks_fdc/maven-repo/snapshots</url>
+             <!--svn:https://o3s.googlecode.com/svn/maven-repo/snapshots-->
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
 
@@ -171,13 +174,13 @@
         <repository>
             <id>maven-o3s-repo</id>
             <name>Maven Repo for O3S (releases)</name>
-            <url>svn:https://o3s.googlecode.com/svn/maven-repo/releases</url>
+            <url>file:///home/pelletib/wks_fdc/maven-repo/releases</url>
             <uniqueVersion>false</uniqueVersion>
         </repository>
         <snapshotRepository>
             <id>maven-o3s-snapshot</id>
             <name>Maven Repo O3S (snapshots)</name>
-            <url>svn:https://o3s.googlecode.com/svn/maven-repo/snapshots</url>
+            <url>file:///home/pelletib/wks_fdc/maven-repo/snapshots</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
 
@@ -215,13 +218,13 @@
         <repository>
             <id>maven-o3s-repo</id>
             <name>Maven Repo for O3S (releases)</name>
-            <url>svn:https://o3s.googlecode.com/svn/maven-repo/releases</url>
+            <url>file:///home/pelletib/wks_fdc/maven-repo/releases</url>
             <uniqueVersion>false</uniqueVersion>
         </repository>
         <snapshotRepository>
             <id>maven-o3s-snapshot</id>
             <name>Maven Repo O3S (snapshots)</name>
-            <url>svn:https://o3s.googlecode.com/svn/maven-repo/snapshots</url>
+            <url>file:///home/pelletib/wks_fdc/maven-repo/snapshots</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
 
@@ -259,13 +262,13 @@
         <repository>
             <id>maven-o3s-repo</id>
             <name>Maven Repo for O3S (releases)</name>
-            <url>svn:https://o3s.googlecode.com/svn/maven-repo/releases</url>
+            <url>file:///home/pelletib/wks_fdc/maven-repo/releases</url>
             <uniqueVersion>false</uniqueVersion>
         </repository>
         <snapshotRepository>
             <id>maven-o3s-snapshot</id>
             <name>Maven Repo O3S (snapshots)</name>
-            <url>svn:https://o3s.googlecode.com/svn/maven-repo/snapshots</url>
+            <url>file:///home/pelletib/wks_fdc/maven-repo/snapshots</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
 
