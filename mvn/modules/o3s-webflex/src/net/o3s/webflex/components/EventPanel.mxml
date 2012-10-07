@@ -50,7 +50,12 @@
          private function resultGetDefaultEvent(event:ResultEvent):void {
             this.event = event.result as MyEvent;
             eventLabel.text = this.event.name;
-            eventImage.load(this.event.imageFile);
+            if (this.event.imageFile != null) {
+               eventImage.load(this.event.imageFile);
+               eventImage.visible=false;
+            } else {
+               eventImage.visible=false;
+            }
             eventDate.text = "le " + formatDateDDMMYYY.format(this.event.date);
 
 
