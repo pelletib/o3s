@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
 import javax.ejb.EJB;
 import javax.ejb.Local;
@@ -210,7 +211,9 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
      * @return
      */
     private String padLeft(String s, int n) {
-        return String.format("%1$#" + n + "s", s);
+//        return String.format("%1$-" + n + "s", s);
+         return StringUtils.leftPad(s, n, " ");
+
     }
 
     /**
@@ -999,6 +1002,30 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	throw new RegisteringException("Unable to find competitionId [" + competitionId + "]", e);
         }
         return registereds;
+    }
+    
+    /**
+     * Get ranking of a registered
+     */
+    @SuppressWarnings("unchecked")
+    public int getRanking(final int registeredId) throws RegisteringException {
+    	
+  	
+		IEntityRegistered registered = findRegisteredFromId(registeredId);
+		if (registered == null) {
+        	throw new RegisteringException("Unable to find registered [" + registeredId + "]");
+		}
+
+    	List<IEntityRegistered>  registereds = findRegisteredFromCompetitionOrderByDuration(registered.getCompetition().getId());
+    	int rank=0;
+    	for(IEntityRegistered r:registereds) {
+    		rank++;
+    		if (r.getId() == registered.getId()) {
+    			return rank;
+    		}
+    		
+    	}
+        return -1;
     }
 
     /**

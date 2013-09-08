@@ -83,6 +83,15 @@ public class NotificationMessageProcessingBean implements MessageListener {
 						throw new NotificationMessageException ("Unable to retrieve a registered related to the event:" + notificationMessage);
 					}
 
+					int rank = 0;
+					try {
+						rank = registering.getRanking(registered.getId());
+					} catch (Exception e) {
+						e.printStackTrace();
+						logger.fine("Unable to process the ranking: " + e.getMessage());
+					}
+
+
 		            logger.info("Notification - arrival: <" +
 		            		registered.getLabel().getValue() + "," +
 		            		registered.getLabel().getRfid() + "," +
@@ -90,7 +99,8 @@ public class NotificationMessageProcessingBean implements MessageListener {
 		            		registered.getCompetition().getName() + "," +
 		            		registered.getCategory().getName() + "," +
 		            		df.format(registered.getArrivalDate()) + "," +
-		            		registered.getElapsedTime());
+		            		registered.getElapsedTime() + "," +
+                                        rank);
 				}
 
 				if (notificationMessage.getType() == NotificationMessage.NOTIFICATION_INT_TYPE_DEPARTURE) {

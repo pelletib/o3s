@@ -93,4 +93,6 @@ public interface IEJBRegisteringLocal {
 	void resetAll() throws RegisteringException;
 
     boolean isValidRfid(String s);
+    
+    int getRanking(final int registeredId) throws RegisteringException;
 }

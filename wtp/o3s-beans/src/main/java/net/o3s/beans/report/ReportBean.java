@@ -1144,7 +1144,7 @@ public class ReportBean implements IEJBReportLocal,IEJBReportRemote {
 
 		if (!registered.isTeamed()) {
 			for (IEntityPerson person:registered.getPersons()) {
-				parameters.put("sex",(person.getSex()=='M'?"M":"F"));
+				parameters.put("sex",(person.getSex()=='M'?"Masculin":"Feminin"));
 				parameters.put("birthday",dfyyyyMMdd.format(person.getBirthday()));
 				parameters.put("license",person.getLicense());
 				parameters.put("club",person.getClub());

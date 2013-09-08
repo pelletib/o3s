@@ -9,7 +9,7 @@
  * version 2.1 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty ofmvn/modules/o3s-webds/src/main/java/net/o3s/web/service/
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
@@ -232,6 +232,17 @@ public class Notification implements javax.jms.MessageListener {
         	}
         }
 
+	int rank = 0;
+	try {
+		rank = registering.getRanking(registered.getId());
+	} catch (Exception e) {
+		e.printStackTrace();
+		logger.fine("Unable to process the ranking: " + e.getMessage());
+	}
+	if (rank > 0) {
+	        message += " - Classement : " + rank;
+	}
+		
     	//Date dateElapsedTime = new Date(registered.getElapsedTime());
     	//DateFormat df = new SimpleDateFormat("HH:mm:ss:S");
     	//message +=  df.format(dateElapsedTime);

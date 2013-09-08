@@ -26,27 +26,27 @@ package net.o3s.apis;
 public class TestData {
 
     // Events
-    public static final String EVENT_NAME_0 = "Foulees de Crossey 2010";
-    public static final String EVENT_DATE_0 = "17/10/2010";
+    public static final String EVENT_NAME_0 = "Foulees de Crossey 2013";
+    public static final String EVENT_DATE_0 = "13/10/2013";
     public static final String EVENT_IMAGE_0 = "logo_cross_crossey.png";
 
     // Competitions
     public static final String NOCOMPETITION_NAME = "Unknown";
 
-    public static final String COMPETITION_NAME_0_1 = "course 0.5 km [2005]";
-    public static final String COMPETITION_NAME_0_2 = "course 0.5 km [2006]";
-    public static final String COMPETITION_NAME_0_3 = "course 0.5 km [2007]";
-    public static final String COMPETITION_NAME_1_1 = "course 1 km [2001]";
-    public static final String COMPETITION_NAME_1_2 = "course 1 km [2002]";
-    public static final String COMPETITION_NAME_1_3 = "course 1 km [2003]";
+    public static final String COMPETITION_NAME_0_1 = "course 0.5 km [2010]";
+    public static final String COMPETITION_NAME_0_2 = "course 0.5 km [2009]";
+    public static final String COMPETITION_NAME_0_3 = "course 0.5 km [2008]";
+    public static final String COMPETITION_NAME_1_1 = "course 1 km [2007]";
+    public static final String COMPETITION_NAME_1_2 = "course 1 km [2006]";
+    public static final String COMPETITION_NAME_1_3 = "course 1 km [2005]";
     public static final String COMPETITION_NAME_1_4 = "course 1 km [2004]";
-    public static final String COMPETITION_NAME_2_1 = "course 1.2 km [1999]";
-    public static final String COMPETITION_NAME_2_2 = "course 1.2 km [2000]";
+    public static final String COMPETITION_NAME_2_1 = "course 1.5 km [2003]";
+    public static final String COMPETITION_NAME_2_2 = "course 1.5 km [2002]";
     public static final String COMPETITION_NAME_3 = "course 2.5 km";
     public static final String COMPETITION_NAME_4 = "course 3.5 km";
-    public static final String COMPETITION_NAME_5 = "course 7.5 km";
-    public static final String COMPETITION_NAME_6 = "course 12 km";
-    public static final String COMPETITION_NAME_7 = "course 21 km";
+    public static final String COMPETITION_NAME_5 = "course 8 km";
+    public static final String COMPETITION_NAME_6 = "course 14 km";
+    public static final String COMPETITION_NAME_7 = "course 28 km";
     public static final String COMPETITION_NAME_8 = "parcours decouverte (3.5 km)";
 
     public static final int NOCOMPETITION_LOWER_LABEL_NB = 0000;
