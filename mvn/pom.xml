@@ -70,11 +70,23 @@
       </snapshots>
     </repository>
 -->
+         <repository>
+           <id>ow2-public</id>
+           <url>http://repository.ow2.org/nexus/content/repositories/public</url>
+           <releases>
+             <enabled>true</enabled>
+           </releases>
+           <snapshots>
+             <enabled>false</enabled>
+           </snapshots>
+         </repository>
 
+<!--
     <repository>
       <id>flex-iframe</id>
       <url>http://flex-iframe.googlecode.com/svn/maven2</url>
     </repository>
+-->
 
     <repository>
       <id>java-net</id>

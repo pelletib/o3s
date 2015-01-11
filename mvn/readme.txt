@@ -11,3 +11,5 @@
 	mvn install:install-file -DgroupId=com.adobe.flex -DartifactId=license -Dversion=4.0.0.101933 -Dpackaging=jar -Dfile=${flexSDK_path}/lib/license.jar
 	
    
+ou encore plus simple
+cp license-4.0.0.10193.jar ~/.m2/repository/com/adobe/flex/license/4.0.0.10193
