@@ -1347,10 +1347,28 @@ public class RegisteringBean implements IEJBRegisteringLocal,IEJBRegisteringRemo
         	IEntityCategory category = null;
 
         	if (isTeamed) {
-             	registered.setPersons(new HashSet(persons));
-            	category = admin.findNoCategory();
-            	registered.setCategory(category);
-            	registered.setClub("N/A");
+			// check category of each person is compatible with the competition
+	              	for (IEntityPerson personOfTeam : persons) {
+
+        			List<IEntityPerson> onlyOnePerson = new ArrayList<IEntityPerson>();
+        			onlyOnePerson.add(personOfTeam);
+		            	List<IEntityCategory> categories = admin.findCategoryFromDatesAndSex(onlyOnePerson.get(0).getBirthday(), onlyOnePerson.get(0).getSex());
+		            	if (categories == null || categories.isEmpty()){
+		            		throw new RegisteringException("Categorie non trouvee pour le couple (date naissance/sexe):" + persons.get(0).getBirthday() + "," + persons.get(0).getSex());
+        		    	}
+		            	// get the first one (almost equiv to random)
+		            	category = categories.get(0);
+
+		            	// check the competition regarding the category (exception is thrown if not)
+		            	checkCompetitionCategory(competition, category);
+        	        }
+
+			// category is ok, registered can be completed
+        	     	registered.setPersons(new HashSet(persons));
+
+        	    	category = admin.findNoCategory();
+        	    	registered.setCategory(category);
+        	    	registered.setClub("N/A");
 
          	} else {
         		List<IEntityPerson> onlyOnePerson = new ArrayList<IEntityPerson>();
